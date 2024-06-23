@@ -14,6 +14,15 @@ document.getElementById('stopCapture').addEventListener('click', () => {
     updateStatus(false); // Update status when capture stops
 });
 
+// Send IPC event to setup
+document.getElementById('setup').addEventListener('click', async () => {
+    try {
+        ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
+    } catch (error) {
+        console.error('Error sending setup request:', error);
+    }
+});
+
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
