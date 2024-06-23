@@ -11,3 +11,9 @@ document.getElementById('startCapture').addEventListener('click', () => {
 document.getElementById('stopCapture').addEventListener('click', () => {
     ipcRenderer.send('stop-capture');
 });
+
+// Listen for updates from the main process
+ipcRenderer.on('update-count', (event, data) => {
+    const countsDiv = document.getElementById('counts');
+    countsDiv.innerHTML = `<p>Total encounters: ${data.wildCount}</p><pre>${JSON.stringify(data.pokemonCounts, null, 2)}</pre>`;
+});
