@@ -5,24 +5,31 @@ const { ipcRenderer } = require('electron');
 // Send IPC event to start capture
 document.getElementById('startCapture').addEventListener('click', () => {
     ipcRenderer.send('start-capture');
+    updateStatus(true); // Update status when capture starts
 });
 
 // Send IPC event to stop capture
 document.getElementById('stopCapture').addEventListener('click', () => {
     ipcRenderer.send('stop-capture');
+    updateStatus(false); // Update status when capture stops
 });
 
-// Listen for updates from the main process
-ipcRenderer.on('update-count', (event, data) => {
-    const countsDiv = document.getElementById('counts');
-    countsDiv.innerHTML = `<p>Total encounters: ${data.wildCount}</p>`;
+// Function to update the status text and color
+function updateStatus(isActive) {
+    const statusElement = document.getElementById('status');
+    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Stopped';
+    statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
+    statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
+}
 
-    const pokemonCounts = data.pokemonCounts;
-    let countsHtml = '<ul>';
-    for (const [pokemon, count] of Object.entries(pokemonCounts)) {
-        countsHtml += `<li>${pokemon}: ${count}</li>`;
-    }
-    countsHtml += '</ul>';
-    countsDiv.innerHTML += countsHtml;
+ipcRenderer.on('update-count', (event, data) => {
+    const pokemonList = document.getElementById('pokemonList');
+    pokemonList.innerHTML = ''; // Clear previous list items
+
+    Object.entries(data.pokemonCounts).forEach(([pokemon, count]) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${pokemon}: ${count}`;
+        pokemonList.appendChild(listItem);
+    });
 });
 
