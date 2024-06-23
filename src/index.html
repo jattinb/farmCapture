@@ -4,12 +4,15 @@
 <html>
 <head>
     <title>Electron App</title>
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Electron App</h1>
-    <button id="startCapture">Start Capture</button>
-    <button id="stopCapture">Stop Capture</button>
-    <div id="counts"></div>
+    <div class="container mt-5">
+        <h1 class="mb-4">Pokémon Encounter Tracker</h1>
+        <button id="startCapture" class="btn btn-success mr-2">Start Capture</button>
+        <button id="stopCapture" class="btn btn-danger">Stop Capture</button>
+        <div id="counts" class="card mt-4 p-3"></div>
+    </div>
     <!-- Include rendered.js for IPC event handling -->
     <script src="./renderer.js"></script>
 </body>
