@@ -97,7 +97,6 @@ async function setup() {
                 w: cropWidth,
                 h: cropHeight,
             },
-            imagePath: croppedImagePath, // Provide the path to the cropped image
         };
 
         return result;

@@ -4,17 +4,31 @@ const recognizeText = require("../helpers/recognizeText");
 const checkValidEncounter = require("../helpers/checkValidEncounter");
 
 class HuntSession extends EventEmitter {
-    constructor() {
+    constructor(huntingWindow) {
         super();
         this.wildCount = 0;
         this.lastWildFollowWord = null;
         this.isLastScreenEncounter = false;
         this.pokemonCounts = {};
+        // this.huntingWindow = {
+        //     x: 1000,    // Example x coordinate
+        //     y: 515,     // Example y coordinate
+        //     width: 700, // Example width
+        //     height: 115 // Example height
+        // };
+        this.huntingWindow = huntingWindow
+
     }
 
     async captureAndRecognize() {
         try {
-            const imageBuffer = await captureWindow();
+
+            this.huntingWindow.x -= 50
+            this.huntingWindow.y -= 50
+            this.huntingWindow.w += 50
+            this.huntingWindow.h += 50
+
+            const imageBuffer = await captureWindow(this.huntingWindow);
             const result = await recognizeText(imageBuffer);
 
             const { valid, curPoke } = checkValidEncounter(result);

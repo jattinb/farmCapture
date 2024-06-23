@@ -7,6 +7,7 @@ const setup = require('../farmTracker/helpers/setup')
 
 let huntSession;
 let mainWindow;
+let huntingWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -39,17 +40,18 @@ app.on('window-all-closed', () => {
   }
 });
 
-ipcMain.on('setup', () => {
+ipcMain.on('setup', async () => {
   let setUpComplete = { status: false, window: { x: 0, y: 0, w: 0, h: 0 } };
-  setUpComplete = setup();
+  setUpComplete = await setup();
   if (!setUpComplete.status) {
     console.log('No Wild Encounter Detected On-Screen')
   }
   console.log('Setup complete')
+  huntingWindow = setUpComplete.window
 })
 
 ipcMain.on('start-capture', () => {
-  huntSession = new HuntSession();
+  huntSession = new HuntSession(huntingWindow);
   huntSession.startCaptureInterval(3000);
 
   huntSession.on('newEncounter', (data) => {
