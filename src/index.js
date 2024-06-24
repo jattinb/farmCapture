@@ -49,7 +49,7 @@ ipcMain.on('setup', async () => {
   }
   console.log('Setup complete')
   huntingWindow = setUpComplete.window
-  huntingDisplayId = setUpComplete.screenIndex
+  huntingDisplayId = setUpComplete.displayId
 })
 
 ipcMain.on('start-capture', () => {

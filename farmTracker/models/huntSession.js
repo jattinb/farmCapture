@@ -18,15 +18,14 @@ class HuntSession extends EventEmitter {
         // };
         this.huntingWindow = huntingWindow
         this.huntingDisplayId = huntingDisplayId
+        this.huntingWindow.x -= 50
+        this.huntingWindow.y -= 50
+        this.huntingWindow.w += 50
+        this.huntingWindow.h += 50
     }
 
     async captureAndRecognize() {
         try {
-
-            this.huntingWindow.x -= 50
-            this.huntingWindow.y -= 50
-            this.huntingWindow.w += 50
-            this.huntingWindow.h += 50
 
             const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
             const result = await recognizeText(imageBuffer);
