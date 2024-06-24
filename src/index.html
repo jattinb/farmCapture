@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Electron App</title>
+    <title>Farm Capture App</title>
     <link href="styles.css" rel="stylesheet"> <!-- Link to your CSS file -->
 </head>
 <body>
@@ -16,7 +16,17 @@
         <div id="loading" class="loading" style="display: none;">Setting up...</div> <!-- Loading indicator -->
         <div id="counts" class="card mt-4 p-3">
             <h3 class="subtitle">Encounter Counts</h3>
-            <ul id="pokemonList" class="pokemon-list"></ul>
+            <table id="pokemonTable" class="pokemon-table">
+                <thead>
+                    <tr>
+                        <th>Pokémon Name</th>
+                        <th>Frequency</th>
+                    </tr>
+                </thead>
+                <tbody id="pokemonTableBody">
+                    <!-- Table rows will be populated here dynamically -->
+                </tbody>
+            </table>
         </div>
     </div>
     <!-- Include renderer.js for IPC event handling -->

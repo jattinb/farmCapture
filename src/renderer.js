@@ -43,12 +43,27 @@ ipcRenderer.on('setup-complete', (event, data) => {
 });
 
 ipcRenderer.on('update-count', (event, data) => {
-    const pokemonList = document.getElementById('pokemonList');
-    pokemonList.innerHTML = ''; // Clear previous list items
-
-    Object.entries(data.pokemonCounts).forEach(([pokemon, count]) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${pokemon}: ${count}`;
-        pokemonList.appendChild(listItem);
-    });
+    // Transform the data to the required format
+    const pokemonData = Object.entries(data.pokemonCounts).map(([name, freq]) => ({ name, freq }));
+    // Update the Pokémon table with the new data
+    updatePokemonTable(pokemonData);
 });
+
+// Function to update the Pokémon table
+function updatePokemonTable(pokemonData) {
+    const tableBody = document.getElementById('pokemonTableBody');
+    tableBody.innerHTML = ''; // Clear existing rows
+
+    pokemonData.forEach(pokemon => {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        const freqCell = document.createElement('td');
+
+        nameCell.textContent = pokemon.name;
+        freqCell.textContent = pokemon.freq;
+
+        row.appendChild(nameCell);
+        row.appendChild(freqCell);
+        tableBody.appendChild(row);
+    });
+}
