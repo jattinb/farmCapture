@@ -25,80 +25,25 @@ async function setup() {
             }
 
             // Parse OCR result to find "VS. Wild <pokemon_name>" line
-            const lines = data.text.split('\n');
-            let vsLineIndex = -1;
-            let pokemonName = '';
-
-            for (let j = 0; j < lines.length; j++) {
-                if (lines[j].includes('VS.')) {
-                    const words = lines[j].split(' ');
-                    const vsIndex = words.indexOf('VS.');
-                    if (vsIndex !== -1 && words[vsIndex + 1] === 'Wild') {
-                        vsLineIndex = j;
-                        pokemonName = words.slice(vsIndex + 2).join(' ');
-                        break;
-                    }
-                }
-            }
+            const { vsLineIndex, pokemonName } = findPokemonLine(data.text);
 
             if (vsLineIndex === -1 || pokemonName === '') {
                 continue; // Skip this screen if "VS. Wild <pokemon_name>" not found
             }
 
             // Get the coordinates of the "VS." word and the Pokémon name
-            const vsWord = 'VS.';
-            const pokemonWords = pokemonName.split(' ');
-
-            const wordData = data.words; // Assuming data.words contains OCR word data
-
-            let vsCoordinates = null;
-            let pokemonCoordinates = null;
-
-            // Find coordinates based on OCR word data
-            for (const word of wordData) {
-                if (word.text === vsWord && !vsCoordinates) {
-                    vsCoordinates = {
-                        x: word.bbox.x0,
-                        y: word.bbox.y0,
-                    };
-                }
-
-                if (pokemonWords.includes(word.text) && !pokemonCoordinates) {
-                    pokemonCoordinates = {
-                        x: word.bbox.x1,
-                        y: word.bbox.y1,
-                    };
-                }
-
-                if (vsCoordinates && pokemonCoordinates) {
-                    break;
-                }
-            }
+            const { vsCoordinates, pokemonCoordinates } = findCoordinates(data.words, 'VS.', pokemonName);
 
             if (!vsCoordinates || !pokemonCoordinates) {
                 continue; // Skip this screen if unable to find coordinates for "VS." or Pokémon name
             }
 
             // Calculate dimensions for cropping
-            const cropX = vsCoordinates.x;
-            const cropY = vsCoordinates.y;
-            const cropWidth = pokemonCoordinates.x - vsCoordinates.x;
-            const cropHeight = pokemonCoordinates.y - vsCoordinates.y;
-
-            // Load the screenshot into Jimp (if cropping is needed)
-            // const image = await Jimp.read(screen);
-            // const croppedImage = image.crop(cropX, cropY, cropWidth, cropHeight);
-            // const croppedImagePath = path.join(__dirname, 'cropped_image.png');
-            // await croppedImage.writeAsync(croppedImagePath);
+            const { cropX, cropY, cropWidth, cropHeight } = calculateCropDimensions(vsCoordinates, pokemonCoordinates);
 
             const result = {
                 status: true,
-                window: {
-                    x: cropX,
-                    y: cropY,
-                    w: cropWidth,
-                    h: cropHeight,
-                },
+                window: { x: cropX, y: cropY, w: cropWidth, h: cropHeight },
                 displayId: displayId
             };
 
@@ -111,6 +56,60 @@ async function setup() {
         console.error('Error during setup:', error);
         return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
     }
+}
+
+// Helper function to find "VS. Wild <pokemon_name>" line in OCR text
+function findPokemonLine(text) {
+    const lines = text.split('\n');
+    let vsLineIndex = -1;
+    let pokemonName = '';
+
+    for (let j = 0; j < lines.length; j++) {
+        if (lines[j].includes('VS.')) {
+            const words = lines[j].split(' ');
+            const vsIndex = words.indexOf('VS.');
+            if (vsIndex !== -1 && words[vsIndex + 1] === 'Wild') {
+                vsLineIndex = j;
+                pokemonName = words.slice(vsIndex + 2).join(' ');
+                break;
+            }
+        }
+    }
+
+    return { vsLineIndex, pokemonName };
+}
+
+// Helper function to find coordinates of "VS." and Pokémon name in OCR word data
+function findCoordinates(wordData, vsWord, pokemonName) {
+    const pokemonWords = pokemonName.split(' ');
+    let vsCoordinates = null;
+    let pokemonCoordinates = null;
+
+    for (const word of wordData) {
+        if (word.text === vsWord && !vsCoordinates) {
+            vsCoordinates = { x: word.bbox.x0, y: word.bbox.y0 };
+        }
+
+        if (pokemonWords.includes(word.text) && !pokemonCoordinates) {
+            pokemonCoordinates = { x: word.bbox.x1, y: word.bbox.y1 };
+        }
+
+        if (vsCoordinates && pokemonCoordinates) {
+            break;
+        }
+    }
+
+    return { vsCoordinates, pokemonCoordinates };
+}
+
+// Helper function to calculate dimensions for cropping
+function calculateCropDimensions(vsCoordinates, pokemonCoordinates) {
+    const cropX = vsCoordinates.x;
+    const cropY = vsCoordinates.y;
+    const cropWidth = pokemonCoordinates.x - vsCoordinates.x;
+    const cropHeight = pokemonCoordinates.y - vsCoordinates.y;
+
+    return { cropX, cropY, cropWidth, cropHeight };
 }
 
 module.exports = setup;
