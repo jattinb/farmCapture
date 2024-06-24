@@ -129,3 +129,35 @@ body {
     background-color: #ffc107; /* Yellow background for loading */
     transition: background-color 0.3s ease;
 }
+
+/* Styles for setup messages */
+.setup-message {
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    position: relative;
+}
+
+.setup-success {
+    background-color: #28a745; /* Green background for success */
+    color: #fff;
+}
+
+.setup-failed {
+    background-color: #dc3545; /* Red background for failed */
+    color: #fff;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+}

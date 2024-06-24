@@ -46,12 +46,15 @@ ipcMain.on('setup', async (event) => {
   let setUpComplete = { status: false, window: { x: 0, y: 0, w: 0, h: 0 } };
   setUpComplete = await setup();
   if (!setUpComplete.status) {
-    console.log('No Wild Encounter Detected On-Screen');
+    console.log('Setup Failed: No Wild Encounter Detected On-Screen');
+    mainWindow.webContents.send('setup-failed', setUpComplete)
   }
-  console.log('Setup complete');
-  huntingWindow = setUpComplete.window;
-  huntingDisplayId = setUpComplete.displayId;
-  mainWindow.webContents.send('setup-complete', setUpComplete);
+  else {
+    console.log('Setup complete');
+    huntingWindow = setUpComplete.window;
+    huntingDisplayId = setUpComplete.displayId;
+    mainWindow.webContents.send('setup-complete', setUpComplete);
+  }
 });
 
 ipcMain.on('start-capture', () => {

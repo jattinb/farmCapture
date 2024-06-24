@@ -39,7 +39,15 @@ ipcRenderer.on('setup-complete', (event, data) => {
     const buttons = document.querySelectorAll('.btn');
     loadingElement.style.display = 'none';
     buttons.forEach(button => button.disabled = false);
-    console.log('Setup complete:', data);
+    displayMessage('setupSuccess'); // Display success message
+});
+
+ipcRenderer.on('setup-failed', () => {
+    const loadingElement = document.getElementById('loading');
+    const buttons = document.querySelectorAll('.btn');
+    loadingElement.style.display = 'none';
+    buttons.forEach(button => button.disabled = false);
+    displayMessage('setupFailed'); // Display failed message
 });
 
 ipcRenderer.on('update-count', (event, data) => {
@@ -74,4 +82,16 @@ function updatePokemonTable(pokemonData) {
         row.appendChild(freqCell);
         tableBody.appendChild(row);
     });
+}
+
+// Function to display a message
+function displayMessage(messageId) {
+    const messageElement = document.getElementById(messageId);
+    messageElement.style.display = 'block';
+}
+
+// Function to close a message
+function closeMessage(messageId) {
+    const messageElement = document.getElementById(messageId);
+    messageElement.style.display = 'none';
 }

@@ -14,6 +14,12 @@
         </div>
         <div id="status" class="status status-stopped">Capture Disabled</div> <!-- Status indicator -->
         <div id="loading" class="loading" style="display: none;">Setting up...</div> <!-- Loading indicator -->
+        <div id="setupSuccess" class="setup-message setup-success" style="display: none;">
+            Setup Succeeded <button class="close-btn" onclick="closeMessage('setupSuccess')">&times;</button>
+        </div> <!-- Setup success message -->
+        <div id="setupFailed" class="setup-message setup-failed" style="display: none;">
+            Setup Failed <button class="close-btn" onclick="closeMessage('setupFailed')">&times;</button>
+        </div> <!-- Setup failed message -->
         <div id="counts" class="card mt-4 p-3">
             <h3 class="subtitle">Encounter Counts</h3>
             <p id="currentEncounter" class="current-encounter">Current Encounter: No encounter</p> <!-- Current encounter line -->
