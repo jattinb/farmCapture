@@ -4,7 +4,7 @@ const recognizeText = require("../helpers/recognizeText");
 const checkValidEncounter = require("../helpers/checkValidEncounter");
 
 class HuntSession extends EventEmitter {
-    constructor(huntingWindow, huntingScreen) {
+    constructor(huntingWindow, huntingDisplayId) {
         super();
         this.wildCount = 0;
         this.lastWildFollowWord = null;
@@ -17,7 +17,7 @@ class HuntSession extends EventEmitter {
         //     height: 115 // Example height
         // };
         this.huntingWindow = huntingWindow
-        this.huntingScreen = huntingScreen
+        this.huntingDisplayId = huntingDisplayId
     }
 
     async captureAndRecognize() {
@@ -28,7 +28,7 @@ class HuntSession extends EventEmitter {
             this.huntingWindow.w += 50
             this.huntingWindow.h += 50
 
-            const imageBuffer = await captureWindow(this.huntingWindow, this.huntingScreen);
+            const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
             const result = await recognizeText(imageBuffer);
 
             const { valid, curPoke } = checkValidEncounter(result);

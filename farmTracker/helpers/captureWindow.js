@@ -2,18 +2,10 @@ const screenshot = require('screenshot-desktop');
 const Jimp = require('jimp');
 
 // Function to capture the window using screenshot-desktop
-const captureWindow = async (window, screenIndex) => {
+const captureWindow = async (window, displayId) => {
     try {
-        // Capture screenshots from all screens
-        const screens = await screenshot.all({ format: 'png' });
-
-        // Check if the screenIndex is within the range of screens
-        if (screenIndex < 0 || screenIndex >= screens.length) {
-            throw new Error('Invalid screen index');
-        }
-
-        // Get the specific screen image buffer based on screenIndex
-        const imgBuffer = screens[screenIndex];
+        // Capture the screenshot of the specific screen
+        const imgBuffer = await screenshot({ screen: displayId, format: 'png' });
 
         // Use Jimp to read the image buffer
         const image = await Jimp.read(imgBuffer);

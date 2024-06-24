@@ -7,12 +7,14 @@ const shard = new TesseractSharder();
 
 async function setup() {
     try {
-        // Capture screenshots from all screens
+        // Capture screenshots from all screens and get display information
+        const displays = await screenshot.listDisplays();
         const screens = await screenshot.all({ format: 'png' });
 
         // Iterate through all screens with index
         for (let i = 0; i < screens.length; i++) {
             const screen = screens[i];
+            const displayId = displays[i].id;
 
             // Perform OCR on the screenshot
             const data = await shard.recognize(screen);
@@ -95,17 +97,17 @@ async function setup() {
                     w: cropWidth,
                     h: cropHeight,
                 },
-                screenIndex: i
+                displayId: displayId
             };
 
             return result; // Return the result for the specific screen
         }
 
         // If none of the screens contain the desired text
-        return { status: false, screenIndex: -1, window: { x: 0, y: 0, w: 0, h: 0 } };
+        return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
     } catch (error) {
         console.error('Error during setup:', error);
-        return { status: false, screenIndex: -1, window: { x: 0, y: 0, w: 0, h: 0 } };
+        return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
     }
 }
 
