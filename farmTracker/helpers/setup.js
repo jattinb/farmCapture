@@ -1,3 +1,5 @@
+// setup.js
+
 const screenshot = require('screenshot-desktop');
 const TesseractSharder = require('tesseract-sharder');
 const Jimp = require('jimp');

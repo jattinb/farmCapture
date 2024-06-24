@@ -1,4 +1,4 @@
-// electron_app/rendered.js
+// electron_app/renderer.js
 
 const { ipcRenderer } = require('electron');
 
@@ -15,12 +15,8 @@ document.getElementById('stopCapture').addEventListener('click', () => {
 });
 
 // Send IPC event to setup
-document.getElementById('setup').addEventListener('click', async () => {
-    try {
-        ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
-    } catch (error) {
-        console.error('Error sending setup request:', error);
-    }
+document.getElementById('setup').addEventListener('click', () => {
+    ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
 });
 
 // Function to update the status text and color
@@ -30,6 +26,21 @@ function updateStatus(isActive) {
     statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
     statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
 }
+
+ipcRenderer.on('setup-start', () => {
+    const loadingElement = document.getElementById('loading');
+    const buttons = document.querySelectorAll('.btn');
+    loadingElement.style.display = 'block';
+    buttons.forEach(button => button.disabled = true);
+});
+
+ipcRenderer.on('setup-complete', (event, data) => {
+    const loadingElement = document.getElementById('loading');
+    const buttons = document.querySelectorAll('.btn');
+    loadingElement.style.display = 'none';
+    buttons.forEach(button => button.disabled = false);
+    console.log('Setup complete:', data);
+});
 
 ipcRenderer.on('update-count', (event, data) => {
     const pokemonList = document.getElementById('pokemonList');
@@ -41,4 +52,3 @@ ipcRenderer.on('update-count', (event, data) => {
         pokemonList.appendChild(listItem);
     });
 });
-

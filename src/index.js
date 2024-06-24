@@ -3,7 +3,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const HuntSession = require('../farmTracker/models/huntSession');
-const setup = require('../farmTracker/helpers/setup')
+const setup = require('../farmTracker/helpers/setup');
 
 let huntSession;
 let mainWindow;
@@ -41,16 +41,18 @@ app.on('window-all-closed', () => {
   }
 });
 
-ipcMain.on('setup', async () => {
+ipcMain.on('setup', async (event) => {
+  mainWindow.webContents.send('setup-start');
   let setUpComplete = { status: false, window: { x: 0, y: 0, w: 0, h: 0 } };
   setUpComplete = await setup();
   if (!setUpComplete.status) {
-    console.log('No Wild Encounter Detected On-Screen')
+    console.log('No Wild Encounter Detected On-Screen');
   }
-  console.log('Setup complete')
-  huntingWindow = setUpComplete.window
-  huntingDisplayId = setUpComplete.displayId
-})
+  console.log('Setup complete');
+  huntingWindow = setUpComplete.window;
+  huntingDisplayId = setUpComplete.displayId;
+  mainWindow.webContents.send('setup-complete', setUpComplete);
+});
 
 ipcMain.on('start-capture', () => {
   huntSession = new HuntSession(huntingWindow, huntingDisplayId);
