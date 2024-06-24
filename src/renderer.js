@@ -22,7 +22,7 @@ document.getElementById('setup').addEventListener('click', () => {
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
-    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Stopped';
+    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Disabled';
     statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
     statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
 }
