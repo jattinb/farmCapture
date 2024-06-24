@@ -7,9 +7,20 @@
 <body>
     <div class="container">
         <h1 class="title">Pokémon Encounter Tracker</h1>
+        <div class="instructions">
+            <button class="collapsible">Setup Instructions</button>
+            <div class="content">
+                <p>Before starting capture, you need to set up the application:</p>
+                <ol>
+                    <li>Ensure the PRO app with a wild Pokémon encounter is visible on your monitor.</li>
+                    <li>Click the <strong>Setup</strong> button below to initialize the capture setup.</li>
+                    <li><em>Note: If the position of the wild encounter window changes after setup, a new setup will be required.</em></li>
+                </ol>
+            </div>
+        </div>
         <div class="button-group">
-            <button id="startCapture" class="btn btn-success">Start Capture</button>
-            <button id="stopCapture" class="btn btn-danger">Stop Capture</button>
+            <button id="startCapture" class="btn btn-success" disabled>Start Capture</button> <!-- Disabled by default -->
+            <button id="stopCapture" class="btn btn-danger" disabled>Stop Capture</button> <!-- Disabled by default -->
             <button id="setup" class="btn btn-primary">Setup</button> <!-- Setup button -->
         </div>
         <div id="status" class="status status-stopped">Capture Disabled</div> <!-- Status indicator -->

@@ -22,6 +22,277 @@ body {
     color: #333;
 }
 
+.instructions {
+    margin-bottom: 20px;
+}
+
+.collapsible {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.collapsible:hover {
+    background-color: #0056b3;
+}
+
+.active, .collapsible:active {
+    background-color: #0056b3;
+}
+
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+.instructions ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.instructions em {
+    color: #dc3545;
+}
+
+.button-group {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.current-encounter, .total-encounters {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.pokemon-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pokemon-table th, .pokemon-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.pokemon-table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+/* New styles for status indicator */
+.status {
+    text-align: center;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.status-stopped {
+    background-color: #dc3545; /* Red background for stopped */
+}
+
+.status-active {
+    background-color: #28a745; /* Green background for active */
+}
+
+.loading {
+    text-align: center;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: bold;
+    background-color: #ffc107; /* Yellow background for loading */
+    transition: background-color 0.3s ease;
+}
+
+/* Styles for setup messages */
+.setup-message {
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    position: relative;
+}
+
+.setup-success {
+    background-color: #28a745; /* Green background for success */
+    color: #fff;
+}
+
+.setup-failed {
+    background-color: #dc3545; /* Red background for failed */
+    color: #fff;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+}
+/* styles.css */
+
+body {
+    background-color: #f0f0f0; /* Light grey background */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.instructions {
+    margin-bottom: 20px;
+}
+
+.collapsible {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.collapsible:hover {
+    background-color: #0056b3;
+}
+
+.active, .collapsible:active {
+    background-color: #0056b3;
+}
+
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+.instructions ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.instructions em {
+    color: #dc3545;
+}
+
 .button-group {
     text-align: center;
     margin-bottom: 20px;

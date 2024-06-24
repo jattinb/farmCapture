@@ -22,7 +22,7 @@ document.getElementById('setup').addEventListener('click', () => {
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
-    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Stopped';
+    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Disabled';
     statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
     statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
 }
@@ -39,7 +39,12 @@ ipcRenderer.on('setup-complete', (event, data) => {
     const buttons = document.querySelectorAll('.btn');
     loadingElement.style.display = 'none';
     buttons.forEach(button => button.disabled = false);
-    displayMessage('setupSuccess'); // Display success message
+
+    document.getElementById('startCapture').disabled = false; // Enable Start button
+    document.getElementById('stopCapture').disabled = false; // Enable Stop button
+
+    displayMessage('setupSuccess');
+    console.log('Setup complete:', data);
 });
 
 ipcRenderer.on('setup-failed', () => {
@@ -95,3 +100,17 @@ function closeMessage(messageId) {
     const messageElement = document.getElementById(messageId);
     messageElement.style.display = 'none';
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const coll = document.querySelector('.collapsible');
+    const content = document.querySelector('.content');
+
+    coll.addEventListener('click', () => {
+        coll.classList.toggle('active');
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+        } else {
+            content.style.display = 'block';
+        }
+    });
+});
