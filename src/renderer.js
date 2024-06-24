@@ -22,7 +22,7 @@ document.getElementById('setup').addEventListener('click', () => {
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
-    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Disabled';
+    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Stopped';
     statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
     statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
 }
@@ -51,6 +51,10 @@ ipcRenderer.on('update-count', (event, data) => {
     // Update total wild encounters
     const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
     document.getElementById('totalEncounters').textContent = `Total Wild Encounters: ${totalEncounters}`;
+
+    // Update current encounter
+    const currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
+    document.getElementById('currentEncounter').textContent = `Current Encounter: ${currentEncounter}`;
 });
 
 // Function to update the Pokémon table

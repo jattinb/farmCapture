@@ -61,6 +61,11 @@ ipcMain.on('start-capture', () => {
   huntSession.on('newEncounter', (data) => {
     mainWindow.webContents.send('update-count', data);
   });
+
+  huntSession.on('noEncounter', (data) => {
+    mainWindow.webContents.send('update-count', data)
+  })
+
 });
 
 ipcMain.on('stop-capture', () => {

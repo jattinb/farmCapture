@@ -6,8 +6,8 @@ const checkValidEncounter = require("../helpers/checkValidEncounter");
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
         super();
+        this.currPoke = null;
         this.wildCount = 0;
-        this.lastWildFollowWord = null;
         this.isLastScreenEncounter = false;
         this.pokemonCounts = {};
         // this.huntingWindow = {
@@ -20,7 +20,7 @@ class HuntSession extends EventEmitter {
         this.huntingDisplayId = huntingDisplayId
         this.huntingWindow.x -= 50
         this.huntingWindow.y -= 50
-        this.huntingWindow.w += 50
+        this.huntingWindow.w += 60
         this.huntingWindow.h += 50
     }
 
@@ -35,6 +35,11 @@ class HuntSession extends EventEmitter {
             if (!valid) {
                 console.log('No encounter');
                 this.isLastScreenEncounter = false;
+                this.emit('noEncounter', {
+                    currPoke: null,
+                    wildCount: this.wildCount,
+                    pokemonCounts: this.pokemonCounts,
+                })
                 return;
             }
 
@@ -43,7 +48,7 @@ class HuntSession extends EventEmitter {
                 return;
             }
 
-            if (this.isLastScreenEncounter && this.lastWildFollowWord === curPoke) {
+            if (this.isLastScreenEncounter && this.currPoke === curPoke) {
                 console.log('Same encounter, not counting');
                 return;
             }
@@ -54,7 +59,7 @@ class HuntSession extends EventEmitter {
                 this.pokemonCounts[curPoke] = 1;
             }
 
-            this.lastWildFollowWord = curPoke;
+            this.currPoke = curPoke;
             this.wildCount++;
 
             console.log(`Detected new "wild ${curPoke}" encounter.`);
@@ -66,6 +71,7 @@ class HuntSession extends EventEmitter {
 
             // Emit the newEncounter event with data
             this.emit('newEncounter', {
+                currPoke: this.currPoke,
                 wildCount: this.wildCount,
                 pokemonCounts: this.pokemonCounts,
             });
