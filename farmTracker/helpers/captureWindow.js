@@ -2,19 +2,21 @@ const screenshot = require('screenshot-desktop');
 const Jimp = require('jimp');
 
 // Function to capture the window using screenshot-desktop
-const captureWindow = async (window) => {
+const captureWindow = async (window, screenIndex) => {
     try {
-        // Capture the screenshot of the desktop and get the image buffer
-        const imgBuffer = await screenshot({ format: 'png' });
+        // Capture screenshots from all screens
+        const screens = await screenshot.all({ format: 'png' });
+
+        // Check if the screenIndex is within the range of screens
+        if (screenIndex < 0 || screenIndex >= screens.length) {
+            throw new Error('Invalid screen index');
+        }
+
+        // Get the specific screen image buffer based on screenIndex
+        const imgBuffer = screens[screenIndex];
 
         // Use Jimp to read the image buffer
         const image = await Jimp.read(imgBuffer);
-
-        // // Define the coordinates and dimensions for cropping
-        // const x = 1000; // Example x coordinate
-        // const y = 515; // Example y coordinate
-        // const width = 700; // Example width
-        // const height = 115; // Example height
 
         // Assuming 'window' is an object with properties x, y, width, and height
         const { x, y, w, h } = window;

@@ -8,6 +8,7 @@ const setup = require('../farmTracker/helpers/setup')
 let huntSession;
 let mainWindow;
 let huntingWindow;
+let huntingScreen;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -48,10 +49,11 @@ ipcMain.on('setup', async () => {
   }
   console.log('Setup complete')
   huntingWindow = setUpComplete.window
+  huntingScreen = setUpComplete.screenIndex
 })
 
 ipcMain.on('start-capture', () => {
-  huntSession = new HuntSession(huntingWindow);
+  huntSession = new HuntSession(huntingWindow, huntingScreen);
   huntSession.startCaptureInterval(3000);
 
   huntSession.on('newEncounter', (data) => {
