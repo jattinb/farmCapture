@@ -47,6 +47,10 @@ ipcRenderer.on('update-count', (event, data) => {
     const pokemonData = Object.entries(data.pokemonCounts).map(([name, freq]) => ({ name, freq }));
     // Update the Pokémon table with the new data
     updatePokemonTable(pokemonData);
+
+    // Update total wild encounters
+    const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
+    document.getElementById('totalEncounters').textContent = `Total Wild Encounters: ${totalEncounters}`;
 });
 
 // Function to update the Pokémon table

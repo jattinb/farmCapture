@@ -78,6 +78,12 @@ body {
     color: #555;
 }
 
+.total-encounters {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #333;
+}
+
 .pokemon-table {
     width: 100%;
     border-collapse: collapse;
