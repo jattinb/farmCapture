@@ -22,7 +22,6 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-  mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -83,6 +82,6 @@ ipcMain.on('stop-capture', () => {
 
 ipcMain.on('reset-capture', () => {
   if (huntSession) {
-    huntSession.resetTimer();
+    huntSession.reset();
   }
 });

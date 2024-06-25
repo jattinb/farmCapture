@@ -1,3 +1,5 @@
+// farmTracker/models/huntSession.js
+
 const EventEmitter = require('events');
 const captureWindow = require("../helpers/captureWindow");
 const recognizeText = require("../helpers/recognizeText");
@@ -6,12 +8,12 @@ const checkValidEncounter = require("../helpers/checkValidEncounter");
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
         super();
-        this.currPoke = null;
-        this.wildCount = 0;
-        this.isLastScreenEncounter = false;
-        this.pokemonCounts = {};
         this.huntingWindow = huntingWindow;
         this.huntingDisplayId = huntingDisplayId;
+        this.isLastScreenEncounter = false;
+        this.currPoke = null;
+        this.wildCount = 0;
+        this.pokemonCounts = {};
         this.huntingWindow.x -= 50;
         this.huntingWindow.y -= 50;
         this.huntingWindow.w += 60;
@@ -112,6 +114,19 @@ class HuntSession extends EventEmitter {
         this.stopTimer();
         this.elapsedTime = 0;
         this.emit('update-timer', this.formatTime(this.elapsedTime));
+    }
+
+    reset() {
+        this.resetTimer();
+        this.wildCount = 0;
+        this.pokemonCounts = {};
+        this.currPoke = null;
+        this.isLastScreenEncounter = false;
+        this.emit('update-count', {
+            currPoke: null,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
     }
 
     formatTime(milliseconds) {

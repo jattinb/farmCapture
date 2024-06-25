@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Farm Capture App</title>
-    <link href="styles.css" rel="stylesheet"> <!-- Link to your CSS file -->
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -19,24 +19,24 @@
             </div>
         </div>
         <div class="button-group">
-            <button id="startCapture" class="btn btn-success" disabled>Start Capture</button> <!-- Disabled by default -->
-            <button id="stopCapture" class="btn btn-danger" disabled>Stop Capture</button> <!-- Disabled by default -->
-            <button id="setup" class="btn btn-primary">Setup</button> <!-- Setup button -->
-            <button id="reset" class="btn btn-warning">Reset</button> <!-- Reset button -->
+            <button id="startCapture" class="btn btn-success" disabled>Start Capture</button>
+            <button id="stopCapture" class="btn btn-danger" disabled>Stop Capture</button>
+            <button id="setup" class="btn btn-primary">Setup</button>
+            <button id="reset" class="btn btn-warning">Reset</button>
         </div>
-        <div id="status" class="status status-stopped">Capture Disabled</div> <!-- Status indicator -->
-        <div id="loading" class="loading" style="display: none;">Setting up...</div> <!-- Loading indicator -->
+        <div id="status" class="status status-stopped">Capture Disabled</div>
+        <div id="loading" class="loading" style="display: none;">Setting up...</div>
         <div id="setupSuccess" class="setup-message setup-success" style="display: none;">
             Setup Succeeded <button class="close-btn" onclick="closeMessage('setupSuccess')">&times;</button>
-        </div> <!-- Setup success message -->
+        </div>
         <div id="setupFailed" class="setup-message setup-failed" style="display: none;">
             Setup Failed <button class="close-btn" onclick="closeMessage('setupFailed')">&times;</button>
-        </div> <!-- Setup failed message -->
+        </div>
         <div id="counts" class="card mt-4 p-3">
             <h3 class="subtitle">Encounter Counts</h3>
-            <p id="currentEncounter" class="current-encounter">Current Encounter: No encounter</p> <!-- Current encounter line -->
-            <p id="totalEncounters" class="total-encounters">Total Wild Encounters: 0</p> <!-- Total encounters line -->
-            <p id="farmDuration" class="farm-duration">Farm Duration: 00:00:00</p> <!-- Farm duration line -->
+            <p id="currentEncounter" class="current-encounter">Current Encounter: No encounter</p>
+            <p id="totalEncounters" class="total-encounters">Total Wild Encounters: 0</p>
+            <p id="farmDuration" class="farm-duration">Farm Duration: 00:00:00</p>
             <table id="pokemonTable" class="pokemon-table">
                 <thead>
                     <tr>
