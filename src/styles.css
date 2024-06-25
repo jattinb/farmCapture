@@ -157,3 +157,15 @@ body {
 .table td {
     background-color: #555555; /* Slightly lighter background for table cells */
 }
+
+/* Aligning encounter counts */
+.section p {
+    display: flex;
+    justify-content: space-between;
+}
+
+.section p span {
+    flex: 1;
+    text-align: left;
+    margin-right: 10px;
+}

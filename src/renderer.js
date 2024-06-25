@@ -2,6 +2,23 @@
 
 const { ipcRenderer } = require('electron');
 
+// Function to display a message
+function displayMessage(messageId) {
+    const messageElement = document.getElementById(messageId);
+    messageElement.style.display = 'block';
+}
+
+// Function to close a message
+function closeMessage(messageId) {
+    const messageElement = document.getElementById(messageId);
+    messageElement.style.display = 'none';
+}
+
+// Function to capitalize first letter
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Send IPC event to start capture
 document.getElementById('startCapture').addEventListener('click', () => {
     ipcRenderer.send('start-capture');
@@ -68,15 +85,16 @@ ipcRenderer.on('update-count', (event, data) => {
 
     // Update total wild encounters
     const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
-    document.getElementById('totalEncounters').textContent = `Total Wild Encounters: ${totalEncounters}`;
+    document.getElementById('totalEncounters').textContent = `${totalEncounters}`;
 
     // Update current encounter
     const currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
-    document.getElementById('currentEncounter').textContent = `Current Encounter: ${currentEncounter}`;
+    currentEncounter = capitalizeFirstLetter(currentEncounter)
+    document.getElementById('currentEncounter').textContent = `${currentEncounter}`;
 });
 
 ipcRenderer.on('update-timer', (event, timeString) => {
-    document.getElementById('farmDuration').textContent = `Farm Duration: ${timeString}`;
+    document.getElementById('farmDuration').textContent = `${timeString}`;
 });
 
 // Function to update the Pokémon table
@@ -89,25 +107,13 @@ function updatePokemonTable(pokemonData) {
         const nameCell = document.createElement('td');
         const freqCell = document.createElement('td');
 
-        nameCell.textContent = pokemon.name;
+        nameCell.textContent = capitalizeFirstLetter(pokemon.name); // Capitalize Pokémon name
         freqCell.textContent = pokemon.frequency;
 
         row.appendChild(nameCell);
         row.appendChild(freqCell);
         tableBody.appendChild(row);
     });
-}
-
-// Function to display a message
-function displayMessage(messageId) {
-    const messageElement = document.getElementById(messageId);
-    messageElement.style.display = 'block';
-}
-
-// Function to close a message
-function closeMessage(messageId) {
-    const messageElement = document.getElementById(messageId);
-    messageElement.style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
