@@ -19,6 +19,11 @@ document.getElementById('setup').addEventListener('click', () => {
     ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
 });
 
+// Send IPC event to reset
+document.getElementById('reset').addEventListener('click', () => {
+    ipcRenderer.send('reset-capture');
+});
+
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
@@ -68,6 +73,10 @@ ipcRenderer.on('update-count', (event, data) => {
     // Update current encounter
     const currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
     document.getElementById('currentEncounter').textContent = `Current Encounter: ${currentEncounter}`;
+});
+
+ipcRenderer.on('update-timer', (event, timeString) => {
+    document.getElementById('farmDuration').textContent = `Farm Duration: ${timeString}`;
 });
 
 // Function to update the Pokémon table

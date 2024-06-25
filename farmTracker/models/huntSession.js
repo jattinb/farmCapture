@@ -10,23 +10,21 @@ class HuntSession extends EventEmitter {
         this.wildCount = 0;
         this.isLastScreenEncounter = false;
         this.pokemonCounts = {};
-        // this.huntingWindow = {
-        //     x: 1000,    // Example x coordinate
-        //     y: 515,     // Example y coordinate
-        //     width: 700, // Example width
-        //     height: 115 // Example height
-        // };
-        this.huntingWindow = huntingWindow
-        this.huntingDisplayId = huntingDisplayId
-        this.huntingWindow.x -= 50
-        this.huntingWindow.y -= 50
-        this.huntingWindow.w += 60
-        this.huntingWindow.h += 50
+        this.huntingWindow = huntingWindow;
+        this.huntingDisplayId = huntingDisplayId;
+        this.huntingWindow.x -= 50;
+        this.huntingWindow.y -= 50;
+        this.huntingWindow.w += 60;
+        this.huntingWindow.h += 50;
+
+        // Timer-related variables
+        this.timer = null;
+        this.startTime = 0;
+        this.elapsedTime = 0;
     }
 
     async captureAndRecognize() {
         try {
-
             const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
             const result = await recognizeText(imageBuffer);
 
@@ -39,7 +37,7 @@ class HuntSession extends EventEmitter {
                     currPoke: null,
                     wildCount: this.wildCount,
                     pokemonCounts: this.pokemonCounts,
-                })
+                });
                 return;
             }
 
@@ -75,24 +73,53 @@ class HuntSession extends EventEmitter {
                 wildCount: this.wildCount,
                 pokemonCounts: this.pokemonCounts,
             });
-
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
-    startCaptureInterval(interval) {
-        console.log("Hunting Session Started")
+    startCaptureInterval(interval = 3000) {
+        console.log("Hunting Session Started");
         this.intervalID = setInterval(() => {
             this.captureAndRecognize();
         }, interval);
+
+        this.startTimer();
     }
 
     stopCaptureInterval() {
-        console.log("Hunting Session Ended")
+        console.log("Hunting Session Ended");
         clearInterval(this.intervalID);
+        this.stopTimer();
         console.log('\nExiting...');
         this.emit('stop'); // Emit a stop event if needed
+    }
+
+    startTimer() {
+        this.startTime = Date.now() - this.elapsedTime;
+        this.timer = setInterval(() => {
+            this.elapsedTime = Date.now() - this.startTime;
+            const timeString = this.formatTime(this.elapsedTime);
+            this.emit('update-timer', timeString);
+        }, 1000);
+    }
+
+    stopTimer() {
+        clearInterval(this.timer);
+    }
+
+    resetTimer() {
+        this.stopTimer();
+        this.elapsedTime = 0;
+        this.emit('update-timer', this.formatTime(this.elapsedTime));
+    }
+
+    formatTime(milliseconds) {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
     }
 }
 

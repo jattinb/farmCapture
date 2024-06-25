@@ -22,6 +22,7 @@
             <button id="startCapture" class="btn btn-success" disabled>Start Capture</button> <!-- Disabled by default -->
             <button id="stopCapture" class="btn btn-danger" disabled>Stop Capture</button> <!-- Disabled by default -->
             <button id="setup" class="btn btn-primary">Setup</button> <!-- Setup button -->
+            <button id="reset" class="btn btn-warning">Reset</button> <!-- Reset button -->
         </div>
         <div id="status" class="status status-stopped">Capture Disabled</div> <!-- Status indicator -->
         <div id="loading" class="loading" style="display: none;">Setting up...</div> <!-- Loading indicator -->
@@ -35,6 +36,7 @@
             <h3 class="subtitle">Encounter Counts</h3>
             <p id="currentEncounter" class="current-encounter">Current Encounter: No encounter</p> <!-- Current encounter line -->
             <p id="totalEncounters" class="total-encounters">Total Wild Encounters: 0</p> <!-- Total encounters line -->
+            <p id="farmDuration" class="farm-duration">Farm Duration: 00:00:00</p> <!-- Farm duration line -->
             <table id="pokemonTable" class="pokemon-table">
                 <thead>
                     <tr>
