@@ -34,14 +34,14 @@ function updateStatus(isActive) {
 
 ipcRenderer.on('setup-start', () => {
     const loadingElement = document.getElementById('loading');
-    const buttons = document.querySelectorAll('.btn');
+    const buttons = document.querySelectorAll('.button');
     loadingElement.style.display = 'block';
     buttons.forEach(button => button.disabled = true);
 });
 
 ipcRenderer.on('setup-complete', (event, data) => {
     const loadingElement = document.getElementById('loading');
-    const buttons = document.querySelectorAll('.btn');
+    const buttons = document.querySelectorAll('.button');
     loadingElement.style.display = 'none';
     buttons.forEach(button => button.disabled = false);
 
@@ -54,7 +54,7 @@ ipcRenderer.on('setup-complete', (event, data) => {
 
 ipcRenderer.on('setup-failed', () => {
     const loadingElement = document.getElementById('loading');
-    const buttons = document.querySelectorAll('.btn');
+    const buttons = document.querySelectorAll('.button');
     loadingElement.style.display = 'none';
     buttons.forEach(button => button.disabled = false);
     displayMessage('setupFailed'); // Display failed message
@@ -62,7 +62,7 @@ ipcRenderer.on('setup-failed', () => {
 
 ipcRenderer.on('update-count', (event, data) => {
     // Transform the data to the required format
-    const pokemonData = Object.entries(data.pokemonCounts).map(([name, freq]) => ({ name, freq }));
+    const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
     // Update the Pokémon table with the new data
     updatePokemonTable(pokemonData);
 
@@ -90,7 +90,7 @@ function updatePokemonTable(pokemonData) {
         const freqCell = document.createElement('td');
 
         nameCell.textContent = pokemon.name;
-        freqCell.textContent = pokemon.freq;
+        freqCell.textContent = pokemon.frequency;
 
         row.appendChild(nameCell);
         row.appendChild(freqCell);
@@ -111,15 +111,14 @@ function closeMessage(messageId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const coll = document.querySelector('.collapsible');
-    const content = document.querySelector('.content');
-
-    coll.addEventListener('click', () => {
-        coll.classList.toggle('active');
-        if (content.style.display === 'block') {
-            content.style.display = 'none';
+    const toggleInstructions = () => {
+        const instructions = document.getElementById('instructions');
+        if (instructions.style.display === 'none' || instructions.style.display === '') {
+            instructions.style.display = 'block';
         } else {
-            content.style.display = 'block';
+            instructions.style.display = 'none';
         }
-    });
+    };
+
+    document.querySelector(".button-blue").addEventListener("click", toggleInstructions);
 });

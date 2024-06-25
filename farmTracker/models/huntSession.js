@@ -117,16 +117,20 @@ class HuntSession extends EventEmitter {
     }
 
     reset() {
-        this.resetTimer();
+        // Reset all relevant variables
         this.wildCount = 0;
         this.pokemonCounts = {};
         this.currPoke = null;
         this.isLastScreenEncounter = false;
+        // Emit events to update UI
+        this.emit('reset');
         this.emit('update-count', {
             currPoke: null,
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
+        // Reset any other necessary state
+        this.resetTimer();
     }
 
     formatTime(milliseconds) {
