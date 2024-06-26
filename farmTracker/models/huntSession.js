@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const captureWindow = require("../helpers/captureWindow");
 const recognizeText = require("../helpers/recognizeText");
 const checkValidEncounter = require("../helpers/checkValidEncounter");
+const formatTime = require("../helpers/formatTime")
 
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
@@ -32,6 +33,8 @@ class HuntSession extends EventEmitter {
 
             const { valid, curPoke } = checkValidEncounter(result);
 
+            // Encounter = 'vs.' on any display followed by a pokemon name (word)
+            // If there is No Encounter
             if (!valid) {
                 console.log('No encounter');
                 this.isLastScreenEncounter = false;
@@ -43,16 +46,19 @@ class HuntSession extends EventEmitter {
                 return;
             }
 
+            // Note: Suspect this code path is never visited
             if (!curPoke) {
                 console.log('Cannot detect Pokémon encountered');
                 return;
             }
 
+            // Same encounter skipping
             if (this.isLastScreenEncounter && this.currPoke === curPoke) {
                 console.log('Same encounter, not counting');
                 return;
             }
 
+            // Valid Unique Encounter, counting
             if (this.pokemonCounts[curPoke]) {
                 this.pokemonCounts[curPoke]++;
             } else {
@@ -101,7 +107,7 @@ class HuntSession extends EventEmitter {
         this.startTime = Date.now() - this.elapsedTime;
         this.timer = setInterval(() => {
             this.elapsedTime = Date.now() - this.startTime;
-            const timeString = this.formatTime(this.elapsedTime);
+            const timeString = formatTime(this.elapsedTime);
             this.emit('update-timer', timeString);
         }, 1000);
     }
@@ -113,7 +119,7 @@ class HuntSession extends EventEmitter {
     resetTimer() {
         this.stopTimer();
         this.elapsedTime = 0;
-        this.emit('update-timer', this.formatTime(this.elapsedTime));
+        this.emit('update-timer', formatTime(this.elapsedTime));
     }
 
     reset() {
@@ -133,13 +139,6 @@ class HuntSession extends EventEmitter {
         this.resetTimer();
     }
 
-    formatTime(milliseconds) {
-        const totalSeconds = Math.floor(milliseconds / 1000);
-        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-        const seconds = String(totalSeconds % 60).padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
-    }
 }
 
 module.exports = HuntSession;

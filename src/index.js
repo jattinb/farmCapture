@@ -42,8 +42,7 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('setup', async (event) => {
   mainWindow.webContents.send('setup-start');
-  let setUpComplete = { status: false, window: { x: 0, y: 0, w: 0, h: 0 } };
-  setUpComplete = await setup();
+  const setUpComplete = await setup();
   if (!setUpComplete.status) {
     console.log('Setup Failed: No Wild Encounter Detected On-Screen');
     mainWindow.webContents.send('setup-failed', setUpComplete)
