@@ -2,8 +2,6 @@
 
 const screenshot = require('screenshot-desktop');
 const TesseractSharder = require('tesseract-sharder');
-const Jimp = require('jimp');
-const path = require('path');
 
 const shard = new TesseractSharder();
 
