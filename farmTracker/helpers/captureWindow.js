@@ -1,23 +1,20 @@
 const screenshot = require('screenshot-desktop');
-const Jimp = require('jimp');
+const sharp = require('sharp');
 
-// Function to capture the window using screenshot-desktop
+// Function to capture the window using screenshot-desktop and process it with sharp
 const captureWindow = async (window, displayId) => {
     try {
         // Capture the screenshot of the specific screen
         const imgBuffer = await screenshot({ screen: displayId, format: 'png' });
 
-        // Use Jimp to read the image buffer
-        const image = await Jimp.read(imgBuffer);
-
         // Assuming 'window' is an object with properties x, y, width, and height
         const { x, y, w, h } = window;
 
-        // Crop the image
-        image.crop(x, y, w, h);
-
-        // Convert cropped image back to buffer
-        const croppedBuffer = await image.getBufferAsync(Jimp.MIME_PNG);
+        // Use sharp to read, crop, and process the image buffer
+        const croppedBuffer = await sharp(imgBuffer)
+            .extract({ left: x, top: y, width: w, height: h })
+            .png()
+            .toBuffer();
 
         // Return the cropped image buffer
         return croppedBuffer;

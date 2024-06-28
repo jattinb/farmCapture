@@ -20,7 +20,8 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
-    "electron": "31.0.2"
+    "electron": "31.0.2",
+    "speedscope": "1.20.0"
   },
   "keywords": [],
   "author": {
@@ -33,6 +34,10 @@
     "electron-squirrel-startup": "^1.0.1",
     "jimp": "0.22.12",
     "screenshot-desktop": "^1.15.0",
+    "sharp": "0.33.4",
     "tesseract-sharder": "^1.0.2"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
