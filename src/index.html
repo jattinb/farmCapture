@@ -8,6 +8,23 @@
 </head>
 <body>
     <div class="container">
+        <div class="section">
+            <h3>Encounter Counts</h3>
+            <p><span id="currentEncounterLabel">Current Encounter:</span> <span id="currentEncounter">No encounter</span></p>
+            <p><span id="totalEncountersLabel">Total Wild Encounters:</span> <span id="totalEncounters">0</span></p>
+            <p><span id="farmDurationLabel">Farm Duration:</span> <span id="farmDuration">00:00:00</span></p>
+            <table id="pokemonTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Pokémon Name</th>
+                        <th>Frequency</th>
+                    </tr>
+                </thead>
+                <tbody id="pokemonTableBody">
+                    <!-- Table rows will be populated here dynamically -->
+                </tbody>
+            </table>
+        </div>
         <button id="toggleInstructionsBtn" class="button button-blue" onclick="toggleInstructions()">Setup Instructions</button>
         <div class="setup-instructions" id="instructions" style="display: none;">
             <h3>Setup Instructions</h3>
@@ -32,24 +49,6 @@
             <div id="setupFailed" class="setup-message setup-failed" style="display: none;">
                 Setup Failed <button class="close-btn" onclick="closeMessage('setupFailed')">&times;</button>
             </div>
-        </div>
-
-        <div class="section">
-            <h3>Encounter Counts</h3>
-            <p><span id="currentEncounterLabel">Current Encounter:</span> <span id="currentEncounter">No encounter</span></p>
-            <p><span id="totalEncountersLabel">Total Wild Encounters:</span> <span id="totalEncounters">0</span></p>
-            <p><span id="farmDurationLabel">Farm Duration:</span> <span id="farmDuration">00:00:00</span></p>
-            <table id="pokemonTable" class="table">
-                <thead>
-                    <tr>
-                        <th>Pokémon Name</th>
-                        <th>Frequency</th>
-                    </tr>
-                </thead>
-                <tbody id="pokemonTableBody">
-                    <!-- Table rows will be populated here dynamically -->
-                </tbody>
-            </table>
         </div>
     </div>
     <!-- Include renderer.js for IPC event handling -->
