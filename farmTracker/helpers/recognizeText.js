@@ -1,18 +1,18 @@
-const TesseractSharder = require('tesseract-sharder');
+const Tesseract = require('tesseract.js');
 
-const shard = new TesseractSharder();
-
-// Function to perform OCR using TesseractSharder
+// Function to perform OCR using tesseract.js
 const recognizeText = async (imageBuffer) => {
     try {
-        const data = await shard.recognize(imageBuffer);
-        if (!data || !data.text) {
+        const { data: { text } } = await Tesseract.recognize(imageBuffer, 'eng', {
+            // logger: m => console.log(m) // Optional logger
+        });
+        if (!text) {
             throw new Error('OCR failed or no text recognized');
         }
-        return data.text;
+        return text;
     } catch (error) {
         throw new Error(`Error recognizing OCR: ${error.message}`);
     }
 };
 
-module.exports = recognizeText
+module.exports = recognizeText;
