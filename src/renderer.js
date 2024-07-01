@@ -88,7 +88,7 @@ ipcRenderer.on('update-count', (event, data) => {
     document.getElementById('totalEncounters').textContent = `${totalEncounters}`;
 
     // Update current encounter
-    const currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
+    let currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
     currentEncounter = capitalizeFirstLetter(currentEncounter)
     document.getElementById('currentEncounter').textContent = `${currentEncounter}`;
 });
