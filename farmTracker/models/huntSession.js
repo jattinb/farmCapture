@@ -9,6 +9,9 @@ const Timer = require("./timer");
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
         super();
+        if (HuntSession.instance) {
+            return HuntSession.instance;
+        }
         this.huntingWindow = this.adjustHuntingWindow(huntingWindow);
         this.huntingDisplayId = huntingDisplayId;
         this.isLastScreenEncounter = false;
@@ -19,6 +22,8 @@ class HuntSession extends EventEmitter {
 
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
+
+        HuntSession.instance = this;
     }
 
     adjustHuntingWindow(huntingWindow) {
