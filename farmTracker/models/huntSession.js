@@ -1,144 +1,123 @@
-// farmTracker/models/huntSession.js
+// farmTracker/models/HuntSession.js
 
 const EventEmitter = require('events');
 const captureWindow = require("../helpers/captureWindow");
 const recognizeText = require("../helpers/recognizeText");
 const checkValidEncounter = require("../helpers/checkValidEncounter");
-const formatTime = require("../helpers/formatTime")
+const Timer = require("./timer");
 
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
         super();
-        this.huntingWindow = huntingWindow;
+        this.huntingWindow = this.adjustHuntingWindow(huntingWindow);
         this.huntingDisplayId = huntingDisplayId;
         this.isLastScreenEncounter = false;
         this.currPoke = null;
         this.wildCount = 0;
         this.pokemonCounts = {};
-        this.huntingWindow.x -= 50;
-        this.huntingWindow.y -= 50;
-        this.huntingWindow.w += 60;
-        this.huntingWindow.h += 50;
+        this.timer = new Timer();
 
-        // Timer-related variables
-        this.timer = null;
-        this.startTime = 0;
-        this.elapsedTime = 0;
+        // Bind timer events
+        this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
+    }
+
+    adjustHuntingWindow(huntingWindow) {
+        return {
+            x: huntingWindow.x - 50,
+            y: huntingWindow.y - 50,
+            w: huntingWindow.w + 60,
+            h: huntingWindow.h + 50,
+        };
     }
 
     async captureAndRecognize() {
         try {
             const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
             const result = await recognizeText(imageBuffer);
-
             const { valid, curPoke } = checkValidEncounter(result);
 
-            // Encounter = 'vs.' on any display followed by a pokemon name (word)
-            // If there is No Encounter
             if (!valid) {
-                console.log('No encounter');
-                this.isLastScreenEncounter = false;
-                this.emit('noEncounter', {
-                    currPoke: null,
-                    wildCount: this.wildCount,
-                    pokemonCounts: this.pokemonCounts,
-                });
+                this.handleNoEncounter();
                 return;
             }
 
-            // Note: Suspect this code path is never visited
             if (!curPoke) {
                 console.log('Cannot detect Pokémon encountered');
                 return;
             }
 
-            // Same encounter skipping
-            if (this.isLastScreenEncounter && this.currPoke === curPoke) {
-                console.log('Same encounter, not counting');
-                return;
-            }
-
-            // Valid Unique Encounter, counting
-            if (this.pokemonCounts[curPoke]) {
-                this.pokemonCounts[curPoke]++;
-            } else {
-                this.pokemonCounts[curPoke] = 1;
-            }
-
-            this.currPoke = curPoke;
-            this.wildCount++;
-
-            console.log(`Detected new "wild ${curPoke}" encounter.`);
-            console.log(`Total encounters: ${this.wildCount}`);
-            console.log('Pokemon counts:');
-            console.log(this.pokemonCounts);
-
-            this.isLastScreenEncounter = true;
-
-            // Emit the newEncounter event with data
-            this.emit('newEncounter', {
-                currPoke: this.currPoke,
-                wildCount: this.wildCount,
-                pokemonCounts: this.pokemonCounts,
-            });
+            this.handleEncounter(curPoke);
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
-    startCaptureInterval(interval = 3000) {
+    handleNoEncounter() {
+        console.log('No encounter');
+        this.isLastScreenEncounter = false;
+        this.emit('noEncounter', {
+            currPoke: null,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
+    }
+
+    handleEncounter(curPoke) {
+        if (this.isLastScreenEncounter && this.currPoke === curPoke) {
+            console.log('Same encounter, not counting');
+            return;
+        }
+
+        if (this.pokemonCounts[curPoke]) {
+            this.pokemonCounts[curPoke]++;
+        } else {
+            this.pokemonCounts[curPoke] = 1;
+        }
+
+        this.currPoke = curPoke;
+        this.wildCount++;
+        this.isLastScreenEncounter = true;
+
+        console.log(`Detected new "wild ${curPoke}" encounter.`);
+        console.log(`Total encounters: ${this.wildCount}`);
+        console.log('Pokemon counts:', this.pokemonCounts);
+
+        this.emit('newEncounter', {
+            currPoke: this.currPoke,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
+    }
+
+    startCaptureInterval(interval = 2000) {
         console.log("Hunting Session Started");
         this.intervalID = setInterval(() => {
             this.captureAndRecognize();
         }, interval);
-
-        this.startTimer();
+        this.timer.start();
     }
 
     stopCaptureInterval() {
         console.log("Hunting Session Ended");
         clearInterval(this.intervalID);
-        this.stopTimer();
+        this.timer.stop();
         console.log('\nExiting...');
-        this.emit('stop'); // Emit a stop event if needed
-    }
-
-    startTimer() {
-        this.startTime = Date.now() - this.elapsedTime;
-        this.timer = setInterval(() => {
-            this.elapsedTime = Date.now() - this.startTime;
-            const timeString = formatTime(this.elapsedTime);
-            this.emit('update-timer', timeString);
-        }, 1000);
-    }
-
-    stopTimer() {
-        clearInterval(this.timer);
-    }
-
-    resetTimer() {
-        this.stopTimer();
-        this.elapsedTime = 0;
-        this.emit('update-timer', formatTime(this.elapsedTime));
+        this.emit('stop');
     }
 
     reset() {
-        // Reset all relevant variables
         this.wildCount = 0;
         this.pokemonCounts = {};
         this.currPoke = null;
         this.isLastScreenEncounter = false;
-        // Emit events to update UI
+        this.timer.reset();
         this.emit('reset');
         this.emit('update-count', {
             currPoke: null,
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
-        // Reset any other necessary state
-        this.resetTimer();
     }
-
 }
 
 module.exports = HuntSession;
