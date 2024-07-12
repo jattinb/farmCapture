@@ -55,7 +55,7 @@ ipcMain.on('setup', async (event) => {
 });
 
 ipcMain.on('start-capture', () => {
-  huntSession = new HuntSession(huntingWindow, huntingDisplayId);
+  huntSession = HuntSession.getInstance(huntingWindow, huntingDisplayId);
   huntSession.startCaptureInterval(3000);
 
   huntSession.on('newEncounter', (data) => {

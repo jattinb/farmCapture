@@ -12,6 +12,7 @@ class HuntSession extends EventEmitter {
         if (HuntSession.instance) {
             return HuntSession.instance;
         }
+
         this.huntingWindow = this.adjustHuntingWindow(huntingWindow);
         this.huntingDisplayId = huntingDisplayId;
         this.isLastScreenEncounter = false;
@@ -111,10 +112,6 @@ class HuntSession extends EventEmitter {
     }
 
     reset() {
-        this.wildCount = 0;
-        this.pokemonCounts = {};
-        this.currPoke = null;
-        this.isLastScreenEncounter = false;
         this.timer.reset();
         this.emit('reset');
         this.emit('update-count', {
@@ -122,6 +119,20 @@ class HuntSession extends EventEmitter {
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
+
+        // Reset the singleton instance
+        HuntSession.resetInstance();
+    }
+
+    static getInstance(huntingWindow, huntingDisplayId) {
+        if (!HuntSession.instance) {
+            HuntSession.instance = new HuntSession(huntingWindow, huntingDisplayId);
+        }
+        return HuntSession.instance;
+    }
+
+    static resetInstance() {
+        HuntSession.instance = null;
     }
 }
 
