@@ -1,10 +1,10 @@
 const screenshot = require('screenshot-desktop');
 const sharp = require('sharp');
 
-// Function to capture the window using screenshot-desktop and process it with sharp
+// Function to capture the window using screenshot-desktop and return the cropped image buffer
 const captureWindow = async (window, displayId) => {
     try {
-        // Capture the screenshot of the specific screen directly as a PNG buffer
+        // Capture the screenshot of the specific screen
         const imgBuffer = await screenshot({ screen: displayId });
 
         // Assuming 'window' is an object with properties x, y, width, and height
@@ -13,7 +13,6 @@ const captureWindow = async (window, displayId) => {
         // Use sharp to read, crop, and process the image buffer
         const croppedBuffer = await sharp(imgBuffer)
             .extract({ left: x, top: y, width: w, height: h })
-            .toFormat('png')
             .toBuffer();
 
         // Return the cropped image buffer
