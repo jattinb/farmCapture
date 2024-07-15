@@ -18,15 +18,22 @@ body {
     margin-top: 50px;
 }
 
-.button {
-    display: block;
-    width: 100%;
-    padding: 10px;
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-bottom: 10px;
+}
+
+.button {
+    flex: 1;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
+    margin: 5px 0;
 }
 
 .button-green {
@@ -75,6 +82,13 @@ body {
 
 .setup-instructions {
     display: none;
+}
+
+.status-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .status {
