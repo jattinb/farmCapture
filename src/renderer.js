@@ -19,18 +19,6 @@ function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Send IPC event to start capture
-document.getElementById('startCapture').addEventListener('click', () => {
-    ipcRenderer.send('start-capture');
-    updateStatus(true); // Update status when capture starts
-});
-
-// Send IPC event to stop capture
-document.getElementById('stopCapture').addEventListener('click', () => {
-    ipcRenderer.send('stop-capture');
-    updateStatus(false); // Update status when capture stops
-});
-
 // Send IPC event to setup
 document.getElementById('setup').addEventListener('click', () => {
     ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
@@ -44,9 +32,29 @@ document.getElementById('reset').addEventListener('click', () => {
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
-    statusElement.textContent = isActive ? 'Capture Active' : 'Capture Disabled';
+    statusElement.textContent = isActive ? 'Session Active' : 'Capture Disabled';
     statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
     statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
+}
+
+// Function to toggle capture state
+function toggleCapture() {
+    const button = document.getElementById('toggleCapture');
+    const isActive = button.classList.contains('button-green');
+
+    if (isActive) {
+        ipcRenderer.send('start-capture');
+        button.classList.remove('button-green');
+        button.classList.add('button-red');
+        button.textContent = 'Stop Capture';
+    } else {
+        ipcRenderer.send('stop-capture');
+        button.classList.remove('button-red');
+        button.classList.add('button-green');
+        button.textContent = 'Start Capture';
+    }
+
+    updateStatus(isActive);
 }
 
 ipcRenderer.on('setup-start', () => {
@@ -62,8 +70,7 @@ ipcRenderer.on('setup-complete', (event, data) => {
     loadingElement.style.display = 'none';
     buttons.forEach(button => button.disabled = false);
 
-    document.getElementById('startCapture').disabled = false; // Enable Start button
-    document.getElementById('stopCapture').disabled = false; // Enable Stop button
+    document.getElementById('toggleCapture').disabled = false; // Enable Toggle Capture button
 
     displayMessage('setupSuccess');
     console.log('Setup complete:', data);
@@ -126,5 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    document.querySelector(".button-blue").addEventListener("click", toggleInstructions);
+    document.getElementById('toggleInstructionsBtn').addEventListener('click', toggleInstructions);
+
+    // Add event listener to toggle capture button
+    document.getElementById('toggleCapture').addEventListener('click', toggleCapture);
 });
