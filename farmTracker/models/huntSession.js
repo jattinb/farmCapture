@@ -1,5 +1,3 @@
-// farmTracker/models/HuntSession.js
-
 const EventEmitter = require('events');
 const captureWindow = require("../helpers/captureWindow");
 const recognizeText = require("../helpers/recognizeText");
@@ -8,7 +6,8 @@ const Timer = require("./timer");
 
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
-        super();
+        super(); // Must call super() before accessing 'this'
+
         if (HuntSession.instance) {
             return HuntSession.instance;
         }
@@ -20,6 +19,7 @@ class HuntSession extends EventEmitter {
         this.wildCount = 0;
         this.pokemonCounts = {};
         this.timer = new Timer();
+        this.intervalID = null;
 
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
@@ -96,6 +96,11 @@ class HuntSession extends EventEmitter {
     }
 
     startCaptureInterval(interval = 2000) {
+        if (this.intervalID) {
+            console.log("Capture interval already running");
+            return;
+        }
+
         console.log("Hunting Session Started");
         this.intervalID = setInterval(() => {
             this.captureAndRecognize();
@@ -104,8 +109,14 @@ class HuntSession extends EventEmitter {
     }
 
     stopCaptureInterval() {
+        if (!this.intervalID) {
+            console.log("No capture interval to stop");
+            return;
+        }
+
         console.log("Hunting Session Ended");
         clearInterval(this.intervalID);
+        this.intervalID = null;
         this.timer.stop();
         console.log('\nExiting...');
         this.emit('stop');
@@ -126,7 +137,10 @@ class HuntSession extends EventEmitter {
 
     static getInstance(huntingWindow, huntingDisplayId) {
         if (!HuntSession.instance) {
+            console.log("Creating new Hunt Session instance");
             HuntSession.instance = new HuntSession(huntingWindow, huntingDisplayId);
+        } else {
+            console.log("Returning existing Hunt Session instance");
         }
         return HuntSession.instance;
     }
