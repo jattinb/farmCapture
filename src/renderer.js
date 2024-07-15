@@ -21,6 +21,11 @@ function capitalizeFirstLetter(str) {
 
 // Send IPC event to setup
 document.getElementById('setup').addEventListener('click', () => {
+    const setupButton = document.getElementById('setup');
+    setupButton.disabled = true;
+    setupButton.classList.add('button-loading');
+    setupButton.textContent = 'Setting up...';
+
     ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
 });
 
@@ -58,17 +63,15 @@ function toggleCapture() {
 }
 
 ipcRenderer.on('setup-start', () => {
-    const loadingElement = document.getElementById('loading');
-    const buttons = document.querySelectorAll('.button');
-    loadingElement.style.display = 'block';
-    buttons.forEach(button => button.disabled = true);
+    // The setup button will already be in the loading state
 });
 
 ipcRenderer.on('setup-complete', (event, data) => {
-    const loadingElement = document.getElementById('loading');
-    const buttons = document.querySelectorAll('.button');
-    loadingElement.style.display = 'none';
-    buttons.forEach(button => button.disabled = false);
+    const setupButton = document.getElementById('setup');
+    setupButton.disabled = false;
+    setupButton.classList.remove('button-loading');
+    setupButton.classList.add('button-blue');
+    setupButton.textContent = 'Setup';
 
     document.getElementById('toggleCapture').disabled = false; // Enable Toggle Capture button
 
@@ -77,10 +80,12 @@ ipcRenderer.on('setup-complete', (event, data) => {
 });
 
 ipcRenderer.on('setup-failed', () => {
-    const loadingElement = document.getElementById('loading');
-    const buttons = document.querySelectorAll('.button');
-    loadingElement.style.display = 'none';
-    buttons.forEach(button => button.disabled = false);
+    const setupButton = document.getElementById('setup');
+    setupButton.disabled = false;
+    setupButton.classList.remove('button-loading');
+    setupButton.classList.add('button-blue');
+    setupButton.textContent = 'Setup';
+
     displayMessage('setupFailed'); // Display failed message
 });
 
@@ -96,7 +101,7 @@ ipcRenderer.on('update-count', (event, data) => {
 
     // Update current encounter
     let currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
-    currentEncounter = capitalizeFirstLetter(currentEncounter)
+    currentEncounter = capitalizeFirstLetter(currentEncounter);
     document.getElementById('currentEncounter').textContent = `${currentEncounter}`;
 });
 

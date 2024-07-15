@@ -95,17 +95,6 @@ body {
     background-color: #4CAF50; /* Green background for active */
 }
 
-.loading {
-    text-align: center;
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 4px;
-    color: #fff;
-    font-weight: bold;
-    background-color: #FFC107; /* Yellow background for loading */
-    transition: background-color 0.3s ease;
-}
-
 .setup-message {
     text-align: center;
     margin-top: 10px;
@@ -168,4 +157,14 @@ body {
     flex: 1;
     text-align: left;
     margin-right: 10px;
+}
+
+/* Loading state for the setup button */
+.button-loading {
+    background-color: #FFC107;
+    cursor: wait;
+}
+
+.button-loading:hover {
+    background-color: #FFC107; /* Ensure the color remains yellow on hover */
 }
