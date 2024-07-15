@@ -37,7 +37,7 @@ document.getElementById('reset').addEventListener('click', () => {
 // Function to update the status text and color
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
-    statusElement.textContent = isActive ? 'Session Active' : 'Capture Disabled';
+    statusElement.textContent = isActive ? 'Active' : 'Inactive';
     statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
     statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
 }
@@ -51,12 +51,12 @@ function toggleCapture() {
         ipcRenderer.send('start-capture');
         button.classList.remove('button-green');
         button.classList.add('button-red');
-        button.textContent = 'Stop Capture';
+        button.textContent = 'Stop';
     } else {
         ipcRenderer.send('stop-capture');
         button.classList.remove('button-red');
         button.classList.add('button-green');
-        button.textContent = 'Start Capture';
+        button.textContent = 'Start';
     }
 
     updateStatus(isActive);

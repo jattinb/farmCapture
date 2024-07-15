@@ -8,30 +8,14 @@
 </head>
 <body>
     <div class="container">
-        <div class="section">
-            <h3>Encounter Counts</h3>
-            <p><span id="currentEncounterLabel">Current Encounter:</span> <span id="currentEncounter">No encounter</span></p>
-            <p><span id="totalEncountersLabel">Total Wild Encounters:</span> <span id="totalEncounters">0</span></p>
-            <p class="farm-duration">
-                <span id="farmDuration">00:00:00</span>
-                <span id="status" class="status status-stopped">Capture Disabled</span>
-            </p>            
-        </div>
-        <table id="pokemonTable" class="table">
-            <thead>
-                <tr>
-                    <th>Pokémon Name</th>
-                    <th>Frequency</th>
-                </tr>
-            </thead>
-            <tbody id="pokemonTableBody">
-                <!-- Table rows will be populated here dynamically -->
-            </tbody>
-        </table>
+        <p class="farm-duration">
+            <span id="farmDuration">00:00:00</span>
+            <span id="status" class="status status-stopped">Inactive</span>
+        </p>
         <div class="button-container">
             <button id="toggleInstructionsBtn" class="button button-blue" onclick="toggleInstructions()">Instructions</button>
             <button id="setup" class="button button-blue">Setup</button>
-            <button id="toggleCapture" class="button button-green" disabled>Start Capture</button>
+            <button id="toggleCapture" class="button button-green" disabled>Start</button>
             <button id="reset" class="button button-grey">Reset</button>
         </div>
         <div class="setup-instructions" id="instructions" style="display: none;">
@@ -49,7 +33,22 @@
         </div>
         <div id="setupFailed" class="setup-message setup-failed" style="display: none;">
             Setup Failed <button class="close-btn" onclick="closeMessage('setupFailed')">&times;</button>
+        </div>  
+        <div class="section">
+            <p><span id="currentEncounterLabel">Current Encounter:</span> <span id="currentEncounter">No encounter</span></p>
+            <p><span id="totalEncountersLabel">Total Wild Encounters:</span> <span id="totalEncounters">0</span></p>          
         </div>
+        <table id="pokemonTable" class="table">
+            <thead>
+                <tr>
+                    <th>Pokémon Name</th>
+                    <th>Frequency</th>
+                </tr>
+            </thead>
+            <tbody id="pokemonTableBody">
+                <!-- Table rows will be populated here dynamically -->
+            </tbody>
+        </table>
     </div>
     <!-- Include renderer.js for IPC event handling -->
     <script src="./renderer.js"></script>
