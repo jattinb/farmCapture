@@ -18,6 +18,87 @@ body {
     margin-top: 50px;
 }
 
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #BBBBBB;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section h3 {
+    margin-top: 0;
+}
+
+.section p {
+    display: flex;
+    justify-content: space-between;
+}
+
+.farm-duration {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.status-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.status {
+    padding: 8px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.status-stopped {
+    background-color: #f44336; /* Red background for stopped */
+}
+
+.status-active {
+    background-color: #4CAF50; /* Green background for active */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #444444;
+    border-radius: 5px;
+}
+
+.table th, .table td {
+    padding: 12px; /* Increased padding for better spacing */
+    text-align: center;
+    border-bottom: 1px solid #555555;
+    color: #FFFFFF; /* Text color for table cells */
+}
+
+.table th {
+    background-color: #333333; /* Dark background for table headers */
+}
+
+.table td {
+    background-color: #555555; /* Slightly lighter background for table cells */
+}
+
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -72,41 +153,18 @@ body {
     background-color: #707070;
 }
 
-.section {
-    margin-bottom: 20px;
-}
-
-.section h3 {
-    margin-top: 0;
-}
-
 .setup-instructions {
     display: none;
 }
 
-.status-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+/* Loading state for the setup button */
+.button-loading {
+    background-color: #FFC107;
+    cursor: wait;
 }
 
-.status {
-    text-align: center;
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 4px;
-    color: #fff;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.status-stopped {
-    background-color: #f44336; /* Red background for stopped */
-}
-
-.status-active {
-    background-color: #4CAF50; /* Green background for active */
+.button-loading:hover {
+    background-color: #FFC107; /* Ensure the color remains yellow on hover */
 }
 
 .setup-message {
@@ -136,49 +194,4 @@ body {
     top: 5px;
     right: 10px;
     cursor: pointer;
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px; /* Add some space above the table */
-    background-color: #444444;
-    border-radius: 5px;
-}
-
-.table th, .table td {
-    padding: 12px; /* Increased padding for better spacing */
-    text-align: center;
-    border-bottom: 1px solid #555555;
-    color: #FFFFFF; /* Text color for table cells */
-}
-
-.table th {
-    background-color: #333333; /* Dark background for table headers */
-}
-
-.table td {
-    background-color: #555555; /* Slightly lighter background for table cells */
-}
-
-/* Aligning encounter counts */
-.section p {
-    display: flex;
-    justify-content: space-between;
-}
-
-.section p span {
-    flex: 1;
-    text-align: left;
-    margin-right: 10px;
-}
-
-/* Loading state for the setup button */
-.button-loading {
-    background-color: #FFC107;
-    cursor: wait;
-}
-
-.button-loading:hover {
-    background-color: #FFC107; /* Ensure the color remains yellow on hover */
 }
