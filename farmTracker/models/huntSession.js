@@ -123,8 +123,13 @@ class HuntSession extends EventEmitter {
     }
 
     reset() {
+        if (this.intervalID) {
+            console.log("Cannot reset while session is running");
+            // this.emit('reset-failed', { reason: "Session is running" });
+            return;
+        }
+
         this.timer.reset();
-        // this.emit('reset'); #Seems unnecessary
         this.emit('reset-count', {
             currPoke: null,
             wildCount: 0,

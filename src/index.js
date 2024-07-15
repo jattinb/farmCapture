@@ -1,5 +1,3 @@
-// electron_app/main.js
-
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const HuntSession = require('../farmTracker/models/huntSession');
@@ -9,6 +7,7 @@ let huntSession;
 let mainWindow;
 let huntingWindow;
 let huntingDisplayId;
+let isSessionRunning = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -57,6 +56,8 @@ ipcMain.on('setup', async (event) => {
 ipcMain.on('start-capture', () => {
   huntSession = HuntSession.getInstance(huntingWindow, huntingDisplayId);
   huntSession.startCaptureInterval(3000);
+  isSessionRunning = true;
+  mainWindow.webContents.send('session-state', { isSessionRunning });
 
   huntSession.on('newEncounter', (data) => {
     mainWindow.webContents.send('update-count', data);
@@ -78,13 +79,17 @@ ipcMain.on('start-capture', () => {
 ipcMain.on('stop-capture', () => {
   if (huntSession) {
     huntSession.stopCaptureInterval();
+    isSessionRunning = false;
+    mainWindow.webContents.send('session-state', { isSessionRunning });
   } else {
     console.log('HuntSession not started or already stopped.');
   }
 });
 
 ipcMain.on('reset-capture', () => {
-  if (huntSession) {
+  if (huntSession && !isSessionRunning) {
     huntSession.reset();
+  } else {
+    console.log('Reset disabled: HuntSession is running.');
   }
 });
