@@ -66,6 +66,10 @@ ipcMain.on('start-capture', () => {
     mainWindow.webContents.send('update-count', data);
   });
 
+  huntSession.on('reset-count', (data) => {
+    mainWindow.webContents.send('update-count', data);
+  });
+
   huntSession.on('update-timer', (timeString) => {
     mainWindow.webContents.send('update-timer', timeString);
   });

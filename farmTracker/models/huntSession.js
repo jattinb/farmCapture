@@ -113,11 +113,11 @@ class HuntSession extends EventEmitter {
 
     reset() {
         this.timer.reset();
-        this.emit('reset');
-        this.emit('update-count', {
+        // this.emit('reset'); #Seems unnecessary
+        this.emit('reset-count', {
             currPoke: null,
-            wildCount: this.wildCount,
-            pokemonCounts: this.pokemonCounts,
+            wildCount: 0,
+            pokemonCounts: {},
         });
 
         // Reset the singleton instance
