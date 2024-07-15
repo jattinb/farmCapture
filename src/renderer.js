@@ -90,43 +90,46 @@ ipcRenderer.on('setup-failed', () => {
 });
 
 ipcRenderer.on('update-count', (event, data) => {
-    // Transform the data to the required format
     const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
-    // Update the Pokémon table with the new data
-    updatePokemonTable(pokemonData);
 
-    // Update total wild encounters
+    // Calculate total encounters
     const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
+
+    // Update total encounters and current encounter display
     document.getElementById('totalEncounters').textContent = `${totalEncounters}`;
+    const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
+    document.getElementById('currentEncounter').textContent = currentEncounter;
 
-    // Update current encounter
-    let currentEncounter = data.currPoke ? data.currPoke : 'No encounter';
-    currentEncounter = capitalizeFirstLetter(currentEncounter);
-    document.getElementById('currentEncounter').textContent = `${currentEncounter}`;
-});
-
-ipcRenderer.on('update-timer', (event, timeString) => {
-    document.getElementById('farmDuration').textContent = `${timeString}`;
+    // Update Pokémon table with new data
+    updatePokemonTable(pokemonData, totalEncounters);
 });
 
 // Function to update the Pokémon table
-function updatePokemonTable(pokemonData) {
+function updatePokemonTable(pokemonData, totalEncounters) {
     const tableBody = document.getElementById('pokemonTableBody');
     tableBody.innerHTML = ''; // Clear existing rows
 
     pokemonData.forEach(pokemon => {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
-        const freqCell = document.createElement('td');
+        const countCell = document.createElement('td');
+        const percentageCell = document.createElement('td');
 
         nameCell.textContent = capitalizeFirstLetter(pokemon.name); // Capitalize Pokémon name
-        freqCell.textContent = pokemon.frequency;
+        countCell.textContent = pokemon.frequency;
+        percentageCell.textContent = `${Math.ceil((pokemon.frequency / totalEncounters) * 100)}%`; // Round percentage up
 
         row.appendChild(nameCell);
-        row.appendChild(freqCell);
+        row.appendChild(countCell);
+        row.appendChild(percentageCell);
         tableBody.appendChild(row);
     });
 }
+
+
+ipcRenderer.on('update-timer', (event, timeString) => {
+    document.getElementById('farmDuration').textContent = `${timeString}`;
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const toggleInstructions = () => {
