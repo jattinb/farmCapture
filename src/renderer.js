@@ -113,16 +113,16 @@ function updatePokemonTable(pokemonData, totalEncounters) {
     pokemonData.forEach(pokemon => {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
-        const countCell = document.createElement('td');
         const percentageCell = document.createElement('td');
+        const countCell = document.createElement('td');
 
         nameCell.textContent = capitalizeFirstLetter(pokemon.name); // Capitalize Pokémon name
-        countCell.textContent = pokemon.frequency;
         percentageCell.textContent = `${Math.ceil((pokemon.frequency / totalEncounters) * 100)}%`; // Round percentage up
+        countCell.textContent = pokemon.frequency;
 
         row.appendChild(nameCell);
-        row.appendChild(countCell);
         row.appendChild(percentageCell);
+        row.appendChild(countCell);
         tableBody.appendChild(row);
     });
 }
