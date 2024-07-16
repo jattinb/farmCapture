@@ -96,9 +96,9 @@ ipcRenderer.on('update-count', (event, data) => {
     const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
 
     // Update total encounters and current encounter display
-    document.getElementById('totalEncounters').textContent = `${totalEncounters}`;
+    document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
     const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
-    document.getElementById('currentEncounter').textContent = currentEncounter;
+    document.getElementById('currentEncounter').innerHTML = `<strong>${currentEncounter}</strong>`;
 
     // Update Pokémon table with new data
     updatePokemonTable(pokemonData, totalEncounters);

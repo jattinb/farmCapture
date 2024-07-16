@@ -35,8 +35,10 @@
             Setup Failed <button class="close-btn" onclick="closeMessage('setupFailed')">&times;</button>
         </div>  
         <div class="section">
-            <p><span id="currentEncounterLabel">Current Encounter:</span> <span id="currentEncounter">No encounter</span></p>
-            <p><span id="totalEncountersLabel">Total Wild Encounters:</span> <span id="totalEncounters">0</span></p>          
+            <p class="encounters">
+                <span>Now: <span id="currentEncounter"><strong>No encounter</strong></span></span>
+                <span>Count: <span id="totalEncounters"><strong>0</strong></span></span>
+            </p>
         </div>
         <table id="pokemonTable" class="table">
             <thead>

@@ -76,6 +76,12 @@ body {
     color: #4CAF50; /* Green text color for active */
 }
 
+.encounters {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+}
+
 /* Table styling */
 .table {
     width: 100%;
