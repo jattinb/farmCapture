@@ -35,7 +35,7 @@ class HuntSession extends EventEmitter {
         return {
             x: huntingWindow.x - 50,
             y: huntingWindow.y - 50,
-            w: huntingWindow.w + 75,
+            w: huntingWindow.w + 100,
             h: huntingWindow.h + 75,
         };
     }
@@ -133,6 +133,10 @@ class HuntSession extends EventEmitter {
             return;
         }
 
+        this.isLastScreenEncounter = false;
+        this.currPoke = null;
+        this.wildCount = 0;
+        this.pokemonCounts = {};
         this.timer.reset();
         this.emit('reset-count', {
             currPoke: null,
@@ -181,7 +185,11 @@ class HuntSession extends EventEmitter {
             console.log("Creating new Hunt Session instance");
             HuntSession.instance = new HuntSession(huntingWindow, huntingDisplayId);
         } else {
-            console.log("Returning existing Hunt Session instance");
+            console.log(huntingWindow, huntingDisplayId)
+            HuntSession.instance.huntingWindow = HuntSession.instance.adjustHuntingWindow(huntingWindow);
+            HuntSession.instance.huntingDisplayId = huntingDisplayId
+            console.log(HuntSession.instance.huntingWindow)
+            console.log("Returning existing Hunt Session instance with updated window setup settings");
         }
         return HuntSession.instance;
     }

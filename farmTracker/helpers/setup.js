@@ -1,9 +1,7 @@
 // setup.js
 
 const screenshot = require('screenshot-desktop');
-const TesseractSharder = require('tesseract-sharder');
-
-const shard = new TesseractSharder();
+const Tesseract = require('tesseract.js');
 
 async function setup() {
     try {
@@ -17,7 +15,10 @@ async function setup() {
             const displayId = displays[i].id;
 
             // Perform OCR on the screenshot
-            const data = await shard.recognize(screen);
+            const { data } = await Tesseract.recognize(screen, 'eng', {
+                // logger: m => console.log(m) // Optional logger
+            });
+
             if (!data || !data.text) {
                 continue; // Skip this screen if OCR failed or no text recognized
             }
@@ -26,6 +27,7 @@ async function setup() {
             const { vsLineIndex, pokemonName } = findPokemonLine(data.text);
 
             if (vsLineIndex === -1 || pokemonName === '') {
+                console.log("VS. not found on page")
                 continue; // Skip this screen if "VS. Wild <pokemon_name>" not found
             }
 
@@ -78,21 +80,22 @@ function findPokemonLine(text) {
 }
 
 // Helper function to find coordinates of "VS." and Pokémon name in OCR word data
-function findCoordinates(wordData, vsWord, pokemonName) {
-    const pokemonWords = pokemonName.split(' ');
+function findCoordinates(wordData, vsWord) {
     let vsCoordinates = null;
     let pokemonCoordinates = null;
 
-    for (const word of wordData) {
+    for (let i = 0; i < wordData.length; i++) {
+        const word = wordData[i];
+
         if (word.text === vsWord && !vsCoordinates) {
             vsCoordinates = { x: word.bbox.x0, y: word.bbox.y0 };
-        }
 
-        if (pokemonWords.includes(word.text) && !pokemonCoordinates) {
-            pokemonCoordinates = { x: word.bbox.x1, y: word.bbox.y1 };
-        }
-
-        if (vsCoordinates && pokemonCoordinates) {
+            if (i + 2 < wordData.length) {
+                pokemonCoordinates = { x: wordData[i + 2].bbox.x1, y: wordData[i + 2].bbox.y1 };
+            }
+            else {
+                throw Error("Pokemon not found next to VS.")
+            }
             break;
         }
     }
