@@ -106,6 +106,7 @@ ipcRenderer.on('update-count', (event, data) => {
 
 // Function to update the Pokémon table
 function updatePokemonTable(pokemonData, totalEncounters) {
+    pokemonData.sort((a, b) => a.frequency - b.frequency);
     const tableBody = document.getElementById('pokemonTableBody');
     tableBody.innerHTML = ''; // Clear existing rows
 
