@@ -90,25 +90,27 @@ ipcRenderer.on('setup-failed', () => {
 });
 
 ipcRenderer.on('update-count', (event, data) => {
+    // Transform the data to the required format
     const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
-
-    // Calculate total encounters
+    // Update the Pokémon table with the new data
     const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
-
-    // Update total encounters and current encounter display
-    document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
     const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
-    document.getElementById('currentEncounter').innerHTML = `<strong>${currentEncounter}</strong>`;
 
-    // Update Pokémon table with new data
-    updatePokemonTable(pokemonData, totalEncounters);
+    updatePokemonTable(pokemonData, totalEncounters, currentEncounter);
+
+    // Update total wild encounters
+    document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
+
+    // Update current encounter
+    document.getElementById('currentEncounter').innerHTML = `<strong>${currentEncounter}</strong>`;
 });
 
 // Function to update the Pokémon table
-function updatePokemonTable(pokemonData, totalEncounters) {
-    pokemonData.sort((a, b) => a.frequency - b.frequency);
+function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
     const tableBody = document.getElementById('pokemonTableBody');
     tableBody.innerHTML = ''; // Clear existing rows
+
+    pokemonData.sort((a, b) => a.frequency - b.frequency); // Sort by count in ascending order
 
     pokemonData.forEach(pokemon => {
         const row = document.createElement('tr');
@@ -119,6 +121,10 @@ function updatePokemonTable(pokemonData, totalEncounters) {
         nameCell.textContent = capitalizeFirstLetter(pokemon.name); // Capitalize Pokémon name
         percentageCell.textContent = `${Math.ceil((pokemon.frequency / totalEncounters) * 100)}%`; // Round percentage up
         countCell.textContent = pokemon.frequency;
+
+        if (pokemon.name.toLowerCase() === currentEncounter.toLowerCase()) {
+            row.classList.add('current-pokemon'); // Add class for styling current Pokémon row
+        }
 
         row.appendChild(nameCell);
         row.appendChild(percentageCell);

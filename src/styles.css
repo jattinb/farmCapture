@@ -92,6 +92,12 @@ body {
     overflow: hidden;
 }
 
+/* Highlight current Pokémon row in green */
+tr.current-pokemon td {
+    background-color: #4CAF50; /* Green background color */
+    font-weight: bold;
+}
+
 .table th, .table td {
     padding: 12px; /* Increased padding for better spacing */
     text-align: center;
@@ -107,12 +113,6 @@ body {
 .table td {
     background-color: #555555; /* Slightly lighter background for table cells */
 }
-
-/* Optional: Adding hover effect for table rows */
-.table tr:hover {
-    background-color: #666666; /* Highlight row on hover */
-}
-
 
 .button-container {
     display: flex;
