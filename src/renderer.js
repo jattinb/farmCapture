@@ -21,12 +21,15 @@ function capitalizeFirstLetter(str) {
 
 // Send IPC event to setup
 document.getElementById('setup').addEventListener('click', () => {
-    const setupButton = document.getElementById('setup');
-    setupButton.disabled = true;
-    setupButton.classList.add('button-loading');
-    setupButton.textContent = 'Working...';
-
-    ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
+    const startButton = document.getElementById('toggleCapture');
+    const isActive = startButton.classList.contains('button-red');
+    if (!isActive) {
+        const setupButton = document.getElementById('setup');
+        setupButton.disabled = true;
+        setupButton.classList.add('button-loading');
+        setupButton.textContent = 'Working...';
+        ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
+    }
 });
 
 // Send IPC event to reset

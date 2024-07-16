@@ -140,6 +140,11 @@ class HuntSession extends EventEmitter {
         HuntSession.resetInstance();
     }
 
+    // Method to check if a hunting session is active
+    isActive() {
+        return !!this.intervalID;
+    }
+
     static getInstance(huntingWindow, huntingDisplayId) {
         if (!HuntSession.instance) {
             console.log("Creating new Hunt Session instance");

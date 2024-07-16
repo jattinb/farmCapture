@@ -40,16 +40,19 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('setup', async (event) => {
-  mainWindow.webContents.send('setup-start');
-  const setUpComplete = await setup();
-  if (!setUpComplete.status) {
-    console.log('Setup Failed: No Wild Encounter Detected On-Screen');
-    mainWindow.webContents.send('setup-failed', setUpComplete)
-  } else {
-    console.log('Setup complete');
-    huntingWindow = setUpComplete.window;
-    huntingDisplayId = setUpComplete.displayId;
-    mainWindow.webContents.send('setup-complete', setUpComplete);
+  if (!(huntSession && huntSession.isActive())) {
+    console.log('Here', huntSession && huntSession.isActive())
+    mainWindow.webContents.send('setup-start');
+    const setUpComplete = await setup();
+    if (!setUpComplete.status) {
+      console.log('Setup Failed: No Wild Encounter Detected On-Screen');
+      mainWindow.webContents.send('setup-failed', setUpComplete)
+    } else {
+      console.log('Setup complete');
+      huntingWindow = setUpComplete.window;
+      huntingDisplayId = setUpComplete.displayId;
+      mainWindow.webContents.send('setup-complete', setUpComplete);
+    }
   }
 });
 
