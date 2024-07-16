@@ -76,28 +76,37 @@ body {
     color: #4CAF50; /* Green text color for active */
 }
 
+/* Table styling */
 .table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
     background-color: #444444;
     border-radius: 5px;
+    overflow: hidden;
 }
 
 .table th, .table td {
     padding: 12px; /* Increased padding for better spacing */
     text-align: center;
-    border-bottom: 1px solid #555555;
+    border: 1px solid #555555; /* Border for table cells */
     color: #FFFFFF; /* Text color for table cells */
 }
 
 .table th {
     background-color: #333333; /* Dark background for table headers */
+    border-bottom: 2px solid #555555; /* Thicker bottom border for headers */
 }
 
 .table td {
     background-color: #555555; /* Slightly lighter background for table cells */
 }
+
+/* Optional: Adding hover effect for table rows */
+.table tr:hover {
+    background-color: #666666; /* Highlight row on hover */
+}
+
 
 .button-container {
     display: flex;
