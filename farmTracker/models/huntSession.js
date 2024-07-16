@@ -3,6 +3,10 @@ const captureWindow = require("../helpers/captureWindow");
 const recognizeText = require("../helpers/recognizeText");
 const checkValidEncounter = require("../helpers/checkValidEncounter");
 const Timer = require("./timer");
+const fs = require('fs');
+const { parse } = require('json2csv');
+const path = require('path');
+const formatTime = require('../helpers/formatTime')
 
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
@@ -138,6 +142,27 @@ class HuntSession extends EventEmitter {
 
         // Reset the singleton instance
         HuntSession.resetInstance();
+    }
+
+    exportSessionToCSV(filename) {
+        const fields = ['pokemon', 'count', 'time', 'totalCount'];
+        const csvData = [];
+
+        // Convert pokemonCounts object to array of { pokemon, count } objects
+        Object.entries(this.pokemonCounts).forEach(([pokemon, count]) => {
+            csvData.push({ pokemon, count });
+        });
+
+        // Include time and wildCount for the session only in the first row
+        if (csvData.length > 0) {
+            csvData[0].time = formatTime(this.timer.elapsedTime)
+            csvData[0].totalCount = this.wildCount;
+        }
+
+        const csv = parse(csvData, { fields });
+        const filePath = path.join(__dirname, `${filename}.csv`);
+        fs.writeFileSync(filePath, csv);
+        console.log(`Session data exported to CSV: ${filePath}`);
     }
 
     // Method to check if a hunting session is active

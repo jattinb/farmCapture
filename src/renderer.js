@@ -1,6 +1,7 @@
 // electron_app/renderer.js
 
 const { ipcRenderer } = require('electron');
+const { parse } = require('json2csv');
 
 // Function to display a message
 function displayMessage(messageId) {
@@ -143,6 +144,16 @@ function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
 
 ipcRenderer.on('update-timer', (event, timeString) => {
     document.getElementById('farmDuration').textContent = `${timeString}`;
+});
+
+// Send IPC event to export session to CSV
+document.getElementById('exportCSV').addEventListener('click', () => {
+    const filename = document.getElementById('exportFilename').value.trim();
+    if (filename) {
+        ipcRenderer.send('export-session', filename);
+    } else {
+        alert('Please enter a filename.');
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {

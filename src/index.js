@@ -96,3 +96,12 @@ ipcMain.on('reset-capture', () => {
     console.log('Reset disabled: HuntSession is running.');
   }
 });
+
+ipcMain.on('export-session', (event, filename) => {
+  if (huntSession) {
+    huntSession.exportSessionToCSV(filename);
+  } else {
+    console.log('Cannot export session: HuntSession not active.');
+    // Optionally send feedback to renderer process
+  }
+});
