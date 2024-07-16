@@ -148,12 +148,15 @@ ipcRenderer.on('update-timer', (event, timeString) => {
 
 // Send IPC event to export session to CSV
 document.getElementById('exportCSV').addEventListener('click', () => {
-    const filename = document.getElementById('exportFilename').value.trim();
-    if (filename) {
-        ipcRenderer.send('export-session', filename);
-    } else {
-        alert('Please enter a filename.');
-    }
+    // Trigger save dialog
+    ipcRenderer.invoke('save-dialog').then((result) => {
+        if (!result.canceled) {
+            const filename = result.filePath;
+            ipcRenderer.send('export-session', filename);
+        }
+    }).catch((err) => {
+        console.error(err);
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {

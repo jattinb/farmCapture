@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const HuntSession = require('../farmTracker/models/huntSession');
 const setup = require('../farmTracker/helpers/setup');
@@ -95,6 +95,18 @@ ipcMain.on('reset-capture', () => {
   } else {
     console.log('Reset disabled: HuntSession is running.');
   }
+});
+
+ipcMain.handle('save-dialog', async (event, options) => {
+  const result = await dialog.showSaveDialog({
+    title: 'Export CSV',
+    defaultPath: 'export.csv',
+    buttonLabel: 'Export',
+    filters: [
+      { name: 'CSV Files', extensions: ['csv'] }
+    ]
+  });
+  return result;
 });
 
 ipcMain.on('export-session', (event, filename) => {

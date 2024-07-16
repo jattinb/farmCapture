@@ -144,6 +144,7 @@ class HuntSession extends EventEmitter {
         HuntSession.resetInstance();
     }
 
+    // Export session data to CSV
     exportSessionToCSV(filename) {
         const fields = ['pokemon', 'count', 'time', 'totalCount'];
         const csvData = [];
@@ -153,16 +154,21 @@ class HuntSession extends EventEmitter {
             csvData.push({ pokemon, count });
         });
 
-        // Include time and wildCount for the session only in the first row
+        // Include time and totalCount for the session only in the first row
         if (csvData.length > 0) {
-            csvData[0].time = formatTime(this.timer.elapsedTime)
+            csvData[0].time = formatTime(this.timer.elapsedTime);
             csvData[0].totalCount = this.wildCount;
         }
 
         const csv = parse(csvData, { fields });
-        const filePath = path.join(__dirname, `${filename}.csv`);
-        fs.writeFileSync(filePath, csv);
-        console.log(`Session data exported to CSV: ${filePath}`);
+        const filePath = `${filename}`; // Construct the file path with the chosen filename
+
+        try {
+            fs.writeFileSync(filePath, csv);
+            console.log(`Session data exported to CSV: ${filePath}`);
+        } catch (err) {
+            console.error('Error exporting session to CSV:', err);
+        }
     }
 
     // Method to check if a hunting session is active
