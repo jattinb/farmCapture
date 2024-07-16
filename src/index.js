@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const HuntSession = require('../farmTracker/models/huntSession');
 const setup = require('../farmTracker/helpers/setup');
@@ -40,16 +40,19 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('setup', async (event) => {
-  mainWindow.webContents.send('setup-start');
-  const setUpComplete = await setup();
-  if (!setUpComplete.status) {
-    console.log('Setup Failed: No Wild Encounter Detected On-Screen');
-    mainWindow.webContents.send('setup-failed', setUpComplete)
-  } else {
-    console.log('Setup complete');
-    huntingWindow = setUpComplete.window;
-    huntingDisplayId = setUpComplete.displayId;
-    mainWindow.webContents.send('setup-complete', setUpComplete);
+  if (!(huntSession && huntSession.isActive())) {
+    console.log('Here', huntSession && huntSession.isActive())
+    mainWindow.webContents.send('setup-start');
+    const setUpComplete = await setup();
+    if (!setUpComplete.status) {
+      console.log('Setup Failed: No Wild Encounter Detected On-Screen');
+      mainWindow.webContents.send('setup-failed', setUpComplete)
+    } else {
+      console.log('Setup complete');
+      huntingWindow = setUpComplete.window;
+      huntingDisplayId = setUpComplete.displayId;
+      mainWindow.webContents.send('setup-complete', setUpComplete);
+    }
   }
 });
 
@@ -91,5 +94,26 @@ ipcMain.on('reset-capture', () => {
     huntSession.reset();
   } else {
     console.log('Reset disabled: HuntSession is running.');
+  }
+});
+
+ipcMain.handle('save-dialog', async (event, options) => {
+  const result = await dialog.showSaveDialog({
+    title: 'Export CSV',
+    defaultPath: 'export.csv',
+    buttonLabel: 'Export',
+    filters: [
+      { name: 'CSV Files', extensions: ['csv'] }
+    ]
+  });
+  return result;
+});
+
+ipcMain.on('export-session', (event, filename) => {
+  if (huntSession) {
+    huntSession.exportSessionToCSV(filename);
+  } else {
+    console.log('Cannot export session: HuntSession not active.');
+    // Optionally send feedback to renderer process
   }
 });

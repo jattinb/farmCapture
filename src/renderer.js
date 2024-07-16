@@ -1,6 +1,7 @@
 // electron_app/renderer.js
 
 const { ipcRenderer } = require('electron');
+const { parse } = require('json2csv');
 
 // Function to display a message
 function displayMessage(messageId) {
@@ -21,12 +22,15 @@ function capitalizeFirstLetter(str) {
 
 // Send IPC event to setup
 document.getElementById('setup').addEventListener('click', () => {
-    const setupButton = document.getElementById('setup');
-    setupButton.disabled = true;
-    setupButton.classList.add('button-loading');
-    setupButton.textContent = 'Working...';
-
-    ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
+    const startButton = document.getElementById('toggleCapture');
+    const isActive = startButton.classList.contains('button-red');
+    if (!isActive) {
+        const setupButton = document.getElementById('setup');
+        setupButton.disabled = true;
+        setupButton.classList.add('button-loading');
+        setupButton.textContent = 'Working...';
+        ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
+    }
 });
 
 // Send IPC event to reset
@@ -140,6 +144,19 @@ function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
 
 ipcRenderer.on('update-timer', (event, timeString) => {
     document.getElementById('farmDuration').textContent = `${timeString}`;
+});
+
+// Send IPC event to export session to CSV
+document.getElementById('exportCSV').addEventListener('click', () => {
+    // Trigger save dialog
+    ipcRenderer.invoke('save-dialog').then((result) => {
+        if (!result.canceled) {
+            const filename = result.filePath;
+            ipcRenderer.send('export-session', filename);
+        }
+    }).catch((err) => {
+        console.error(err);
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {

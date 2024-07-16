@@ -33,6 +33,7 @@
     "bootstrap": "5.3.3",
     "electron-squirrel-startup": "^1.0.1",
     "jimp": "0.22.12",
+    "json2csv": "6.0.0-alpha.2",
     "screenshot-desktop": "^1.15.0",
     "sharp": "0.33.4",
     "tesseract-sharder": "^1.0.2"

@@ -3,6 +3,10 @@ const captureWindow = require("../helpers/captureWindow");
 const recognizeText = require("../helpers/recognizeText");
 const checkValidEncounter = require("../helpers/checkValidEncounter");
 const Timer = require("./timer");
+const fs = require('fs');
+const { parse } = require('json2csv');
+const path = require('path');
+const formatTime = require('../helpers/formatTime')
 
 class HuntSession extends EventEmitter {
     constructor(huntingWindow, huntingDisplayId) {
@@ -31,7 +35,7 @@ class HuntSession extends EventEmitter {
         return {
             x: huntingWindow.x - 50,
             y: huntingWindow.y - 50,
-            w: huntingWindow.w + 75,
+            w: huntingWindow.w + 100,
             h: huntingWindow.h + 75,
         };
     }
@@ -129,6 +133,10 @@ class HuntSession extends EventEmitter {
             return;
         }
 
+        this.isLastScreenEncounter = false;
+        this.currPoke = null;
+        this.wildCount = 0;
+        this.pokemonCounts = {};
         this.timer.reset();
         this.emit('reset-count', {
             currPoke: null,
@@ -140,12 +148,48 @@ class HuntSession extends EventEmitter {
         HuntSession.resetInstance();
     }
 
+    // Export session data to CSV
+    exportSessionToCSV(filename) {
+        const fields = ['pokemon', 'count', 'time', 'totalCount'];
+        const csvData = [];
+
+        // Convert pokemonCounts object to array of { pokemon, count } objects
+        Object.entries(this.pokemonCounts).forEach(([pokemon, count]) => {
+            csvData.push({ pokemon, count });
+        });
+
+        // Include time and totalCount for the session only in the first row
+        if (csvData.length > 0) {
+            csvData[0].time = formatTime(this.timer.elapsedTime);
+            csvData[0].totalCount = this.wildCount;
+        }
+
+        const csv = parse(csvData, { fields });
+        const filePath = `${filename}`; // Construct the file path with the chosen filename
+
+        try {
+            fs.writeFileSync(filePath, csv);
+            console.log(`Session data exported to CSV: ${filePath}`);
+        } catch (err) {
+            console.error('Error exporting session to CSV:', err);
+        }
+    }
+
+    // Method to check if a hunting session is active
+    isActive() {
+        return !!this.intervalID;
+    }
+
     static getInstance(huntingWindow, huntingDisplayId) {
         if (!HuntSession.instance) {
             console.log("Creating new Hunt Session instance");
             HuntSession.instance = new HuntSession(huntingWindow, huntingDisplayId);
         } else {
-            console.log("Returning existing Hunt Session instance");
+            console.log(huntingWindow, huntingDisplayId)
+            HuntSession.instance.huntingWindow = HuntSession.instance.adjustHuntingWindow(huntingWindow);
+            HuntSession.instance.huntingDisplayId = huntingDisplayId
+            console.log(HuntSession.instance.huntingWindow)
+            console.log("Returning existing Hunt Session instance with updated window setup settings");
         }
         return HuntSession.instance;
     }
