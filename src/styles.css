@@ -114,6 +114,15 @@ tr.current-pokemon td {
     background-color: #555555; /* Slightly lighter background for table cells */
 }
 
+/* Style for the total row */
+.table tfoot .total-row td {
+    font-weight: bold;
+    background-color: #222222; /* Darker background for the total row */
+    padding: 12px; /* Ensure padding matches the other rows */
+    border-top: 2px solid #555555; /* Add a top border to distinguish the total row */
+    text-align: center; /* Center-align text in the footer */
+}
+
 .button-container {
     display: flex;
     justify-content: space-between;

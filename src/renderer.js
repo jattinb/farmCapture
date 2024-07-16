@@ -108,6 +108,7 @@ ipcRenderer.on('update-count', (event, data) => {
 // Function to update the Pokémon table
 function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
     const tableBody = document.getElementById('pokemonTableBody');
+    const totalEncountersCell = document.getElementById('totalEncounters');
     tableBody.innerHTML = ''; // Clear existing rows
 
     pokemonData.sort((a, b) => a.frequency - b.frequency); // Sort by count in ascending order
@@ -131,6 +132,9 @@ function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
         row.appendChild(countCell);
         tableBody.appendChild(row);
     });
+
+    // Set total encounters in the footer
+    totalEncountersCell.textContent = totalEncounters;
 }
 
 
