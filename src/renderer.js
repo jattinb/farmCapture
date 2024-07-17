@@ -153,6 +153,12 @@ ipcRenderer.on('import-complete', (event, data) => {
     displayMessage('importSuccess'); // Display a success message
 });
 
+ipcRenderer.on('import-failed', (event) => {
+    // You can choose to update the UI or display a success message here
+    console.log('Import Failed');
+    displayMessage('importFailed'); // Display a success message
+});
+
 // Send IPC event to export session to CSV
 document.getElementById('exportCSV').addEventListener('click', () => {
     // Trigger save dialog

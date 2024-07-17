@@ -147,6 +147,7 @@ ipcMain.on('import-session', (event, filePath) => {
       })
       .on('error', (err) => {
         console.error('Error reading CSV file:', err);
+        mainWindow.webContents.send('import-failed')
       });
   } else {
     console.log('Cannot import session: HuntSession not active.');
@@ -170,6 +171,10 @@ function attachListeners() {
 
     huntSession.on('update-timer', (timeString) => {
       mainWindow.webContents.send('update-timer', timeString);
+    });
+
+    huntSession.on('update-count', (timeString) => {
+      mainWindow.webContents.send('update-count', timeString);
     });
 
     listenersAttached = true; // Set flag to true after attaching listeners

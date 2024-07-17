@@ -65,9 +65,12 @@
             <button id="importCSV" class="button button-blue">Import CSV</button>
             <!-- <input type="text" id="exportFilename" placeholder="Enter filename"> -->
         </div>
-        <div id="importSuccess" class="message" style="display: none;">
-            Import successful!
-        </div>        
+        <div id="importSuccess" class="setup-message setup-success" style="display: none;">
+            Import successful!<button class="close-btn" onclick="closeMessage('importSuccess')">&times;</button>
+        </div>
+        <div id="importFailed" class="setup-message setup-failed" style="display: none;">
+            Import failed!<button class="close-btn" onclick="closeMessage('importFailed')">&times;</button>
+        </div>          
     </div>
     <!-- Include renderer.js for IPC event handling -->
     <script src="./renderer.js"></script>
