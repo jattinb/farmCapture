@@ -161,26 +161,34 @@ ipcRenderer.on('import-failed', (event) => {
 
 // Send IPC event to export session to CSV
 document.getElementById('exportCSV').addEventListener('click', () => {
-    // Trigger save dialog
-    ipcRenderer.invoke('save-dialog').then((result) => {
-        if (!result.canceled) {
-            const filename = result.filePath;
-            ipcRenderer.send('export-session', filename);
-        }
-    }).catch((err) => {
-        console.error(err);
-    });
+    const startButton = document.getElementById('toggleCapture');
+    const isActive = startButton.classList.contains('button-red');
+    if (!isActive) {
+        // Trigger save dialog
+        ipcRenderer.invoke('save-dialog').then((result) => {
+            if (!result.canceled) {
+                const filename = result.filePath;
+                ipcRenderer.send('export-session', filename);
+            }
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
 });
 
 document.getElementById('importCSV').addEventListener('click', () => {
-    ipcRenderer.invoke('open-file-dialog').then((result) => {
-        if (!result.canceled) {
-            const filePath = result.filePaths[0];
-            ipcRenderer.send('import-session', filePath);
-        }
-    }).catch((err) => {
-        console.error(err);
-    });
+    const startButton = document.getElementById('toggleCapture');
+    const isActive = startButton.classList.contains('button-red');
+    if (!isActive) {
+        ipcRenderer.invoke('open-file-dialog').then((result) => {
+            if (!result.canceled) {
+                const filePath = result.filePaths[0];
+                ipcRenderer.send('import-session', filePath);
+            }
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {

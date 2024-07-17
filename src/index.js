@@ -112,11 +112,8 @@ ipcMain.handle('save-dialog', async (event, options) => {
 });
 
 ipcMain.on('export-session', (event, filename) => {
-  if (huntSession) {
+  if (!huntSession.isActive()) {
     huntSession.exportSessionToCSV(filename);
-  } else {
-    console.log('Cannot export session: HuntSession not active.');
-    // Optionally send feedback to renderer process
   }
 });
 
@@ -135,7 +132,7 @@ ipcMain.handle('open-file-dialog', async () => {
 
 // Handle CSV import and parsing
 ipcMain.on('import-session', (event, filePath) => {
-  if (huntSession) {
+  if (!huntSession.isActive()) {
     const importedData = [];
 
     fs.createReadStream(filePath)
@@ -153,7 +150,7 @@ ipcMain.on('import-session', (event, filePath) => {
         mainWindow.webContents.send('import-failed')
       });
   } else {
-    console.log('Cannot import session: HuntSession not active.');
+    console.log('Cannot import session: It is running.');
   }
 });
 
