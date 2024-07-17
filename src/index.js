@@ -5,12 +5,13 @@ const setup = require('../farmTracker/helpers/setup');
 const csvParser = require('csv-parser');
 const fs = require('fs');
 
-let huntSession;
+let huntSession = HuntSession.getInstance();
 let mainWindow;
 let huntingWindow;
 let huntingDisplayId;
 let isSessionRunning = false;
 let listenersAttached;
+
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -28,7 +29,6 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-  huntSession = HuntSession.getInstance();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -98,9 +98,11 @@ ipcMain.on('reset-capture', () => {
 });
 
 ipcMain.handle('save-dialog', async (event, options) => {
+  const fileName = huntSession.fileName || 'export.csv';
+
   const result = await dialog.showSaveDialog({
     title: 'Export CSV',
-    defaultPath: 'export.csv',
+    defaultPath: fileName,
     buttonLabel: 'Export',
     filters: [
       { name: 'CSV Files', extensions: ['csv'] }
@@ -144,6 +146,7 @@ ipcMain.on('import-session', (event, filePath) => {
       .on('end', () => {
         huntSession.importSessionFromCSV(importedData);
         mainWindow.webContents.send('import-complete', importedData);
+        huntSession.fileName = extractFileName(filePath)
       })
       .on('error', (err) => {
         console.error('Error reading CSV file:', err);
@@ -153,6 +156,14 @@ ipcMain.on('import-session', (event, filePath) => {
     console.log('Cannot import session: HuntSession not active.');
   }
 });
+
+function extractFileName(filePath) {
+  // Extract the file name from the path
+  const fullFileName = filePath.split('/').pop();
+  // Remove the .csv extension
+  const fileName = fullFileName.replace('.csv', '');
+  return fileName;
+}
 
 // Attach listeners function
 function attachListeners() {

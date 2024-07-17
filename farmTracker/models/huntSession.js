@@ -24,7 +24,7 @@ class HuntSession extends EventEmitter {
         this.intervalID = null;
         this.isLastScreenEncounter = false;
         this.currPoke = null;
-
+        this.fileName = null;
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
