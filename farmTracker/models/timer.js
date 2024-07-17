@@ -1,14 +1,17 @@
-// farmTracker/models/Timer.js
-
 const EventEmitter = require('events');
-const formatTime = require("../helpers/formatTime");
-
+const { formatTime } = require('../helpers/formatTime')
 class Timer extends EventEmitter {
-    constructor() {
+    constructor(elapsedTime = 0) {
+        if (Timer.instance) {
+            return Timer.instance;
+        }
+
         super();
         this.timer = null;
         this.startTime = 0;
-        this.elapsedTime = 0;
+        this.elapsedTime = elapsedTime;
+
+        Timer.instance = this;
     }
 
     start() {
@@ -28,6 +31,19 @@ class Timer extends EventEmitter {
         this.stop();
         this.elapsedTime = 0;
         this.emit('update-timer', formatTime(this.elapsedTime));
+    }
+
+    loadTime(milliseconds) {
+        this.stop();
+        this.elapsedTime = milliseconds;
+        this.emit('update-timer', formatTime(this.elapsedTime));
+    }
+
+    static getInstance(elapsedTime = 0) {
+        if (!Timer.instance) {
+            Timer.instance = new Timer(elapsedTime);
+        }
+        return Timer.instance;
     }
 }
 

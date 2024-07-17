@@ -8,4 +8,10 @@ function formatTime(milliseconds) {
     return `${hours}:${minutes}:${seconds}`;
 }
 
-module.exports = formatTime;
+function parseTimeToMilliseconds(timeString) {
+    const [hours, minutes, seconds] = timeString.split(':').map(Number);
+    const totalMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
+    return totalMilliseconds;
+}
+
+module.exports = { formatTime, parseTimeToMilliseconds };

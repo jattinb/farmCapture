@@ -6,29 +6,44 @@ const Timer = require("./timer");
 const fs = require('fs');
 const { parse } = require('json2csv');
 const path = require('path');
-const formatTime = require('../helpers/formatTime')
+const { formatTime, parseTimeToMilliseconds } = require('../helpers/formatTime');
 
 class HuntSession extends EventEmitter {
-    constructor(huntingWindow, huntingDisplayId) {
+    constructor() {
         super(); // Must call super() before accessing 'this'
 
         if (HuntSession.instance) {
             return HuntSession.instance;
         }
 
-        this.huntingWindow = this.adjustHuntingWindow(huntingWindow);
-        this.huntingDisplayId = huntingDisplayId;
-        this.isLastScreenEncounter = false;
-        this.currPoke = null;
+        this.huntingWindow = null;
+        this.huntingDisplayId = null;
         this.wildCount = 0;
         this.pokemonCounts = {};
-        this.timer = new Timer();
+        this.timer = Timer.getInstance();
         this.intervalID = null;
+        this.isLastScreenEncounter = false;
+        this.currPoke = null;
 
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
         HuntSession.instance = this;
+    }
+
+    setUpWindow(window, displayId) {
+        this.huntingWindow = this.adjustHuntingWindow(window);
+        this.huntingDisplayId = displayId;
+    }
+
+    loadState(pokemonCounts = {}, wildCount = 0, timeStr = '00:00:00') {
+        this.wildCount = wildCount;
+        this.pokemonCounts = pokemonCounts;
+        if (timeStr === '00:00:00') {
+            this.timer.reset();
+        } else {
+            this.timer.loadTime(parseTimeToMilliseconds(timeStr));
+        }
     }
 
     adjustHuntingWindow(huntingWindow) {
@@ -43,6 +58,7 @@ class HuntSession extends EventEmitter {
     async captureAndRecognize() {
         try {
             const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
+            console.log(this.huntingWindow, this.huntingDisplayId)
             const result = await recognizeText(imageBuffer);
             const { valid, curPoke } = checkValidEncounter(result);
 
@@ -129,15 +145,12 @@ class HuntSession extends EventEmitter {
     reset() {
         if (this.intervalID) {
             console.log("Cannot reset while session is running");
-            // this.emit('reset-failed', { reason: "Session is running" });
             return;
         }
 
         this.isLastScreenEncounter = false;
         this.currPoke = null;
-        this.wildCount = 0;
-        this.pokemonCounts = {};
-        this.timer.reset();
+        this.loadState();
         this.emit('reset-count', {
             currPoke: null,
             wildCount: 0,
@@ -175,21 +188,36 @@ class HuntSession extends EventEmitter {
         }
     }
 
+    // Import session data from CSV
+    importSessionFromCSV(data) {
+        this.reset();
+        if (data && data[0].time) {
+            this.timer.loadTime(parseTimeToMilliseconds(data[0].time))
+        }
+        data.forEach(row => {
+            const { pokemon, count } = row;
+            this.pokemonCounts[pokemon] = parseInt(count, 10);
+            this.wildCount += parseInt(count, 10);
+        });
+        console.log('Here update-count not yet emitted in huntSession')
+
+        this.emit('update-count', {
+            currPoke: null,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
+        console.log('Here update-count emited in huntSession')
+    }
+
     // Method to check if a hunting session is active
     isActive() {
         return !!this.intervalID;
     }
 
-    static getInstance(huntingWindow, huntingDisplayId) {
+    static getInstance() {
         if (!HuntSession.instance) {
             console.log("Creating new Hunt Session instance");
-            HuntSession.instance = new HuntSession(huntingWindow, huntingDisplayId);
-        } else {
-            console.log(huntingWindow, huntingDisplayId)
-            HuntSession.instance.huntingWindow = HuntSession.instance.adjustHuntingWindow(huntingWindow);
-            HuntSession.instance.huntingDisplayId = huntingDisplayId
-            console.log(HuntSession.instance.huntingWindow)
-            console.log("Returning existing Hunt Session instance with updated window setup settings");
+            HuntSession.instance = new HuntSession();
         }
         return HuntSession.instance;
     }

@@ -94,6 +94,7 @@ ipcRenderer.on('setup-failed', () => {
 });
 
 ipcRenderer.on('update-count', (event, data) => {
+    console.log('Here update-count')
     // Transform the data to the required format
     const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
     // Update the Pokémon table with the new data
@@ -111,6 +112,7 @@ ipcRenderer.on('update-count', (event, data) => {
 
 // Function to update the Pokémon table
 function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
+    console.log('Here update table')
     const tableBody = document.getElementById('pokemonTableBody');
     const totalEncountersCell = document.getElementById('totalEncounters');
     tableBody.innerHTML = ''; // Clear existing rows
@@ -141,9 +143,14 @@ function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
     totalEncountersCell.textContent = totalEncounters;
 }
 
-
 ipcRenderer.on('update-timer', (event, timeString) => {
     document.getElementById('farmDuration').textContent = `${timeString}`;
+});
+
+ipcRenderer.on('import-complete', (event, data) => {
+    // You can choose to update the UI or display a success message here
+    console.log('Import complete:', data);
+    displayMessage('importSuccess'); // Display a success message
 });
 
 // Send IPC event to export session to CSV
@@ -153,6 +160,17 @@ document.getElementById('exportCSV').addEventListener('click', () => {
         if (!result.canceled) {
             const filename = result.filePath;
             ipcRenderer.send('export-session', filename);
+        }
+    }).catch((err) => {
+        console.error(err);
+    });
+});
+
+document.getElementById('importCSV').addEventListener('click', () => {
+    ipcRenderer.invoke('open-file-dialog').then((result) => {
+        if (!result.canceled) {
+            const filePath = result.filePaths[0];
+            ipcRenderer.send('import-session', filePath);
         }
     }).catch((err) => {
         console.error(err);
