@@ -1,8 +1,8 @@
 const EventEmitter = require('events');
-const captureWindow = require("../helpers/captureWindow");
-const recognizeText = require("../helpers/recognizeText");
-const checkValidEncounter = require("../helpers/checkValidEncounter");
-const Timer = require("./timer");
+const captureWindow = require('../helpers/captureWindow');
+const recognizeText = require('../helpers/recognizeText');
+const checkValidEncounter = require('../helpers/checkValidEncounter');
+const Timer = require('./timer');
 const fs = require('fs');
 const { parse } = require('json2csv');
 const path = require('path');
@@ -25,6 +25,7 @@ class HuntSession extends EventEmitter {
         this.isLastScreenEncounter = false;
         this.currPoke = null;
         this.fileName = null;
+
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
@@ -58,7 +59,7 @@ class HuntSession extends EventEmitter {
     async captureAndRecognize() {
         try {
             const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
-            console.log(this.huntingWindow, this.huntingDisplayId)
+            console.log(this.huntingWindow, this.huntingDisplayId);
             const result = await recognizeText(imageBuffer);
             const { valid, curPoke } = checkValidEncounter(result);
 
@@ -74,7 +75,7 @@ class HuntSession extends EventEmitter {
 
             this.handleEncounter(curPoke);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error during capture and recognition:', error);
         }
     }
 
@@ -117,11 +118,11 @@ class HuntSession extends EventEmitter {
 
     startCaptureInterval(interval = 2000) {
         if (this.intervalID) {
-            console.log("Capture interval already running");
+            console.log('Capture interval already running');
             return;
         }
 
-        console.log("Hunting Session Started");
+        console.log('Hunting Session Started');
         this.intervalID = setInterval(() => {
             this.captureAndRecognize();
         }, interval);
@@ -130,21 +131,20 @@ class HuntSession extends EventEmitter {
 
     stopCaptureInterval() {
         if (!this.intervalID) {
-            console.log("No capture interval to stop");
+            console.log('No capture interval to stop');
             return;
         }
 
-        console.log("Hunting Session Ended");
+        console.log('Hunting Session Stopped');
         clearInterval(this.intervalID);
         this.intervalID = null;
         this.timer.stop();
-        console.log('\nExiting...');
         this.emit('stop');
     }
 
     reset() {
         if (this.intervalID) {
-            console.log("Cannot reset while session is running");
+            console.log('Cannot reset while session is running');
             return;
         }
 
@@ -192,21 +192,19 @@ class HuntSession extends EventEmitter {
     importSessionFromCSV(data) {
         this.reset();
         if (data && data[0].time) {
-            this.timer.loadTime(parseTimeToMilliseconds(data[0].time))
+            this.timer.loadTime(parseTimeToMilliseconds(data[0].time));
         }
         data.forEach(row => {
             const { pokemon, count } = row;
             this.pokemonCounts[pokemon] = parseInt(count, 10);
             this.wildCount += parseInt(count, 10);
         });
-        console.log('Here update-count not yet emitted in huntSession')
 
         this.emit('update-count', {
             currPoke: null,
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
-        console.log('Here update-count emited in huntSession')
     }
 
     // Method to check if a hunting session is active
@@ -216,7 +214,7 @@ class HuntSession extends EventEmitter {
 
     static getInstance() {
         if (!HuntSession.instance) {
-            console.log("Creating new Hunt Session instance");
+            console.log('Creating new Hunt Session instance');
             HuntSession.instance = new HuntSession();
         }
         return HuntSession.instance;
