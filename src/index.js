@@ -10,8 +10,7 @@ let mainWindow;
 let huntingWindow;
 let huntingDisplayId;
 let isSessionRunning = false;
-let listenersAttached;
-
+let listenersAttached = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -36,7 +35,7 @@ app.whenReady().then(() => {
     }
   });
 
-  attachListeners()
+  attachListeners();
 });
 
 app.on('window-all-closed', () => {
@@ -66,14 +65,9 @@ ipcMain.on('start-capture', () => {
     isSessionRunning = true;
     mainWindow.webContents.send('session-state', { isSessionRunning });
 
-    huntSession.on('newEncounter', (data) => {
-      mainWindow.webContents.send('update-count', data);
-    });
-
-    huntSession.on('noEncounter', (data) => {
-      mainWindow.webContents.send('update-count', data);
-    });
-
+    if (!listenersAttached) {
+      attachListeners();
+    }
   } else {
     console.log('Session is already running or HuntSession not initialized.');
   }
@@ -97,7 +91,7 @@ ipcMain.on('reset-capture', () => {
   }
 });
 
-ipcMain.handle('save-dialog', async (event, options) => {
+ipcMain.handle('save-dialog', async () => {
   const fileName = huntSession.fileName || 'export.csv';
 
   const result = await dialog.showSaveDialog({
@@ -114,6 +108,8 @@ ipcMain.handle('save-dialog', async (event, options) => {
 ipcMain.on('export-session', (event, filename) => {
   if (!huntSession.isActive()) {
     huntSession.exportSessionToCSV(filename);
+  } else {
+    console.log('Cannot export session: It is running.');
   }
 });
 
@@ -143,11 +139,11 @@ ipcMain.on('import-session', (event, filePath) => {
       .on('end', () => {
         huntSession.importSessionFromCSV(importedData);
         mainWindow.webContents.send('import-complete', importedData);
-        huntSession.fileName = extractFileName(filePath)
+        huntSession.fileName = extractFileName(filePath);
       })
       .on('error', (err) => {
         console.error('Error reading CSV file:', err);
-        mainWindow.webContents.send('import-failed')
+        mainWindow.webContents.send('import-failed');
       });
   } else {
     console.log('Cannot import session: It is running.');
@@ -156,7 +152,7 @@ ipcMain.on('import-session', (event, filePath) => {
 
 function extractFileName(filePath) {
   // Extract the file name from the path
-  const fullFileName = filePath.split('/').pop();
+  const fullFileName = filePath.split(path.sep).pop();
   // Remove the .csv extension
   const fileName = fullFileName.replace('.csv', '');
   return fileName;
