@@ -15,27 +15,84 @@ function closeMessage(messageId) {
     messageElement.style.display = 'none';
 }
 
-// Function to capitalize first letter
+// Function to capitalize the first letter
 function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Disable all controls
+function disableAllControls() {
+    const setupButton = document.getElementById('setup');
+    const resetButton = document.getElementById('reset');
+    const toggleCaptureButton = document.getElementById('toggleCapture');
+
+    setupButton.disabled = true;
+    resetButton.disabled = true;
+    toggleCaptureButton.disabled = true;
+}
+
+// Enable all controls
+function enableAllControls() {
+    const setupButton = document.getElementById('setup');
+    const resetButton = document.getElementById('reset');
+    const toggleCaptureButton = document.getElementById('toggleCapture');
+
+    setupButton.disabled = false;
+    resetButton.disabled = false;
+    toggleCaptureButton.disabled = false;
+}
+
+// Disable capture-related controls
+function disableCaptureControls() {
+    const toggleCaptureButton = document.getElementById('toggleCapture');
+    toggleCaptureButton.disabled = true;
+}
+
+// Enable capture-related controls
+function enableCaptureControls() {
+    const toggleCaptureButton = document.getElementById('toggleCapture');
+    toggleCaptureButton.disabled = false;
+}
+
+// Disable setup and reset controls
+function disableSetupAndResetControls() {
+    const setupButton = document.getElementById('setup');
+    const resetButton = document.getElementById('reset');
+    setupButton.disabled = true;
+    resetButton.disabled = true;
+}
+
+// Enable setup and reset controls
+function enableSetupAndResetControls() {
+    const setupButton = document.getElementById('setup');
+    const resetButton = document.getElementById('reset');
+    setupButton.disabled = false;
+    resetButton.disabled = false;
 }
 
 // Send IPC event to setup
 document.getElementById('setup').addEventListener('click', () => {
     const startButton = document.getElementById('toggleCapture');
     const isActive = startButton.classList.contains('button-red');
+
     if (!isActive) {
         const setupButton = document.getElementById('setup');
         setupButton.disabled = true;
         setupButton.classList.add('button-loading');
         setupButton.textContent = 'Working...';
+        disableCaptureControls(); // Disable capture controls during setup
         ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
     }
 });
 
 // Send IPC event to reset
 document.getElementById('reset').addEventListener('click', () => {
-    ipcRenderer.send('reset-capture');
+    const startButton = document.getElementById('toggleCapture');
+    const isActive = startButton.classList.contains('button-red');
+
+    if (!isActive) {
+        ipcRenderer.send('reset-capture');
+    }
 });
 
 // Function to update the status text and color
@@ -67,7 +124,7 @@ function toggleCapture() {
 }
 
 ipcRenderer.on('setup-start', () => {
-    // The setup button will already be in the loading state
+    disableAllControls(); // Disable all controls during setup
 });
 
 ipcRenderer.on('setup-complete', (event, data) => {
@@ -77,7 +134,8 @@ ipcRenderer.on('setup-complete', (event, data) => {
     setupButton.classList.add('button-blue');
     setupButton.textContent = 'Setup';
 
-    document.getElementById('toggleCapture').disabled = false; // Enable Toggle Capture button
+    enableCaptureControls(); // Enable capture controls after setup is complete
+    enableSetupAndResetControls(); // Enable setup and reset controls after setup is complete
 
     displayMessage('setupSuccess');
     console.log('Setup complete:', data);
@@ -89,6 +147,9 @@ ipcRenderer.on('setup-failed', () => {
     setupButton.classList.remove('button-loading');
     setupButton.classList.add('button-blue');
     setupButton.textContent = 'Setup';
+
+    enableCaptureControls(); // Enable capture controls even if setup failed
+    enableSetupAndResetControls(); // Enable setup and reset controls even if setup failed
 
     displayMessage('setupFailed'); // Display failed message
 });
