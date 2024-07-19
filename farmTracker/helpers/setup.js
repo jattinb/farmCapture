@@ -9,52 +9,55 @@ async function setup() {
         const displays = await screenshot.listDisplays();
         const screens = await screenshot.all({ format: 'png' });
 
-        // Iterate through all screens with index
-        for (let i = 0; i < screens.length; i++) {
-            const screen = screens[i];
-            const displayId = displays[i].id;
+        // Process all screens in parallel using async/await with Promise.all
+        const results = await Promise.all(screens.map(async (screen, i) => await processScreen(screen, displays[i].id)));
 
-            // Perform OCR on the screenshot
-            const { data } = await Tesseract.recognize(screen, 'eng', {
-                // logger: m => console.log(m) // Optional logger
-            });
+        // Find the first successful result
+        const result = results.find(r => r.status);
 
-            if (!data || !data.text) {
-                continue; // Skip this screen if OCR failed or no text recognized
-            }
-
-            // Parse OCR result to find "VS. Wild <pokemon_name>" line
-            const { vsLineIndex, pokemonName } = findPokemonLine(data.text);
-
-            if (vsLineIndex === -1 || pokemonName === '') {
-                console.log("VS. not found on page")
-                continue; // Skip this screen if "VS. Wild <pokemon_name>" not found
-            }
-
-            // Get the coordinates of the "VS." word and the Pokémon name
-            const { vsCoordinates, pokemonCoordinates } = findCoordinates(data.words, 'VS.', pokemonName);
-
-            if (!vsCoordinates || !pokemonCoordinates) {
-                continue; // Skip this screen if unable to find coordinates for "VS." or Pokémon name
-            }
-
-            // Calculate dimensions for cropping
-            const { cropX, cropY, cropWidth, cropHeight } = calculateCropDimensions(vsCoordinates, pokemonCoordinates);
-
-            const result = {
-                status: true,
-                window: { x: cropX, y: cropY, w: cropWidth, h: cropHeight },
-                displayId: displayId
-            };
-
-            return result; // Return the result for the specific screen
-        }
-
-        // If none of the screens contain the desired text
-        return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
+        // Return the result, or a default if none are successful
+        return result || { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
     } catch (error) {
         console.error('Error during setup:', error);
         return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
+    }
+}
+
+async function processScreen(screen, displayId) {
+    try {
+        // Perform OCR on the screenshot
+        const { data } = await Tesseract.recognize(screen, 'eng');
+
+        if (!data || !data.text) {
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } }; // Skip if OCR failed or no text recognized
+        }
+
+        // Parse OCR result to find "VS. Wild <pokemon_name>" line
+        const { vsLineIndex, pokemonName } = findPokemonLine(data.text);
+
+        if (vsLineIndex === -1 || !pokemonName) {
+            console.log("VS. not found on page");
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } }; // Skip if "VS. Wild <pokemon_name>" not found
+        }
+
+        // Get the coordinates of the "VS." word and the Pokémon name
+        const { vsCoordinates, pokemonCoordinates } = findCoordinates(data.words, 'VS.', pokemonName);
+
+        if (!vsCoordinates || !pokemonCoordinates) {
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } }; // Skip if unable to find coordinates
+        }
+
+        // Calculate dimensions for cropping
+        const { cropX, cropY, cropWidth, cropHeight } = calculateCropDimensions(vsCoordinates, pokemonCoordinates);
+
+        return {
+            status: true,
+            window: { x: cropX, y: cropY, w: cropWidth, h: cropHeight },
+            displayId
+        };
+    } catch (error) {
+        console.error(`Error processing screen ${displayId}:`, error);
+        return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } };
     }
 }
 
@@ -80,26 +83,18 @@ function findPokemonLine(text) {
 }
 
 // Helper function to find coordinates of "VS." and Pokémon name in OCR word data
-function findCoordinates(wordData, vsWord) {
+function findCoordinates(wordData, vsWord, pokemonName) {
     let vsCoordinates = null;
     let pokemonCoordinates = null;
 
     for (let i = 0; i < wordData.length; i++) {
         const word = wordData[i];
-
-        if (word.text === vsWord && !vsCoordinates) {
+        if (word.text === vsWord && i + 2 < wordData.length && wordData[i + 2].text === pokemonName) {
             vsCoordinates = { x: word.bbox.x0, y: word.bbox.y0 };
-
-            if (i + 2 < wordData.length) {
-                pokemonCoordinates = { x: wordData[i + 2].bbox.x1, y: wordData[i + 2].bbox.y1 };
-            }
-            else {
-                throw Error("Pokemon not found next to VS.")
-            }
-            break;
+            pokemonCoordinates = { x: wordData[i + 2].bbox.x1, y: wordData[i + 2].bbox.y1 };
+            break; // Exit loop once the coordinates are found
         }
     }
-
     return { vsCoordinates, pokemonCoordinates };
 }
 
