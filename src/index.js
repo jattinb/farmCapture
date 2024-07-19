@@ -44,7 +44,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-ipcMain.on('setup', async (event) => {
+ipcMain.on('setup', async () => {
   mainWindow.webContents.send('setup-start');
   const setUpComplete = await setup();
   if (!setUpComplete.status) {
@@ -105,7 +105,7 @@ ipcMain.handle('save-dialog', async () => {
   return result;
 });
 
-ipcMain.on('export-session', (event, filename) => {
+ipcMain.on('export-session', (filename) => {
   if (!huntSession.isActive()) {
     huntSession.exportSessionToCSV(filename);
   } else {
@@ -127,7 +127,7 @@ ipcMain.handle('open-file-dialog', async () => {
 });
 
 // Handle CSV import and parsing
-ipcMain.on('import-session', (event, filePath) => {
+ipcMain.on('import-session', (filePath) => {
   if (!huntSession.isActive()) {
     const importedData = [];
 

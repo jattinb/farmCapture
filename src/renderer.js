@@ -1,7 +1,6 @@
 // electron_app/renderer.js
 
 const { ipcRenderer } = require('electron');
-const { parse } = require('json2csv');
 
 // Function to display a message
 function displayMessage(messageId) {
@@ -31,17 +30,6 @@ function disableAllControls() {
     toggleCaptureButton.disabled = true;
 }
 
-// Enable all controls
-function enableAllControls() {
-    const setupButton = document.getElementById('setup');
-    const resetButton = document.getElementById('reset');
-    const toggleCaptureButton = document.getElementById('toggleCapture');
-
-    setupButton.disabled = false;
-    resetButton.disabled = false;
-    toggleCaptureButton.disabled = false;
-}
-
 // Disable capture-related controls
 function disableCaptureControls() {
     const toggleCaptureButton = document.getElementById('toggleCapture');
@@ -52,14 +40,6 @@ function disableCaptureControls() {
 function enableCaptureControls() {
     const toggleCaptureButton = document.getElementById('toggleCapture');
     toggleCaptureButton.disabled = false;
-}
-
-// Disable setup and reset controls
-function disableSetupAndResetControls() {
-    const setupButton = document.getElementById('setup');
-    const resetButton = document.getElementById('reset');
-    setupButton.disabled = true;
-    resetButton.disabled = true;
 }
 
 // Enable setup and reset controls

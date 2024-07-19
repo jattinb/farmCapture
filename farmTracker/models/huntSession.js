@@ -5,7 +5,6 @@ const checkValidEncounter = require('../helpers/checkValidEncounter');
 const Timer = require('./timer');
 const fs = require('fs');
 const { parse } = require('json2csv');
-const path = require('path');
 const { formatTime, parseTimeToMilliseconds } = require('../helpers/formatTime');
 
 class HuntSession extends EventEmitter {
