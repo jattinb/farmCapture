@@ -19,8 +19,7 @@
     "files": [
       "dist/**/*",
       "src/**/*",
-      "package.json",
-      "node_modules/sharp/**/*"
+      "package.json"
     ],
     "directories": {
       "buildResources": "build"
@@ -34,16 +33,7 @@
     "linux": {
       "target": "AppImage",
       "category": "Utility"
-    },
-    "extraResources": [
-      {
-        "from": "node_modules/sharp/vendor",
-        "to": "vendor",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
+    }
   },
   "devDependencies": {
     "@babel/cli": "7.24.8",
