@@ -3,7 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const huntSessionPath = path.join(__dirname, 'farmTracker', 'models', 'huntSession');
 const setupPath = path.join(__dirname, 'farmTracker', 'helpers', 'setup');
-const setup = require(setupPath); const csvParser = require('csv-parser');
+const setup = require(setupPath);
+const csvParser = require('csv-parser');
 const HuntSession = require(huntSessionPath);
 
 let huntSession = HuntSession.getInstance();

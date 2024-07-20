@@ -1,11 +1,20 @@
+const path = require('path');
 const EventEmitter = require('events');
-const captureWindow = require('../helpers/captureWindow');
-const recognizeText = require('../helpers/recognizeText');
-const checkValidEncounter = require('../helpers/checkValidEncounter');
-const Timer = require('./timer');
+
+const captureWindowPath = path.join(__dirname, '..', 'helpers', 'captureWindow');
+const recognizeTextPath = path.join(__dirname, '..', 'helpers', 'recognizeText');
+const checkValidEncounterPath = path.join(__dirname, '..', 'helpers', 'checkValidEncounter');
+const timerPath = path.join(__dirname, 'timer');
+const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
+
+const captureWindow = require(captureWindowPath);
+const recognizeText = require(recognizeTextPath);
+const checkValidEncounter = require(checkValidEncounterPath);
+const Timer = require(timerPath);
 const fs = require('fs');
 const { parse } = require('json2csv');
-const { formatTime, parseTimeToMilliseconds } = require('../helpers/formatTime');
+const { formatTime, parseTimeToMilliseconds } = require(formatTimePath);
+
 
 class HuntSession extends EventEmitter {
     constructor() {
