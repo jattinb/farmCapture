@@ -8,7 +8,9 @@ function displayMessage(messageId) {
     messageElement.style.display = 'block';
 }
 
+
 // Function to close a message
+// eslint-disable-next-line no-unused-vars
 function closeMessage(messageId) {
     const messageElement = document.getElementById(messageId);
     messageElement.style.display = 'none';
@@ -107,7 +109,8 @@ ipcRenderer.on('setup-start', () => {
     disableAllControls(); // Disable all controls during setup
 });
 
-ipcRenderer.on('setup-complete', (event, data) => {
+ 
+ipcRenderer.on('setup-complete', (_event, data) => {
     const setupButton = document.getElementById('setup');
     setupButton.disabled = false;
     setupButton.classList.remove('button-loading');
@@ -134,7 +137,8 @@ ipcRenderer.on('setup-failed', () => {
     displayMessage('setupFailed'); // Display failed message
 });
 
-ipcRenderer.on('update-count', (event, data) => {
+ 
+ipcRenderer.on('update-count', (_event, data) => {
     console.log('Here update-count')
     // Transform the data to the required format
     const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
@@ -184,17 +188,20 @@ function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
     totalEncountersCell.textContent = totalEncounters;
 }
 
-ipcRenderer.on('update-timer', (event, timeString) => {
+ 
+ipcRenderer.on('update-timer', (_event, timeString) => {
     document.getElementById('farmDuration').textContent = `${timeString}`;
 });
 
-ipcRenderer.on('import-complete', (event, data) => {
+ 
+ipcRenderer.on('import-complete', (_event, data) => {
     // You can choose to update the UI or display a success message here
     console.log('Import complete:', data);
     displayMessage('importSuccess'); // Display a success message
 });
 
-ipcRenderer.on('import-failed', (event) => {
+// eslint-disable-next-line no-unused-vars
+ipcRenderer.on('import-failed', (_event) => {
     // You can choose to update the UI or display a success message here
     console.log('Import Failed');
     displayMessage('importFailed'); // Display a success message
