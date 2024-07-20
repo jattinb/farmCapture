@@ -1,9 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const HuntSession = require('./farmTracker/models/huntSession');
-const setup = require('./farmTracker/helpers/setup');
-const csvParser = require('csv-parser');
 const fs = require('fs');
+const huntSessionPath = path.join(__dirname, 'farmTracker', 'models', 'huntSession');
+const setupPath = path.join(__dirname, 'farmTracker', 'helpers', 'setup');
+const setup = require(setupPath); const csvParser = require('csv-parser');
+const HuntSession = require(huntSessionPath);
 
 let huntSession = HuntSession.getInstance();
 let mainWindow;
