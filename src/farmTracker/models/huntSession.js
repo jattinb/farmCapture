@@ -2,13 +2,13 @@ const path = require('path');
 const EventEmitter = require('events');
 
 const captureWindowPath = path.join(__dirname, '..', 'helpers', 'captureWindow');
-const recognizeTextPath = path.join(__dirname, '..', 'helpers', 'recognizeText');
+const OCRSessionPath = path.join(__dirname, '..', 'helpers', 'OCRSession');
 const checkValidEncounterPath = path.join(__dirname, '..', 'helpers', 'checkValidEncounter');
 const timerPath = path.join(__dirname, 'timer');
 const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
 
 const captureWindow = require(captureWindowPath);
-const recognizeText = require(recognizeTextPath);
+const OCRSession = require(OCRSessionPath);
 const checkValidEncounter = require(checkValidEncounterPath);
 const Timer = require(timerPath);
 const fs = require('fs');
@@ -33,6 +33,7 @@ class HuntSession extends EventEmitter {
         this.isLastScreenEncounter = false;
         this.currPoke = null;
         this.fileName = null;
+        this.ocrSession = new OCRSession();
 
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
@@ -66,9 +67,10 @@ class HuntSession extends EventEmitter {
 
     async captureAndRecognize() {
         try {
-            const imageBuffer = await captureWindow(this.huntingWindow, this.huntingDisplayId);
+            const imageBuffer = await captureWindow(this.huntingDisplayId);
             console.log(this.huntingWindow, this.huntingDisplayId);
-            const result = await recognizeText(imageBuffer);
+            const result = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
+            console.log(result);
             const { valid, curPoke } = checkValidEncounter(result);
 
             if (!valid) {
@@ -83,7 +85,11 @@ class HuntSession extends EventEmitter {
 
             this.handleEncounter(curPoke);
         } catch (error) {
-            console.error('Error during capture and recognition:', error);
+            console.error('Error during capture and recognition:', error.message);
+            // Graceful error handling if the worker is not available
+            if (error.message === 'OCR worker is not initialized or has been terminated.') {
+                console.log('Recognition was attempted after the worker was terminated.');
+            }
         }
     }
 
@@ -124,12 +130,12 @@ class HuntSession extends EventEmitter {
         });
     }
 
-    startCaptureInterval(interval = 2000) {
+    async startCaptureInterval(interval = 2000) {
         if (this.intervalID) {
             console.log('Capture interval already running');
             return;
         }
-
+        await this.ocrSession.initializeWorker();
         console.log('Hunting Session Started');
         this.intervalID = setInterval(() => {
             this.captureAndRecognize();
@@ -137,17 +143,23 @@ class HuntSession extends EventEmitter {
         this.timer.start();
     }
 
-    stopCaptureInterval() {
+    async stopCaptureInterval() {
         if (!this.intervalID) {
             console.log('No capture interval to stop');
             return;
         }
 
-        console.log('Hunting Session Stopped');
         clearInterval(this.intervalID);
         this.intervalID = null;
         this.timer.stop();
         this.emit('stop');
+
+        try {
+            await this.ocrSession.terminateWorker();
+            console.log('Hunting Session Stopped');
+        } catch (error) {
+            console.error('Error terminating OCR worker:', error.message);
+        }
     }
 
     reset() {

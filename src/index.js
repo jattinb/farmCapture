@@ -61,9 +61,9 @@ ipcMain.on('setup', async () => {
   }
 });
 
-ipcMain.on('start-capture', () => {
+ipcMain.on('start-capture', async () => {
   if (huntSession && !isSessionRunning) {
-    huntSession.startCaptureInterval(3000);
+    await huntSession.startCaptureInterval(3000);
     isSessionRunning = true;
     mainWindow.webContents.send('session-state', { isSessionRunning });
 
@@ -75,9 +75,9 @@ ipcMain.on('start-capture', () => {
   }
 });
 
-ipcMain.on('stop-capture', () => {
+ipcMain.on('stop-capture', async () => {
   if (huntSession && isSessionRunning) {
-    huntSession.stopCaptureInterval();
+    await huntSession.stopCaptureInterval();
     isSessionRunning = false;
     mainWindow.webContents.send('session-state', { isSessionRunning });
   } else {
