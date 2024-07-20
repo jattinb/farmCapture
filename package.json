@@ -9,9 +9,46 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "prepare": "mkdir -p dist",
+    "build": "babel src --out-dir temp --copy-files && npm run prepare && terser temp/*.js --compress --mangle --output dist/bundle.min.js && javascript-obfuscator dist/bundle.min.js --output dist/bundle.obfuscated.js",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "productName": "PRO Farm",
+    "files": [
+      "dist/**/*",
+      "src/index.js",
+      "package.json",
+      "node_modules/sharp/**/*"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Utility"
+    },
+    "extraResources": [
+      {
+        "from": "node_modules/sharp/vendor",
+        "to": "vendor",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   },
   "devDependencies": {
+    "@babel/cli": "7.24.8",
+    "@babel/core": "7.24.9",
+    "@babel/preset-env": "7.24.8",
     "@electron-forge/cli": "^7.4.0",
     "@electron-forge/maker-deb": "^7.4.0",
     "@electron-forge/maker-rpm": "^7.4.0",
@@ -21,9 +58,13 @@
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
     "@eslint/js": "9.7.0",
+    "babel-plugin-transform-remove-console": "6.9.4",
     "electron": "31.0.2",
+    "electron-builder": "24.13.3",
     "globals": "15.8.0",
-    "speedscope": "1.20.0"
+    "javascript-obfuscator": "4.1.1",
+    "speedscope": "1.20.0",
+    "terser": "5.31.3"
   },
   "keywords": [],
   "author": {
