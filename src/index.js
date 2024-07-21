@@ -107,7 +107,7 @@ ipcMain.handle('save-dialog', async () => {
   return result;
 });
 
-ipcMain.on('export-session', (filename) => {
+ipcMain.on('export-session', (_event, filename) => {
   if (!huntSession.isActive()) {
     huntSession.exportSessionToCSV(filename);
   } else {
@@ -129,10 +129,10 @@ ipcMain.handle('open-file-dialog', async () => {
 });
 
 // Handle CSV import and parsing
-ipcMain.on('import-session', (filePath) => {
+ipcMain.on('import-session', (_event, filePath) => {
   if (!huntSession.isActive()) {
     const importedData = [];
-
+    console.log(filePath)
     fs.createReadStream(filePath)
       .pipe(csvParser())
       .on('data', (row) => {
