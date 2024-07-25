@@ -1,38 +1,34 @@
 {
   "name": "farmcapture",
-  "productName": "farmcapture",
+  "productName": "PRO Hunt",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": "src/index.js",
+  "main": "dist/bundle.js",
   "scripts": {
     "start": "electron-forge start",
+    "start:dev": "electron src/index.js",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "prepare": "mkdir -p dist",
-    "build": "babel src --out-dir temp --copy-files && npm run prepare && terser temp/*.js --compress --mangle --output dist/bundle.min.js && javascript-obfuscator dist/bundle.min.js --output dist/bundle.obfuscated.js",
-    "dist": "npm run build && electron-builder"
+    "prepare": "mkdir -p temp",
+    "build": "webpack",
+    "dist": "electron-builder"
   },
   "build": {
-    "productName": "PRO Farm",
+    "appId": "com.example.app",
     "files": [
       "dist/**/*",
-      "src/**/*",
-      "package.json"
+      {
+        "from": "temp/",
+        "to": "temp/",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "directories": {
-      "buildResources": "build"
-    },
-    "mac": {
-      "category": "public.app-category.utilities"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage",
-      "category": "Utility"
+      "output": "release"
     }
   },
   "devDependencies": {
@@ -48,13 +44,31 @@
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
     "@eslint/js": "9.7.0",
+    "@rollup/plugin-babel": "6.0.4",
+    "@rollup/plugin-commonjs": "26.0.1",
+    "@rollup/plugin-json": "6.1.0",
+    "@rollup/plugin-node-resolve": "15.2.3",
+    "babel-loader": "9.1.3",
     "babel-plugin-transform-remove-console": "6.9.4",
+    "copy-webpack-plugin": "12.0.2",
+    "cssnano": "7.0.4",
     "electron": "31.0.2",
     "electron-builder": "24.13.3",
     "globals": "15.8.0",
     "javascript-obfuscator": "4.1.1",
+    "rollup": "2.79.1",
+    "rollup-plugin-babel": "4.4.0",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-html": "0.2.1",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-obfuscator": "1.1.0",
+    "rollup-plugin-postcss": "4.0.2",
+    "rollup-plugin-terser": "7.0.2",
     "speedscope": "1.20.0",
-    "terser": "5.31.3"
+    "webpack": "5.93.0",
+    "webpack-cli": "5.1.4",
+    "webpack-node-externals": "3.0.0",
+    "webpack-obfuscator": "3.5.1"
   },
   "keywords": [],
   "author": {
