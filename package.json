@@ -1,8 +1,8 @@
 {
   "name": "farmcapture",
-  "productName": "PRO Hunt",
+  "productName": "TrackerBee",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Track Wild Pokemon Encounters",
   "main": "dist/bundle.js",
   "scripts": {
     "start": "electron-forge start",
@@ -17,6 +17,7 @@
   },
   "build": {
     "appId": "com.example.app",
+    "icon": "resources/masterball_icon",
     "files": [
       "dist/**/*",
       {
@@ -29,6 +30,46 @@
     ],
     "directories": {
       "output": "release"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        "zip"
+      ],
+      "icon": "resources/masterball_icon.ico"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        "deb",
+        "rpm"
+      ],
+      "icon": "resources/masterball_icon.png"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        "zip"
+      ],
+      "icon": "resources/masterball_icon.icns"
     }
   },
   "devDependencies": {
