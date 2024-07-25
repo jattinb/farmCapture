@@ -1,20 +1,25 @@
 const path = require('path');
 const EventEmitter = require('events');
 
-const captureWindowPath = path.join(__dirname, '..', 'helpers', 'captureWindow');
-const OCRSessionPath = path.join(__dirname, '..', 'helpers', 'OCRSession');
-const checkValidEncounterPath = path.join(__dirname, '..', 'helpers', 'checkValidEncounter');
-const timerPath = path.join(__dirname, 'timer');
-const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
+// const captureWindowPath = path.join(__dirname, '..', 'helpers', 'captureWindow');
+// const OCRSessionPath = path.join(__dirname, '..', 'helpers', 'OCRSession');
+// const checkValidEncounterPath = path.join(__dirname, '..', 'helpers', 'checkValidEncounter');
+// const timerPath = path.join(__dirname, 'timer');
+// const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
 
-const captureWindow = require(captureWindowPath);
-const OCRSession = require(OCRSessionPath);
-const checkValidEncounter = require(checkValidEncounterPath);
-const Timer = require(timerPath);
+// const captureWindow = require(captureWindowPath);
+// const OCRSession = require(OCRSessionPath);
+// const checkValidEncounter = require(checkValidEncounterPath);
+// const { formatTime, parseTimeToMilliseconds } = require(formatTimePath);
+// const Timer = require(timerPath);
 const fs = require('fs');
 const { parse } = require('json2csv');
-const { formatTime, parseTimeToMilliseconds } = require(formatTimePath);
 
+const { formatTime, parseTimeToMilliseconds } = require('./../helpers/formatTime');
+const captureWindow = require('./../helpers/captureWindow');
+const OCRSession = require('./../helpers/OCRSession');
+const checkValidEncounter = require('./../helpers/checkValidEncounter');
+const Timer = require('./../models/timer');
 
 class HuntSession extends EventEmitter {
     constructor() {

@@ -1,7 +1,9 @@
 const path = require('path');
 const EventEmitter = require('events');
-const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
-const { formatTime } = require(formatTimePath);
+// const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
+// const { formatTime } = require(formatTimePath);
+const { formatTime } = require('./../helpers/formatTime');
+
 
 class Timer extends EventEmitter {
     constructor(elapsedTime = 0) {
