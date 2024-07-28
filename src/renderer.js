@@ -121,7 +121,7 @@ ipcRenderer.on('setup-complete', (_event, data) => {
     enableSetupAndResetControls(); // Enable setup and reset controls after setup is complete
 
     displayMessage('setupSuccess');
-    console.log('Setup complete:', data);
+    console.log('Setup complete');
 });
 
 ipcRenderer.on('setup-failed', (event, data) => {
@@ -139,7 +139,6 @@ ipcRenderer.on('setup-failed', (event, data) => {
 
 
 ipcRenderer.on('update-count', (_event, data) => {
-    console.log('Here update-count')
     // Transform the data to the required format
     const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
     // Update the Pokémon table with the new data
@@ -157,7 +156,6 @@ ipcRenderer.on('update-count', (_event, data) => {
 
 // Function to update the Pokémon table
 function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
-    console.log('Here update table')
     const tableBody = document.getElementById('pokemonTableBody');
     const totalEncountersCell = document.getElementById('totalEncounters');
     tableBody.innerHTML = ''; // Clear existing rows
@@ -196,7 +194,7 @@ ipcRenderer.on('update-timer', (_event, timeString) => {
 
 ipcRenderer.on('import-complete', (_event, data) => {
     // You can choose to update the UI or display a success message here
-    console.log('Import complete:', data);
+    console.log('Import complete');
     displayMessage('importSuccess'); // Display a success message
 });
 
@@ -232,7 +230,6 @@ document.getElementById('importCSV').addEventListener('click', () => {
             if (!result.canceled) {
                 const filePath = result.filePaths[0];
                 ipcRenderer.send('import-session', filePath);
-                console.log(filePath)
             }
         }).catch((err) => {
             console.error(err);

@@ -24,8 +24,8 @@ module.exports = {
                 use: {
                     loader: 'babel-loader', // Use Babel for transpiling
                     options: {
-                        presets: ['@babel/preset-env'] // Use the preset for ES6+ features
-                        // plugins: ['transform-remove-console'] // Add the plugin here if needed
+                        presets: ['@babel/preset-env'], // Use the preset for ES6+ features
+                        plugins: ['transform-remove-console'] // Add the plugin here if needed
                     },
                 },
             },
