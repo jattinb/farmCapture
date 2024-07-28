@@ -10,16 +10,16 @@ async function setup() {
         const screens = await screenshot.all({ format: 'png' });
 
         // Process all screens in parallel using async/await with Promise.all
-        const results = await Promise.all(screens.map(async (screen, i) => await processScreen(screen, displays[i].id)));
+        const results = await Promise.all(screens.map((screen, i) => processScreen(screen, displays[i].id)));
 
         // Find the first successful result
         const result = results.find(r => r.status);
 
         // Return the result, or a default if none are successful
-        return result || { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
+        return result || { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'No successful result' };
     } catch (error) {
         console.error('Error during setup:', error);
-        return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 } };
+        return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 }, error: error.message };
     }
 }
 
@@ -29,7 +29,7 @@ async function processScreen(screen, displayId) {
         const { data } = await Tesseract.recognize(screen, 'eng');
 
         if (!data || !data.text) {
-            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } }; // Skip if OCR failed or no text recognized
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized' };
         }
 
         // Parse OCR result to find "VS. Wild <pokemon_name>" line
@@ -37,14 +37,14 @@ async function processScreen(screen, displayId) {
 
         if (vsLineIndex === -1 || !pokemonName) {
             console.log("VS. not found on page");
-            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } }; // Skip if "VS. Wild <pokemon_name>" not found
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"VS. Wild <pokemon_name>" not found' };
         }
 
         // Get the coordinates of the "VS." word and the Pokémon name
         const { vsCoordinates, pokemonCoordinates } = findCoordinates(data.words, 'VS.', pokemonName);
 
         if (!vsCoordinates || !pokemonCoordinates) {
-            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } }; // Skip if unable to find coordinates
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'Unable to find coordinates' };
         }
 
         // Calculate dimensions for cropping
@@ -53,11 +53,12 @@ async function processScreen(screen, displayId) {
         return {
             status: true,
             window: { x: cropX, y: cropY, w: cropWidth, h: cropHeight },
-            displayId
+            displayId,
+            error: null
         };
     } catch (error) {
         console.error(`Error processing screen ${displayId}:`, error);
-        return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 } };
+        return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: error.message };
     }
 }
 
@@ -92,7 +93,7 @@ function findCoordinates(wordData, vsWord, pokemonName) {
         if (word.text === vsWord && i + 2 < wordData.length && wordData[i + 2].text === pokemonName) {
             vsCoordinates = { x: word.bbox.x0, y: word.bbox.y0 };
             pokemonCoordinates = { x: wordData[i + 2].bbox.x1, y: wordData[i + 2].bbox.y1 };
-            break; // Exit loop once the coordinates are found
+            break;
         }
     }
     return { vsCoordinates, pokemonCoordinates };

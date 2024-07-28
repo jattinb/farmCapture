@@ -124,7 +124,7 @@ ipcRenderer.on('setup-complete', (_event, data) => {
     console.log('Setup complete:', data);
 });
 
-ipcRenderer.on('setup-failed', () => {
+ipcRenderer.on('setup-failed', (event, data) => {
     const setupButton = document.getElementById('setup');
     setupButton.disabled = false;
     setupButton.classList.remove('button-loading');
@@ -133,7 +133,7 @@ ipcRenderer.on('setup-failed', () => {
 
     enableCaptureControls(); // Enable capture controls even if setup failed
     enableSetupAndResetControls(); // Enable setup and reset controls even if setup failed
-
+    console.log("Setup Failed:", data.error);
     displayMessage('setupFailed'); // Display failed message
 });
 
