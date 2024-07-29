@@ -32,6 +32,9 @@
       "output": "release"
     },
     "win": {
+      "asarUnpack": [
+        "node_modules/screenshot-desktop/lib/win32"
+      ],
       "target": [
         {
           "target": "nsis",
@@ -69,7 +72,7 @@
         },
         "zip"
       ],
-      "icon": "resources/masterball_icon.icns"
+      "icon": "resources/masterball_icon.ico"
     }
   },
   "devDependencies": {
