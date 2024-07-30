@@ -35,6 +35,18 @@ class OCRSession {
             throw new Error(`Error recognizing OCR: ${error.message}`);
         }
     }
+
+    async recognizeTextNoWindow(imageBuffer) {
+        try {
+            // Perform OCR using Tesseract.js without specifying a rectangle
+            const result = await this.worker.recognize(imageBuffer);
+
+            // Return the entire result object
+            return result;
+        } catch (error) {
+            throw new Error(`Error recognizing text: ${error.message}`);
+        }
+    }
 }
 
 module.exports = OCRSession

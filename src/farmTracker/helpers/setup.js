@@ -1,6 +1,6 @@
 const screenshot = require('screenshot-desktop');
 const Jimp = require('jimp');
-const OCR = require('./OCRforSetUp')
+const OCR = require('./OCRSession')
 
 async function setup() {
     const OCRforSetUp = new OCR();
@@ -28,7 +28,7 @@ async function processScreen(screen, displayId, OCRforSetUp) {
     try {
         const filteredBuffer = await filterImage(screen);
 
-        const { data: goldData } = await OCRforSetUp.recognizeText(filteredBuffer, 'eng'); // Adjust rectangle if needed
+        const { data: goldData } = await OCRforSetUp.recognizeTextNoWindow(filteredBuffer, 'eng'); // Adjust rectangle if needed
 
         if (!goldData || !goldData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized' };
@@ -43,7 +43,7 @@ async function processScreen(screen, displayId, OCRforSetUp) {
         const { x, y, w, h } = vsCoordinates;
         const coloredImage = await Jimp.read(screen);
         const croppedBuffer = await coloredImage.crop(x, y, w, h).getBufferAsync(Jimp.MIME_PNG);
-        const { data: colorData } = await OCRforSetUp.recognizeText(croppedBuffer, { x: 0, y: 0, w: 0, h: 0 }); // Adjust rectangle if needed
+        const { data: colorData } = await OCRforSetUp.recognizeTextNoWindow(croppedBuffer, { x: 0, y: 0, w: 0, h: 0 }); // Adjust rectangle if needed
 
         if (!colorData || !colorData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized in color screenshot' };
