@@ -46,9 +46,9 @@ async function processScreen(screen, displayId, OCRforSetUp) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized in color screenshot' };
         }
         // console.log(colorData.text)
-        const { vsLineIndex, pokemonName, bottomRight } = findPokemonLine(colorData.text, colorData.words);
+        const { pokemonName, bottomRight } = findPokemonLine(colorData.text, colorData.words);
 
-        if (vsLineIndex === -1 || !pokemonName || !bottomRight) {
+        if (!pokemonName || !bottomRight) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"WILD <pokemon_name>" not found or bottom right point missing' };
         }
 
