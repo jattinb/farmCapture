@@ -1,13 +1,17 @@
 const screenshot = require('screenshot-desktop');
-const Tesseract = require('tesseract.js');
 const Jimp = require('jimp');
+const OCR = require('./OCRforSetUp')
 
 async function setup() {
+    const OCRforSetUp = new OCR();
+
     try {
+        await OCRforSetUp.initializeWorker();
+
         const displays = await screenshot.listDisplays();
         const screens = await screenshot.all({ format: 'png' });
 
-        const results = await Promise.all(screens.map((screen, i) => processScreen(screen, displays[i].id)));
+        const results = await Promise.all(screens.map((screen, i) => processScreen(screen, displays[i].id, OCRforSetUp)));
 
         const result = results.find(r => r.status);
 
@@ -15,14 +19,16 @@ async function setup() {
     } catch (error) {
         console.error('Error during setup:', error);
         return { status: false, displayId: null, window: { x: 0, y: 0, w: 0, h: 0 }, error: error.message };
+    } finally {
+        await OCRforSetUp.terminateWorker();
     }
 }
 
-async function processScreen(screen, displayId) {
+async function processScreen(screen, displayId, OCRforSetUp) {
     try {
         const filteredBuffer = await filterImage(screen);
 
-        const { data: goldData } = await Tesseract.recognize(filteredBuffer, 'eng');
+        const { data: goldData } = await OCRforSetUp.recognizeText(filteredBuffer, 'eng'); // Adjust rectangle if needed
 
         if (!goldData || !goldData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized' };
@@ -37,7 +43,7 @@ async function processScreen(screen, displayId) {
         const { x, y, w, h } = vsCoordinates;
         const coloredImage = await Jimp.read(screen);
         const croppedBuffer = await coloredImage.crop(x, y, w, h).getBufferAsync(Jimp.MIME_PNG);
-        const { data: colorData } = await Tesseract.recognize(croppedBuffer, 'eng');
+        const { data: colorData } = await OCRforSetUp.recognizeText(croppedBuffer, { x: 0, y: 0, w: 0, h: 0 }); // Adjust rectangle if needed
 
         if (!colorData || !colorData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized in color screenshot' };
@@ -46,17 +52,16 @@ async function processScreen(screen, displayId) {
         const { vsLineIndex, pokemonName, bottomRight } = findPokemonLine(colorData.text, colorData.words);
 
         if (vsLineIndex === -1 || !pokemonName || !bottomRight) {
-            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"VS. Wild <pokemon_name>" not found or bottom right point missing' };
+            return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"WILD <pokemon_name>" not found or bottom right point missing' };
         }
 
-        // Calculate the final bounding box
         const finalBox = {
             x: vsCoordinates.x,
             y: vsCoordinates.y,
             w: bottomRight.x,
             h: bottomRight.y
         };
-        console.log(finalBox)
+        console.log(finalBox);
         return {
             status: true,
             window: finalBox,
@@ -68,7 +73,6 @@ async function processScreen(screen, displayId) {
         return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: error.message };
     }
 }
-
 
 async function filterImage(inputBuffer) {
     const image = await Jimp.read(inputBuffer);
@@ -170,7 +174,5 @@ function findPokemonLine(text, wordData) {
 
     return { pokemonName, bottomRight };
 }
-
-
 
 module.exports = setup;
