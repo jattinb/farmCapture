@@ -22,27 +22,27 @@ async function processScreen(screen, displayId) {
     try {
         const filteredBuffer = await filterImage(screen);
 
-        const { data: greyscaleData } = await Tesseract.recognize(filteredBuffer, 'eng');
+        const { data: goldData } = await Tesseract.recognize(filteredBuffer, 'eng');
 
-        if (!greyscaleData || !greyscaleData.text) {
+        if (!goldData || !goldData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized' };
         }
-        console.log("From filtered", greyscaleData.text);
-        const vsCoordinates = findVSCoordinates(greyscaleData.words);
+        // console.log("From filtered", goldData.text);
+        const vsCoordinates = findVSCoordinates(goldData.words);
 
         if (!vsCoordinates) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"VS." not found' };
         }
 
         const { x, y, w, h } = vsCoordinates;
-        const croppedImage = await Jimp.read(screen);
-        const croppedBuffer = await croppedImage.crop(x, y, w, h).getBufferAsync(Jimp.MIME_PNG);
+        const coloredImage = await Jimp.read(screen);
+        const croppedBuffer = await coloredImage.crop(x, y, w, h).getBufferAsync(Jimp.MIME_PNG);
         const { data: colorData } = await Tesseract.recognize(croppedBuffer, 'eng');
 
         if (!colorData || !colorData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized in color screenshot' };
         }
-
+        console.log(colorData.text)
         const { vsLineIndex, pokemonName, bottomRight } = findPokemonLine(colorData.text, colorData.words);
 
         if (vsLineIndex === -1 || !pokemonName || !bottomRight) {
@@ -127,7 +127,7 @@ function rgbToHsv(r, g, b) {
 
 function findVSCoordinates(wordData) {
     for (let i = 0; i < wordData.length; i++) {
-        console.log(wordData[i].text)
+        // console.log(wordData[i].text)
         const word = wordData[i].text.toLowerCase();
         if (word === 'vs.' || word === 'vs') {
             const bbox = wordData[i].bbox;
@@ -140,7 +140,6 @@ function findVSCoordinates(wordData) {
 
 function findPokemonLine(text, wordData) {
     const lines = text.split('\n');
-    let vsLineIndex = -1;
     let pokemonName = '';
     let bottomRight = null;
 
@@ -150,16 +149,14 @@ function findPokemonLine(text, wordData) {
         return map;
     }, {});
 
-    console.log(wordMap)
     // Iterate through lines to find the relevant line and Pokémon name
     for (let j = 0; j < lines.length; j++) {
         const line = lines[j].toUpperCase();
-        if (line.includes('VS.')) {
+        if (line.includes('WILD')) {
             const words = line.split(' ');
-            const vsIndex = words.indexOf('VS.');
-            if (vsIndex !== -1 && words[vsIndex + 1] === 'WILD') {
-                vsLineIndex = j;
-                pokemonName = words.slice(vsIndex + 2).join(' ');
+            const wildIndex = words.indexOf('WILD');
+            if (wildIndex !== -1) {
+                pokemonName = words.slice(wildIndex + 1).join(' ');
 
                 // Lookup the Pokémon name in the word map
                 const bbox = wordMap[pokemonName.toUpperCase()];
@@ -171,8 +168,9 @@ function findPokemonLine(text, wordData) {
         }
     }
 
-    return { vsLineIndex, pokemonName, bottomRight };
+    return { pokemonName, bottomRight };
 }
+
 
 
 module.exports = setup;
