@@ -28,7 +28,7 @@ async function processScreen(screen, displayId, OCRforSetUp) {
     try {
         const filteredBuffer = await filterImage(screen);
 
-        const { data: goldData } = await OCRforSetUp.recognizeTextNoWindow(filteredBuffer, 'eng'); // Adjust rectangle if needed
+        const { data: goldData } = await OCRforSetUp.recognizeTextSetupNoWindow(filteredBuffer, 'eng'); // Adjust rectangle if needed
 
         if (!goldData || !goldData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized' };
@@ -40,15 +40,12 @@ async function processScreen(screen, displayId, OCRforSetUp) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"VS." not found' };
         }
 
-        const { x, y, w, h } = vsCoordinates;
-        const coloredImage = await Jimp.read(screen);
-        const croppedBuffer = await coloredImage.crop(x, y, w, h).getBufferAsync(Jimp.MIME_PNG);
-        const { data: colorData } = await OCRforSetUp.recognizeTextNoWindow(croppedBuffer, { x: 0, y: 0, w: 0, h: 0 }); // Adjust rectangle if needed
+        const { data: colorData } = await OCRforSetUp.recognizeTextSetup(screen, vsCoordinates); // Adjust rectangle if needed
 
         if (!colorData || !colorData.text) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: 'OCR failed or no text recognized in color screenshot' };
         }
-        console.log(colorData.text)
+        // console.log(colorData.text)
         const { vsLineIndex, pokemonName, bottomRight } = findPokemonLine(colorData.text, colorData.words);
 
         if (vsLineIndex === -1 || !pokemonName || !bottomRight) {
@@ -58,8 +55,8 @@ async function processScreen(screen, displayId, OCRforSetUp) {
         const finalBox = {
             x: vsCoordinates.x,
             y: vsCoordinates.y,
-            w: bottomRight.x,
-            h: bottomRight.y
+            w: bottomRight.x - vsCoordinates.x,
+            h: bottomRight.y - vsCoordinates.y
         };
         console.log(finalBox);
         return {

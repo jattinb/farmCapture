@@ -36,10 +36,26 @@ class OCRSession {
         }
     }
 
-    async recognizeTextNoWindow(imageBuffer) {
+    async recognizeTextSetupNoWindow(imageBuffer) {
         try {
             // Perform OCR using Tesseract.js without specifying a rectangle
             const result = await this.worker.recognize(imageBuffer);
+
+            // Return the entire result object 
+            return result;
+        } catch (error) {
+            throw new Error(`Error recognizing text: ${error.message}`);
+        }
+    }
+
+    async recognizeTextSetup(imageBuffer, window) {
+        try {
+            const { x, y, w, h } = window;
+
+            // Perform OCR using Tesseract.js without specifying a rectangle
+            const result = await this.worker.recognize(imageBuffer, {
+                rectangle: { top: y, left: x, width: w, height: h }
+            });
 
             // Return the entire result object
             return result;
