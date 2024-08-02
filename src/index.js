@@ -71,17 +71,18 @@ ipcMain.on('setup', async () => {
 });
 
 ipcMain.on('start-capture', async () => {
-  if (huntSession && !isSessionRunning) {
-    await huntSession.startCaptureInterval(3000);
-    isSessionRunning = true;
-    mainWindow.webContents.send('session-state', { isSessionRunning });
-
-    if (!listenersAttached) {
-      attachListeners();
-    }
-  } else {
+  if (!huntSession || isSessionRunning) {
     console.log('Session is already running or HuntSession not initialized.');
+    return;
   }
+
+  if (!listenersAttached) {
+    attachListeners();
+  }
+
+  await huntSession.startCaptureInterval(3000);
+  isSessionRunning = true;
+  mainWindow.webContents.send('session-state', { isSessionRunning });
 });
 
 ipcMain.on('stop-capture', async () => {
