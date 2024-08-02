@@ -96,14 +96,15 @@ ipcMain.on('stop-capture', async () => {
   mainWindow.webContents.send('session-state', { isSessionRunning });
 });
 
-
 ipcMain.on('reset-capture', () => {
-  if (huntSession && !isSessionRunning) {
-    huntSession.reset();
-  } else {
+  if (!huntSession || isSessionRunning) {
     console.log('Reset disabled: HuntSession is running.');
+    return;
   }
+
+  huntSession.reset();
 });
+
 
 ipcMain.handle('save-dialog', async () => {
   const fileName = huntSession.fileName || 'export.csv';
