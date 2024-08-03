@@ -28,6 +28,9 @@
         ]
       }
     ],
+    "asarUnpack": [
+      "dist/pokemon_names.csv"
+    ],
     "directories": {
       "output": "release"
     },
