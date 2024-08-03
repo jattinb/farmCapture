@@ -20,6 +20,8 @@ const captureWindow = require('./../helpers/captureWindow');
 const OCRSession = require('./../helpers/OCRSession');
 const checkValidEncounter = require('./../helpers/checkValidEncounter');
 const Timer = require('./../models/timer');
+const { isPokemonInSet } = require('./../helpers/pokemonList');
+const { findPokemon } = require('../helpers/pokemonSearch');
 
 class HuntSession extends EventEmitter {
     constructor() {
@@ -39,7 +41,8 @@ class HuntSession extends EventEmitter {
         this.currPoke = null;
         this.fileName = null;
         this.ocrSession = new OCRSession();
-
+        this.pokemonList = null
+        this.pokemonSet = null
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
@@ -109,22 +112,25 @@ class HuntSession extends EventEmitter {
     }
 
     handleEncounter(curPoke) {
-        if (this.isLastScreenEncounter && this.currPoke === curPoke) {
+        // Check if the Pokémon name is valid
+        const validPoke = isPokemonInSet(curPoke, this.pokemonSet) ? curPoke : findPokemon(curPoke, this.pokemonList);
+
+        if (this.isLastScreenEncounter && this.currPoke === validPoke) {
             console.log('Same encounter, not counting');
             return;
         }
 
-        if (this.pokemonCounts[curPoke]) {
-            this.pokemonCounts[curPoke]++;
+        if (this.pokemonCounts[validPoke]) {
+            this.pokemonCounts[validPoke]++;
         } else {
-            this.pokemonCounts[curPoke] = 1;
+            this.pokemonCounts[validPoke] = 1;
         }
 
-        this.currPoke = curPoke;
+        this.currPoke = validPoke;
         this.wildCount++;
         this.isLastScreenEncounter = true;
 
-        console.log(`Detected new "wild ${curPoke}" encounter.`);
+        console.log(`Detected new "wild ${validPoke}" encounter.`);
         console.log(`Total encounters: ${this.wildCount}`);
         console.log('Pokemon counts:', this.pokemonCounts);
 
