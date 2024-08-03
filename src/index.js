@@ -9,6 +9,7 @@ const fs = require('fs');
 
 const HuntSession = require('./farmTracker/models/huntSession');
 const setup = require('./farmTracker/helpers/setup');
+const { loadPokemonList } = require('./farmTracker/helpers/pokemonList');
 
 let huntSession = HuntSession.getInstance();
 let mainWindow;
@@ -31,7 +32,7 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
 
   app.on('activate', () => {
@@ -39,7 +40,8 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
-
+  huntSession.pokemonList = await loadPokemonList()
+  huntSession.pokemonSet = new Set(huntSession.pokemonList)
   attachListeners();
 });
 
