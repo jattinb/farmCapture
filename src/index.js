@@ -56,16 +56,16 @@ ipcMain.on('setup', async () => {
     mainWindow.webContents.send('setup-start');
     const setUpComplete = await setup();
 
-    if (!setUpComplete.status) {
-      console.error('Setup Failed: No Wild Encounter Detected On-Screen', setUpComplete.error);
-      mainWindow.webContents.send('setup-failed', setUpComplete);
-    } else {
-      console.log('Setup complete');
-      huntingWindow = setUpComplete.window;
-      huntingDisplayId = setUpComplete.displayId;
-      mainWindow.webContents.send('setup-complete', setUpComplete);
-      huntSession.setUpWindow(huntingWindow, huntingDisplayId);
+    if (!setUpComplete.status || !setUpComplete.window || !setUpComplete.displayId) {
+      throw new Error(setUpComplete.error);
     }
+
+    console.log('Setup complete');
+    huntingWindow = setUpComplete.window;
+    huntingDisplayId = setUpComplete.displayId;
+    mainWindow.webContents.send('setup-complete', setUpComplete);
+    huntSession.setUpWindow(huntingWindow, huntingDisplayId);
+
   } catch (error) {
     console.error('Error during setup process:', error);
     mainWindow.webContents.send('setup-failed', { status: false, error: error.message });
@@ -73,36 +73,40 @@ ipcMain.on('setup', async () => {
 });
 
 ipcMain.on('start-capture', async () => {
-  if (huntSession && !isSessionRunning) {
-    await huntSession.startCaptureInterval(3000);
-    isSessionRunning = true;
-    mainWindow.webContents.send('session-state', { isSessionRunning });
-
-    if (!listenersAttached) {
-      attachListeners();
-    }
-  } else {
+  if (!huntSession || isSessionRunning) {
     console.log('Session is already running or HuntSession not initialized.');
+    return;
   }
+
+  if (!listenersAttached) {
+    attachListeners();
+  }
+
+  await huntSession.startCaptureInterval(3000);
+  isSessionRunning = true;
+  mainWindow.webContents.send('session-state', { isSessionRunning });
 });
 
 ipcMain.on('stop-capture', async () => {
-  if (huntSession && isSessionRunning) {
-    await huntSession.stopCaptureInterval();
-    isSessionRunning = false;
-    mainWindow.webContents.send('session-state', { isSessionRunning });
-  } else {
+  if (!huntSession || !isSessionRunning) {
     console.log('HuntSession not started or already stopped.');
+    return;
   }
+
+  await huntSession.stopCaptureInterval();
+  isSessionRunning = false;
+  mainWindow.webContents.send('session-state', { isSessionRunning });
 });
 
 ipcMain.on('reset-capture', () => {
-  if (huntSession && !isSessionRunning) {
-    huntSession.reset();
-  } else {
+  if (!huntSession || isSessionRunning) {
     console.log('Reset disabled: HuntSession is running.');
+    return;
   }
+
+  huntSession.reset();
 });
+
 
 ipcMain.handle('save-dialog', async () => {
   const fileName = huntSession.fileName || 'export.csv';
@@ -119,11 +123,11 @@ ipcMain.handle('save-dialog', async () => {
 });
 
 ipcMain.on('export-session', (_event, filename) => {
-  if (!huntSession.isActive()) {
-    huntSession.exportSessionToCSV(filename);
-  } else {
+  if (huntSession.isActive()) {
     console.log('Cannot export session: It is running.');
   }
+
+  huntSession.exportSessionToCSV(filename);
 });
 
 // Handle open file dialog
@@ -141,26 +145,26 @@ ipcMain.handle('open-file-dialog', async () => {
 
 // Handle CSV import and parsing
 ipcMain.on('import-session', (_event, filePath) => {
-  if (!huntSession.isActive()) {
-    const importedData = [];
-    console.log(filePath)
-    fs.createReadStream(filePath)
-      .pipe(csvParser())
-      .on('data', (row) => {
-        importedData.push(row);
-      })
-      .on('end', () => {
-        huntSession.importSessionFromCSV(importedData);
-        mainWindow.webContents.send('import-complete', importedData);
-        huntSession.fileName = extractFileName(filePath);
-      })
-      .on('error', (err) => {
-        console.error('Error reading CSV file:', err);
-        mainWindow.webContents.send('import-failed');
-      });
-  } else {
+  if (huntSession.isActive()) {
     console.log('Cannot import session: It is running.');
+    return
   }
+  const importedData = [];
+  console.log(filePath)
+  fs.createReadStream(filePath)
+    .pipe(csvParser())
+    .on('data', (row) => {
+      importedData.push(row);
+    })
+    .on('end', () => {
+      huntSession.importSessionFromCSV(importedData);
+      mainWindow.webContents.send('import-complete', importedData);
+      huntSession.fileName = extractFileName(filePath);
+    })
+    .on('error', (err) => {
+      console.error('Error reading CSV file:', err);
+      mainWindow.webContents.send('import-failed');
+    });
 });
 
 function extractFileName(filePath) {
@@ -173,27 +177,30 @@ function extractFileName(filePath) {
 
 // Attach listeners function
 function attachListeners() {
-  if (!listenersAttached) {
-    huntSession.on('newEncounter', (data) => {
-      mainWindow.webContents.send('update-count', data);
-    });
-
-    huntSession.on('noEncounter', (data) => {
-      mainWindow.webContents.send('update-count', data);
-    });
-
-    huntSession.on('reset-count', (data) => {
-      mainWindow.webContents.send('update-count', data);
-    });
-
-    huntSession.on('update-timer', (timeString) => {
-      mainWindow.webContents.send('update-timer', timeString);
-    });
-
-    huntSession.on('update-count', (timeString) => {
-      mainWindow.webContents.send('update-count', timeString);
-    });
-
-    listenersAttached = true; // Set flag to true after attaching listeners
+  if (listenersAttached) {
+    console.log('Listners are already attached')
+    return
   }
+
+  huntSession.on('newEncounter', (data) => {
+    mainWindow.webContents.send('update-count', data);
+  });
+
+  huntSession.on('noEncounter', (data) => {
+    mainWindow.webContents.send('update-count', data);
+  });
+
+  huntSession.on('reset-count', (data) => {
+    mainWindow.webContents.send('update-count', data);
+  });
+
+  huntSession.on('update-timer', (timeString) => {
+    mainWindow.webContents.send('update-timer', timeString);
+  });
+
+  huntSession.on('update-count', (timeString) => {
+    mainWindow.webContents.send('update-count', timeString);
+  });
+
+  listenersAttached = true; // Set flag to true after attaching listeners
 }

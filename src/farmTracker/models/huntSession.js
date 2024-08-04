@@ -59,9 +59,9 @@ class HuntSession extends EventEmitter {
         this.pokemonCounts = pokemonCounts;
         if (timeStr === '00:00:00') {
             this.timer.reset();
-        } else {
-            this.timer.loadTime(parseTimeToMilliseconds(timeStr));
+            return
         }
+        this.timer.loadTime(parseTimeToMilliseconds(timeStr));
     }
 
     adjustHuntingWindow(huntingWindow) {
