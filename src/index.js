@@ -197,3 +197,10 @@ function attachListeners() {
     listenersAttached = true; // Set flag to true after attaching listeners
   }
 }
+
+// Toggle always on top
+ipcMain.on('toggle-always-on-top', () => {
+  const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
+  mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
+  mainWindow.webContents.send('always-on-top-toggled', !isAlwaysOnTop);
+});
