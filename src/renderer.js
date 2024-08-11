@@ -252,3 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listener to toggle capture button
     document.getElementById('toggleCapture').addEventListener('click', toggleCapture);
 });
+
+
+function toggleAlwaysOnTop() {
+    ipcRenderer.send('toggle-always-on-top');
+}
+
+ipcRenderer.on('always-on-top-toggled', (_event, isAlwaysOnTop) => {
+    const toggleButton = document.getElementById('toggleAlwaysOnTopButton');
+    toggleButton.textContent = isAlwaysOnTop ? 'Disable Always On Top' : 'Enable Always On Top';
+});
