@@ -6,6 +6,11 @@ body {
     color: #FFFFFF;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative; /* To position the checkbox */
 }
 
 .container {
@@ -223,4 +228,19 @@ tr.current-pokemon td {
     top: 5px;
     right: 10px;
     cursor: pointer;
+}
+
+.always-on-top-label {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8em; /* Reduced font size */
+    color: #007BFF;
+    display: flex;
+    align-items: center;
+}
+
+.always-on-top-label input[type="checkbox"] {
+    margin-left: 10px; /* Adjust margin for spacing */
+    transform: scale(0.8); /* Reduced size */
 }
