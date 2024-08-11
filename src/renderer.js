@@ -2,6 +2,8 @@
 
 const { ipcRenderer } = require('electron');
 
+const audio = new Audio('./pokemon-battle.mp3');
+
 // Function to display a message
 function displayMessage(messageId) {
     const messageElement = document.getElementById(messageId);
@@ -261,4 +263,9 @@ function toggleAlwaysOnTop() {
 ipcRenderer.on('always-on-top-toggled', (_event, isAlwaysOnTop) => {
     const toggleButton = document.getElementById('toggleAlwaysOnTopButton');
     toggleButton.textContent = isAlwaysOnTop ? 'Disable Always On Top' : 'Enable Always On Top';
+});
+
+ipcRenderer.on('target-found', (_event, data) => {
+    // Play an attention-grabbing sound
+    audio.play();
 });

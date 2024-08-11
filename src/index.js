@@ -194,6 +194,10 @@ function attachListeners() {
       mainWindow.webContents.send('update-count', timeString);
     });
 
+    huntSession.on('targetFound', (data) => {
+      mainWindow.webContents.send('target-found', data);
+    });
+
     listenersAttached = true; // Set flag to true after attaching listeners
   }
 }
