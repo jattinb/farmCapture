@@ -6,7 +6,7 @@
   "main": "dist/bundle.js",
   "scripts": {
     "start": "electron-forge start",
-    "start:dev": "electron src/index.js",
+    "start:dev": "NODE_ENV=dev electron src/index.js",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",

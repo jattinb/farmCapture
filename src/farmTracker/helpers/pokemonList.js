@@ -3,7 +3,7 @@ const path = require('path');
 const csv = require('csv-parser');
 
 // Determine the correct path based on the environment
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'dev';
 const csvFilePath = isDev
     ? path.join(__dirname, '..', '..', 'pokemon_names.csv')
     : path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'pokemon_names.csv');
