@@ -43,6 +43,7 @@ class HuntSession extends EventEmitter {
         this.ocrSession = new OCRSession();
         this.pokemonList = null
         this.pokemonSet = null
+        this.targetPoke = []
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
@@ -139,6 +140,12 @@ class HuntSession extends EventEmitter {
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
+
+        if (this.targetPoke.includes(this.currPoke)) {
+            this.emit('targetFound', {
+                targetPoke: this.currPoke
+            });
+        }
     }
 
     async startCaptureInterval(interval = 2000) {
