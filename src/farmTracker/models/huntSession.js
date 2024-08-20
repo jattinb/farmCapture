@@ -158,7 +158,7 @@ class HuntSession extends EventEmitter {
         });
     }
 
-    async startCaptureInterval(interval = 2000) {
+    async startCaptureInterval(interval = 1000) {
         if (this.intervalID) {
             console.log('Capture interval already running');
             return;
