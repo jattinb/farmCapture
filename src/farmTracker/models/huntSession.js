@@ -82,6 +82,7 @@ class HuntSession extends EventEmitter {
             // Perform OCR recognition on the captured image
             const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
 
+            console.log(text, confidence)
             // Handle low-confidence OCR results
             if (confidence < 50) {
                 this.handleNoEncounter();
@@ -128,23 +129,26 @@ class HuntSession extends EventEmitter {
     }
 
     handleEncounter(curPoke) {
-        // Check if the Pokémon name is valid
-        const validPoke = isPokemonInSet(curPoke, this.pokemonSet) ? curPoke : findPokemon(curPoke, this.pokemonList);
-        if (validPoke == 'No match found') {
-            console.log('No Match Found')
-            return;
+        let validPoke = curPoke;
+
+        // Check if the Pokémon has already been encountered
+        if (!this.pokemonCounts[curPoke]) {
+            // Validate the Pokémon name if not already in pokemonCounts
+            validPoke = isPokemonInSet(curPoke, this.pokemonSet) ? curPoke : findPokemon(curPoke, this.pokemonList);
+            if (validPoke === 'No match found') {
+                console.log('No Match Found');
+                return;
+            }
         }
+
+        // Skip counting if it's the same encounter as the last one
         if (this.isLastScreenEncounter && this.currPoke === validPoke) {
             console.log('Same encounter, not counting');
             return;
         }
 
-        if (this.pokemonCounts[validPoke]) {
-            this.pokemonCounts[validPoke]++;
-        } else {
-            this.pokemonCounts[validPoke] = 1;
-        }
-
+        // Update pokemonCounts and other properties
+        this.pokemonCounts[validPoke] = (this.pokemonCounts[validPoke] || 0) + 1;
         this.currPoke = validPoke;
         this.wildCount++;
         this.isLastScreenEncounter = true;
