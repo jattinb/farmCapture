@@ -22,15 +22,17 @@ class OCRSession {
             const { x, y, w, h } = window;
 
             // Perform OCR using Tesseract.js with specified rectangle
-            const { data: { text } } = await this.worker.recognize(imageBuffer, {
+            const { data: { text, confidence } } = await this.worker.recognize(imageBuffer, {
                 rectangle: { top: y, left: x, width: w, height: h }
             });
-
+            const result = await this.worker.recognize(imageBuffer, {
+                rectangle: { top: y, left: x, width: w, height: h }
+            });
             if (!text) {
                 throw new Error('OCR failed or no text recognized');
             }
 
-            return text;
+            return { text, confidence };
         } catch (error) {
             throw new Error(`Error recognizing OCR: ${error.message}`);
         }

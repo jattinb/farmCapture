@@ -75,26 +75,42 @@ class HuntSession extends EventEmitter {
 
     async captureAndRecognize() {
         try {
+            // Capture the window based on the huntingDisplayId
             const imageBuffer = await captureWindow(this.huntingDisplayId);
             console.log(this.huntingWindow, this.huntingDisplayId);
-            const result = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
-            console.log(result);
-            const { valid, curPoke } = checkValidEncounter(result);
+
+            // Perform OCR recognition on the captured image
+            const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
+
+            // Handle low-confidence OCR results
+            if (confidence < 50) {
+                this.handleNoEncounter();
+                return;
+            }
+
+            console.log(text);
+
+            // Check if the OCR result contains a valid encounter
+            const { valid, curPoke } = checkValidEncounter(text);
 
             if (!valid) {
                 this.handleNoEncounter();
                 return;
             }
 
+            // Ensure that a Pokémon was detected
             if (!curPoke) {
                 console.log('Cannot detect Pokémon encountered');
                 return;
             }
 
+            // Handle the detected Pokémon encounter
             this.handleEncounter(curPoke);
+
         } catch (error) {
-            console.error('Error during capture and recognition:', error.message);
-            // Graceful error handling if the worker is not available
+            console.error('Error during capture and recognition:', error);
+
+            // Handle specific OCR worker error
             if (error.message === 'OCR worker is not initialized or has been terminated.') {
                 console.log('Recognition was attempted after the worker was terminated.');
             }
