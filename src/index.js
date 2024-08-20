@@ -179,7 +179,7 @@ function attachListeners() {
     });
 
     huntSession.on('noEncounter', (data) => {
-      mainWindow.webContents.send('update-count', data);
+      mainWindow.webContents.send('update-count-noEncounter', data);
     });
 
     huntSession.on('reset-count', (data) => {

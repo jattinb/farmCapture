@@ -82,14 +82,12 @@ class HuntSession extends EventEmitter {
             // Perform OCR recognition on the captured image
             const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
 
-            console.log(text, confidence)
+            // console.log(text, confidence)
             // Handle low-confidence OCR results
             if (confidence < 50) {
                 this.handleNoEncounter();
                 return;
             }
-
-            console.log(text);
 
             // Check if the OCR result contains a valid encounter
             const { valid, curPoke } = checkValidEncounter(text);
@@ -121,11 +119,7 @@ class HuntSession extends EventEmitter {
     handleNoEncounter() {
         console.log('No encounter');
         this.isLastScreenEncounter = false;
-        this.emit('noEncounter', {
-            currPoke: null,
-            wildCount: this.wildCount,
-            pokemonCounts: this.pokemonCounts,
-        });
+        this.emit('noEncounter');
     }
 
     handleEncounter(curPoke) {

@@ -137,15 +137,23 @@ ipcRenderer.on('setup-failed', (event, data) => {
     displayMessage('setupFailed'); // Display failed message
 });
 
+// Handle the update-count-noEncounter event
+ipcRenderer.on('update-count-noEncounter', (_event) => {
+    const highlightedRow = document.querySelector('.current-pokemon');
+    if (highlightedRow) {
+        highlightedRow.classList.remove('current-pokemon'); // Remove the highlight
+    }
+
+    // Clear the current encounter display
+    document.getElementById('currentEncounter').innerHTML = '<strong>No encounter</strong>';
+});
 
 ipcRenderer.on('update-count', (_event, data) => {
-    // Transform the data to the required format
-    const pokemonData = Object.entries(data.pokemonCounts).map(([name, frequency]) => ({ name, frequency }));
-    // Update the Pokémon table with the new data
-    const totalEncounters = Object.values(data.pokemonCounts).reduce((sum, count) => sum + count, 0);
     const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
+    const totalEncounters = data.wildCount; // Use wildCount for totalEncounters
+    const pokemonData = data.pokemonCounts; // Use pokemonCounts for pokemonData
 
-    updatePokemonTable(pokemonData, totalEncounters, currentEncounter);
+    updatePokemonTable(pokemonData, currentEncounter, totalEncounters);
 
     // Update total wild encounters
     document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
@@ -155,35 +163,40 @@ ipcRenderer.on('update-count', (_event, data) => {
 });
 
 // Function to update the Pokémon table
-function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
+function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
     const tableBody = document.getElementById('pokemonTableBody');
-    const totalEncountersCell = document.getElementById('totalEncounters');
-    tableBody.innerHTML = ''; // Clear existing rows
+    const currentEncounterLower = currentEncounter.toLowerCase();
 
-    pokemonData.sort((a, b) => a.frequency - b.frequency); // Sort by count in ascending order
+    // Clear existing rows only if there is any data to update
+    if (pokemonData) {
+        tableBody.innerHTML = '';
 
-    pokemonData.forEach(pokemon => {
-        const row = document.createElement('tr');
-        const nameCell = document.createElement('td');
-        const percentageCell = document.createElement('td');
-        const countCell = document.createElement('td');
+        // Convert pokemonData from object to array, then sort by frequency
+        const sortedPokemonData = Object.entries(pokemonData)
+            .map(([name, frequency]) => ({ name, frequency }))
+            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency in ascending order
 
-        nameCell.textContent = capitalizeFirstLetter(pokemon.name); // Capitalize Pokémon name
-        percentageCell.textContent = `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`; // Round percentage up
-        countCell.textContent = pokemon.frequency;
+        sortedPokemonData.forEach(pokemon => {
+            const row = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            const percentageCell = document.createElement('td');
+            const countCell = document.createElement('td');
 
-        if (pokemon.name.toLowerCase() === currentEncounter.toLowerCase()) {
-            row.classList.add('current-pokemon'); // Add class for styling current Pokémon row
-        }
+            nameCell.textContent = capitalizeFirstLetter(pokemon.name);
+            percentageCell.textContent = `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`;
+            countCell.textContent = pokemon.frequency;
 
-        row.appendChild(nameCell);
-        row.appendChild(percentageCell);
-        row.appendChild(countCell);
-        tableBody.appendChild(row);
-    });
+            // Highlight the row if the Pokémon matches the current encounter
+            if (pokemon.name.toLowerCase() === currentEncounterLower) {
+                row.classList.add('current-pokemon');
+            }
 
-    // Set total encounters in the footer
-    totalEncountersCell.textContent = totalEncounters;
+            row.appendChild(nameCell);
+            row.appendChild(percentageCell);
+            row.appendChild(countCell);
+            tableBody.appendChild(row);
+        });
+    }
 }
 
 
