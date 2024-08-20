@@ -58,7 +58,7 @@ async function processScreen(screen, displayId, OCRforSetUp) {
             w: bottomRight.x - vsCoordinates.x,
             h: bottomRight.y - vsCoordinates.y
         };
-        console.log(finalBox);
+        // console.log(finalBox);
         return {
             status: true,
             window: finalBox,
@@ -132,7 +132,7 @@ function findVSCoordinates(wordData) {
         const word = wordData[i].text.toLowerCase();
         if (word === 'vs.' || word === 'vs') {
             const bbox = wordData[i].bbox;
-            console.log("Break here", word)
+            // console.log("Break here", word)
             return { x: bbox.x0, y: bbox.y0, w: 500, h: 100 };
         }
     }

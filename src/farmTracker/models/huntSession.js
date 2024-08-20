@@ -43,7 +43,7 @@ class HuntSession extends EventEmitter {
         this.ocrSession = new OCRSession();
         this.pokemonList = null
         this.pokemonSet = null
-        this.targetPoke = []
+        this.targetPoke = ['froakie']
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
@@ -77,7 +77,7 @@ class HuntSession extends EventEmitter {
     async captureAndRecognize() {
         try {
             const imageBuffer = await captureWindow(this.huntingDisplayId);
-            console.log(this.huntingWindow, this.huntingDisplayId);
+            // console.log(this.huntingWindow, this.huntingDisplayId);
             const result = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
             console.log(result);
             const { valid, curPoke } = checkValidEncounter(result);
@@ -132,7 +132,7 @@ class HuntSession extends EventEmitter {
         this.isLastScreenEncounter = true;
 
         console.log(`Detected new "wild ${validPoke}" encounter.`);
-        console.log(`Total encounters: ${this.wildCount}`);
+        // console.log(`Total encounters: ${this.wildCount}`);
         console.log('Pokemon counts:', this.pokemonCounts);
 
         this.emit('newEncounter', {
@@ -148,7 +148,7 @@ class HuntSession extends EventEmitter {
         }
     }
 
-    async startCaptureInterval(interval = 2000) {
+    async startCaptureInterval(interval = 500) {
         if (this.intervalID) {
             console.log('Capture interval already running');
             return;
