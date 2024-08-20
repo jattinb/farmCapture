@@ -1,7 +1,7 @@
 {
   "name": "farmcapture",
   "productName": "TrackerBee",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Track Wild Pokemon Encounters",
   "main": "dist/bundle.js",
   "scripts": {
