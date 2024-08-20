@@ -193,12 +193,12 @@ tr.current-pokemon td {
 
 /* Loading state for the setup button */
 .button-loading {
-    background-color: #FFC107;
+    background-color: #6F42C1;
     cursor: wait;
 }
 
 .button-loading:hover {
-    background-color: #FFC107; /* Ensure the color remains yellow on hover */
+    background-color: #6F42C1; /* Ensure the color remains yellow on hover */
 }
 
 .setup-message {
