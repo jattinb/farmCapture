@@ -169,7 +169,7 @@ function updatePokemonTable(pokemonData, totalEncounters, currentEncounter) {
         const countCell = document.createElement('td');
 
         nameCell.textContent = capitalizeFirstLetter(pokemon.name); // Capitalize Pokémon name
-        percentageCell.textContent = `${Math.ceil((pokemon.frequency / totalEncounters) * 100)}%`; // Round percentage up
+        percentageCell.textContent = `${((pokemon.frequency / totalEncounters) * 100).toFixed(2)}%`; // Round percentage up
         countCell.textContent = pokemon.frequency;
 
         if (pokemon.name.toLowerCase() === currentEncounter.toLowerCase()) {
