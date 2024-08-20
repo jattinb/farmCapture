@@ -130,7 +130,10 @@ class HuntSession extends EventEmitter {
     handleEncounter(curPoke) {
         // Check if the Pokémon name is valid
         const validPoke = isPokemonInSet(curPoke, this.pokemonSet) ? curPoke : findPokemon(curPoke, this.pokemonList);
-
+        if (validPoke == 'No match found') {
+            console.log('No Match Found')
+            return;
+        }
         if (this.isLastScreenEncounter && this.currPoke === validPoke) {
             console.log('Same encounter, not counting');
             return;
