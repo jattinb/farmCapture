@@ -129,6 +129,12 @@ body {
     margin-bottom: 10px; /* Reduced margin */
 }
 
+/* Highlight current Pokémon row in green */
+tr.current-pokemon td {
+    background-color: #4CAF50; /* Green background color */
+    font-weight: bold;
+}
+
 .table th, .table td {
     padding: 12px; /* Original padding */
     text-align: center;
