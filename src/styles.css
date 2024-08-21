@@ -1,5 +1,6 @@
 /* styles.css */
 
+/* Common styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #2C2C2C;
@@ -13,14 +14,22 @@ body {
     position: relative; /* To position the checkbox */
 }
 
+/* Original styles */
 .container {
     margin: auto;
     background-color: #333333;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    border-radius: 8px;
+    border-radius: 10px;
+    width: 400px; /* Original width */
+    padding: 20px; /* Original padding */
     margin-top: 10px;
+}
+
+/* Compact mode styles */
+.compact-mode .container {
     width: 300px; /* Reduced width */
     padding: 10px; /* Reduced padding */
+    border-radius: 8px; /* Slightly smaller border-radius */
 }
 
 .header {
@@ -30,42 +39,55 @@ body {
 
 .header h1 {
     margin: 0;
-    font-size: 22px;
+    font-size: 24px; /* Original title font size */
+}
+
+.compact-mode .header h1 {
+    font-size: 22px; /* Smaller title font size */
 }
 
 .header h2 {
     margin: 0;
-    font-size: 14px;
+    font-size: 16px;
     color: #BBBBBB;
 }
 
+.compact-mode .header h2 {
+    font-size: 14px; /* Smaller subtitle font size */
+}
+
 .section {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
-.section h3 {
-    margin-top: 0;
-}
-
-.section p {
-    display: flex;
-    justify-content: space-between;
+.compact-mode .section {
+    margin-bottom: 10px; /* Reduced margin */
 }
 
 .farm-duration {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     text-align: left; /* Align content to the right */
-    margin-top: 4px;
-    margin-bottom: 16px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.compact-mode .farm-duration {
+    font-size: 20px; /* Smaller duration font size */
+    margin-top: 4px; /* Reduced top margin */
+    margin-bottom: 16px; /* Reduced bottom margin */
 }
 
 .status-container {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.compact-mode .status-container {
+    margin-bottom: 10px; /* Reduced margin */
 }
 
 .status {
@@ -84,28 +106,37 @@ body {
 .encounters {
     display: flex;
     justify-content: space-between;
-    font-size: 18px; /* Reduced font size */}
+    font-size: 18px;
+}
+
+.compact-mode .encounters {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
 
 /* Table styling */
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     background-color: #444444;
     border-radius: 5px;
     overflow: hidden;
 }
 
-/* Highlight current Pokémon row in green */
-tr.current-pokemon td {
-    background-color: #4CAF50; /* Green background color */
-    font-weight: bold;
+.compact-mode .table {
+    margin-bottom: 10px; /* Reduced margin */
 }
 
 .table th, .table td {
+    padding: 12px; /* Original padding */
     text-align: center;
     border: 1px solid #555555; /* Border for table cells */
     color: #FFFFFF; /* Text color for table cells */
+}
+
+.compact-mode .table th, .compact-mode .table td {
     padding: 8px; /* Reduced padding */
     font-size: 16px; /* Reduced font size */
 }
@@ -132,14 +163,26 @@ tr.current-pokemon td {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.compact-mode .button-container {
     gap: 5px; /* Reduced gap */
     margin-bottom: 5px; /* Reduced margin */
 }
 
 .button {
     flex: 1;
+    padding: 10px;
     border: none;
+    border-radius: 5px;
+    font-size: 16px;
     cursor: pointer;
+    margin: 5px 0;
+}
+
+.compact-mode .button {
     padding: 5px; /* Reduced padding */
     border-radius: 3px; /* Reduced border-radius */
     font-size: 14px; /* Reduced font size */
@@ -189,17 +232,25 @@ tr.current-pokemon td {
     padding: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     border-radius: 10px;
-    font-size: 14px;
 }
 
-/* Loading state for the setup button */
+.compact-mode .setup-instructions {
+    display: none;
+    background-color: #262525;
+    margin: auto;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    font-size: 14px; /* Reduced font size */
+}
+
 .button-loading {
     background-color: #6F42C1;
     cursor: wait;
 }
 
 .button-loading:hover {
-    background-color: #6F42C1; /* Ensure the color remains yellow on hover */
+    background-color: #6F42C1; /* Ensure the color remains the same on hover */
 }
 
 .setup-message {
@@ -209,7 +260,7 @@ tr.current-pokemon td {
     border-radius: 4px;
     font-weight: bold;
     position: relative;
-    font-size: 14px;
+    font-size: 14px; /* Reduced font size */
 }
 
 .setup-success {
@@ -232,16 +283,57 @@ tr.current-pokemon td {
     cursor: pointer;
 }
 
-.always-on-top-label {
+/* Non-compact mode */
+.compact-label {
     position: fixed;
+    bottom: 40px; /* Compact label above Always On Top */
+    right: 10px;
+    font-size: 0.8em; /* Reduced font size */
     color: #007BFF;
     display: flex;
     align-items: center;
-    bottom: 8px; /* Adjusted position */
+}
+
+.always-on-top-label {
+    position: fixed;
+    bottom: 10px; /* Closer to Compact label */
+    right: 10px;
+    font-size: 0.8em; /* Reduced font size */
+    color: #007BFF;
+    display: flex;
+    align-items: center;
+}
+
+/* Compact mode */
+.compact-mode .compact-label {
+    bottom: 25px; /* Adjusted position for compact mode */
     right: 8px;
-    font-size: 0.7em; /* Reduced font size */}
+    font-size: 0.7em; /* Reduced font size */
+}
+
+.compact-mode .always-on-top-label {
+    bottom: 5px; /* Closer to Compact label in compact mode */
+    right: 8px;
+    font-size: 0.7em; /* Reduced font size */
+}
+
+/* Checkbox adjustments */
+.compact-label input[type="checkbox"] {
+    margin-left: 10px; /* Adjust margin for spacing */
+    transform: scale(0.8); /* Reduced size */
+}
+
+.compact-mode .compact-label input[type="checkbox"] {
+    margin-left: 5px; /* Adjusted margin */
+    transform: scale(0.7); /* Further reduced size */
+}
 
 .always-on-top-label input[type="checkbox"] {
-    margin-left: 5px; /* Adjust margin for spacing */
-    transform: scale(0.7); /* Reduced size */
+    margin-left: 10px; /* Adjust margin for spacing */
+    transform: scale(0.8); /* Reduced size */
+}
+
+.compact-mode .always-on-top-label input[type="checkbox"] {
+    margin-left: 5px; /* Adjusted margin */
+    transform: scale(0.7); /* Further reduced size */
 }

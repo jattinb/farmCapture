@@ -20,7 +20,7 @@ let listenersAttached = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 340,
+    width: 450,
     height: 700,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -203,4 +203,14 @@ ipcMain.on('toggle-always-on-top', () => {
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
   mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
   mainWindow.webContents.send('always-on-top-toggled', !isAlwaysOnTop);
+});
+
+ipcMain.on('toggle-size', (_event, isCompact) => {
+  const [currentWidth, currentHeight] = mainWindow.getSize(); // Get the current width and height
+
+  if (isCompact) {
+    mainWindow.setSize(340, currentHeight - 200); // Change only the width to 340
+  } else {
+    mainWindow.setSize(450, currentHeight + 200); // Change only the width to 450
+  }
 });

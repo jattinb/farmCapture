@@ -264,6 +264,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add event listener to toggle capture button
     document.getElementById('toggleCapture').addEventListener('click', toggleCapture);
+
+    const compactBtn = document.getElementById('toggleCompact');
+    if (compactBtn) {
+        let isCompact = false;
+
+        // Initialize the button text
+        compactBtn.textContent = isCompact ? 'Original' : 'Compact';
+
+        compactBtn.addEventListener('click', () => {
+            isCompact = !isCompact;
+            ipcRenderer.send('toggle-size', isCompact);
+
+            // Toggle CSS class on the body or main container
+            const body = document.body; // Or another container element
+            if (isCompact) {
+                body.classList.add('compact-mode');
+                compactBtn.textContent = 'Original';
+            } else {
+                body.classList.remove('compact-mode');
+                compactBtn.textContent = 'Compact';
+            }
+        });
+    } else {
+        console.warn('Element with ID "toggleSizeBtn" not found.');
+    }
+
+    const captureBtn = document.getElementById('toggleCapture');
+    if (captureBtn) {
+        captureBtn.addEventListener('click', toggleCapture);
+    } else {
+        console.warn('Element with ID "toggleCapture" not found.');
+    }
 });
 
 
