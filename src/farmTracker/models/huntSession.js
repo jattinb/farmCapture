@@ -108,7 +108,7 @@ class HuntSession extends EventEmitter {
 
         } catch (error) {
             console.error('Error during capture and recognition:', error);
-
+            this.handleNoEncounter()
             // Handle specific OCR worker error
             if (error.message === 'OCR worker is not initialized or has been terminated.') {
                 console.log('Recognition was attempted after the worker was terminated.');
