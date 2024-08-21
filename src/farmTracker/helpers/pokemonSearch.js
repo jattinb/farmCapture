@@ -1,7 +1,6 @@
 const Fuse = require('fuse.js');
 
 function findPokemon(name, pokemonList) {
-
     const pokemonListArray = pokemonList;
 
     // Set up Fuse.js options
@@ -16,8 +15,23 @@ function findPokemon(name, pokemonList) {
     // Search for the closest match
     const result = fuse.search(name);
 
-    // Return the closest match or a fallback if nothing found
-    return result.length > 0 ? result[0].item : 'No match found';
+    if (result.length === 0) {
+        return 'No match found';
+    }
+
+    // Get the highest score
+    const highestScore = result[0].score;
+
+    // Filter out results with the same highest score
+    const topMatches = result.filter(item => item.score === highestScore);
+
+    // If there's more than one match with the same highest score, return 'No match found'
+    if (topMatches.length > 1) {
+        return 'No match found';
+    }
+
+    // Otherwise, return the closest match
+    return topMatches[0].item;
 }
 
-module.exports = { findPokemon };  
+module.exports = { findPokemon };
