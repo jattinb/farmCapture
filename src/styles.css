@@ -14,13 +14,13 @@ body {
 }
 
 .container {
-    width: 400px;
     margin: auto;
-    padding: 20px;
     background-color: #333333;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    border-radius: 10px;
+    border-radius: 8px;
     margin-top: 10px;
+    width: 300px; /* Reduced width */
+    padding: 10px; /* Reduced padding */
 }
 
 .header {
@@ -30,17 +30,17 @@ body {
 
 .header h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .header h2 {
     margin: 0;
-    font-size: 16px;
+    font-size: 14px;
     color: #BBBBBB;
 }
 
 .section {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .section h3 {
@@ -56,16 +56,16 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     text-align: left; /* Align content to the right */
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 4px;
+    margin-bottom: 16px;
 }
 
 .status-container {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .status {
@@ -84,14 +84,13 @@ body {
 .encounters {
     display: flex;
     justify-content: space-between;
-    font-size: 18px;
-}
+    font-size: 18px; /* Reduced font size */}
 
 /* Table styling */
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     background-color: #444444;
     border-radius: 5px;
     overflow: hidden;
@@ -104,10 +103,11 @@ tr.current-pokemon td {
 }
 
 .table th, .table td {
-    padding: 12px; /* Increased padding for better spacing */
     text-align: center;
     border: 1px solid #555555; /* Border for table cells */
     color: #FFFFFF; /* Text color for table cells */
+    padding: 8px; /* Reduced padding */
+    font-size: 16px; /* Reduced font size */
 }
 
 .table th {
@@ -132,18 +132,18 @@ tr.current-pokemon td {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 5px; /* Reduced gap */
+    margin-bottom: 5px; /* Reduced margin */
 }
 
 .button {
     flex: 1;
-    padding: 10px;
     border: none;
-    border-radius: 5px;
-    font-size: 16px;
     cursor: pointer;
-    margin: 5px 0;
+    padding: 5px; /* Reduced padding */
+    border-radius: 3px; /* Reduced border-radius */
+    font-size: 14px; /* Reduced font size */
+    margin: 4px 0; /* Reduced margin */
 }
 
 .button-green {
@@ -189,6 +189,7 @@ tr.current-pokemon td {
     padding: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     border-radius: 10px;
+    font-size: 14px;
 }
 
 /* Loading state for the setup button */
@@ -208,6 +209,7 @@ tr.current-pokemon td {
     border-radius: 4px;
     font-weight: bold;
     position: relative;
+    font-size: 14px;
 }
 
 .setup-success {
@@ -232,15 +234,14 @@ tr.current-pokemon td {
 
 .always-on-top-label {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
-    font-size: 0.8em; /* Reduced font size */
     color: #007BFF;
     display: flex;
     align-items: center;
-}
+    bottom: 8px; /* Adjusted position */
+    right: 8px;
+    font-size: 0.7em; /* Reduced font size */}
 
 .always-on-top-label input[type="checkbox"] {
-    margin-left: 10px; /* Adjust margin for spacing */
-    transform: scale(0.8); /* Reduced size */
+    margin-left: 5px; /* Adjust margin for spacing */
+    transform: scale(0.7); /* Reduced size */
 }

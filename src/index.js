@@ -20,7 +20,7 @@ let listenersAttached = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 450,
+    width: 340,
     height: 700,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
