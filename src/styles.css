@@ -343,3 +343,54 @@ tr.current-pokemon td {
     margin-left: 5px; /* Adjusted margin */
     transform: scale(0.7); /* Further reduced size */
 }
+
+/* Styling for action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px; /* Reduced gap between buttons */
+}
+
+.action-buttons button {
+    font-size: 10px; /* Smaller font size for buttons */
+    padding: 2px 6px; /* Reduced padding for a more compact button */
+    border-radius: 4px; /* Small rounded corners */
+    background-color: #4CAF50; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove borders */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.action-buttons button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.action-buttons button:active {
+    background-color: #3e8e41; /* Even darker when clicked */
+}
+
+.action-buttons button:disabled {
+    background-color: #ccc; /* Disabled state styling */
+    cursor: not-allowed; /* Not allowed cursor */
+}
+
+/* Delete button styles */
+.action-buttons .delete-button {
+    background-color: #f44336; /* Red background for delete button */
+}
+
+.action-buttons .delete-button:hover {
+    background-color: #e53935; /* Darker red on hover */
+}
+
+.action-buttons .delete-button svg {
+    width: 14px; /* Adjust the icon size */
+    height: 14px; /* Ensure icon is not too large */
+    fill: white; /* Icon color */
+}
+
+.compact-mode .action-buttons .delete-button {
+    padding: 2px; /* Smaller padding in compact mode */
+}

@@ -162,43 +162,75 @@ ipcRenderer.on('update-count', (_event, data) => {
     document.getElementById('currentEncounter').innerHTML = `<strong>${currentEncounter}</strong>`;
 });
 
-// Function to update the Pokémon table
+// Function to update the Pokémon table and include action buttons
 function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
     const tableBody = document.getElementById('pokemonTableBody');
     const currentEncounterLower = currentEncounter.toLowerCase();
 
-    // Clear existing rows only if there is any data to update
     if (pokemonData) {
         tableBody.innerHTML = '';
 
         // Convert pokemonData from object to array, then sort by frequency
         const sortedPokemonData = Object.entries(pokemonData)
             .map(([name, frequency]) => ({ name, frequency }))
-            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency in ascending order
+            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency
 
         sortedPokemonData.forEach(pokemon => {
             const row = document.createElement('tr');
             const nameCell = document.createElement('td');
             const percentageCell = document.createElement('td');
             const countCell = document.createElement('td');
+            const actionCell = document.createElement('td'); // New cell for action buttons
 
+            // Add Pokémon name
             nameCell.textContent = capitalizeFirstLetter(pokemon.name);
+
+            // Add percentage and count
             percentageCell.textContent = `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`;
             countCell.textContent = pokemon.frequency;
+
+            // Create action buttons for increment, decrement, and delete
+            const actionButtons = document.createElement('div');
+            actionButtons.classList.add('action-buttons'); // Add class for styling
+
+            const plusBtn = document.createElement('button');
+            plusBtn.textContent = '+';
+            plusBtn.classList.add('button', 'button-plus');
+            // plusBtn.addEventListener('click', () => incrementPokemon(pokemon.name));
+
+            const minusBtn = document.createElement('button');
+            minusBtn.textContent = '-';
+            minusBtn.classList.add('button', 'button-minus');
+            // minusBtn.addEventListener('click', () => decrementPokemon(pokemon.name));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'X';
+            deleteBtn.classList.add('button', 'button-red', 'delete-button'); // Added delete-button class
+            // deleteBtn.addEventListener('click', () => deletePokemon(pokemon.name));
+
+            // Append buttons to action buttons container
+            actionButtons.appendChild(plusBtn);
+            actionButtons.appendChild(minusBtn);
+            actionButtons.appendChild(deleteBtn);
+
+            // Append action buttons to action cell
+            actionCell.appendChild(actionButtons);
 
             // Highlight the row if the Pokémon matches the current encounter
             if (pokemon.name.toLowerCase() === currentEncounterLower) {
                 row.classList.add('current-pokemon');
             }
 
+            // Append all cells to the row
             row.appendChild(nameCell);
             row.appendChild(percentageCell);
             row.appendChild(countCell);
+            row.appendChild(actionCell); // Add action buttons to the row
+
             tableBody.appendChild(row);
         });
     }
 }
-
 
 ipcRenderer.on('update-timer', (_event, timeString) => {
     document.getElementById('farmDuration').textContent = `${timeString}`;
