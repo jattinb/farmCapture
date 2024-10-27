@@ -200,18 +200,18 @@ tr.current-pokemon td {
     color: white;
 }
 
-.button-green:hover {
+/* .button-green:hover {
     background-color: #45a049;
-}
+} */
 
 .button-red {
     background-color: #f44336;
     color: white;
 }
 
-.button-red:hover {
+/* .button-red:hover {
     background-color: #da190b;
-}
+} */
 
 .button-blue {
     background-color: #2196F3;
@@ -349,48 +349,59 @@ tr.current-pokemon td {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 4px; /* Reduced gap between buttons */
+    gap: 4px; /* Gap between buttons */
 }
 
 .action-buttons button {
     font-size: 10px; /* Smaller font size for buttons */
-    padding: 2px 6px; /* Reduced padding for a more compact button */
+    padding: 4px 8px; /* Adjusted padding for better touch targets */
     border-radius: 4px; /* Small rounded corners */
-    background-color: #4CAF50; /* Button background color */
+    background-color: #4CAF50; /* Default button background color */
     color: white; /* Button text color */
     border: none; /* Remove borders */
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s; /* Added transition for scaling */
 }
 
-.action-buttons button:hover {
-    background-color: #45a049; /* Darker green on hover */
+/* Hover effect */
+.action-buttons button:hover:not(:disabled) {
+    transform: scale(1.05); /* Scale up on hover */
 }
 
-.action-buttons button:active {
-    background-color: #3e8e41; /* Even darker when clicked */
-}
-
+/* Disabled state */
 .action-buttons button:disabled {
     background-color: #ccc; /* Disabled state styling */
     cursor: not-allowed; /* Not allowed cursor */
 }
 
+/* Prevent hover color change for disabled buttons */
+.action-buttons button:disabled:hover {
+    background-color: #ccc; /* Maintain grey color when hovered */
+}
+
 /* Delete button styles */
-.action-buttons .delete-button {
+.button-delete {
     background-color: #f44336; /* Red background for delete button */
 }
 
-.action-buttons .delete-button:hover {
-    background-color: #e53935; /* Darker red on hover */
+.button-delete:hover:not(:disabled) {
+    background-color: #d32f2f; /* Darker red on hover */
 }
 
-.action-buttons .delete-button svg {
-    width: 14px; /* Adjust the icon size */
-    height: 14px; /* Ensure icon is not too large */
-    fill: white; /* Icon color */
+/* Button color variations */
+.button-plus {
+    background-color: #008CBA; /* Blue for plus */
 }
 
-.compact-mode .action-buttons .delete-button {
-    padding: 2px; /* Smaller padding in compact mode */
+.button-minus {
+    background-color: #007BFF; /* Light blue for minus */
+}
+
+/* Compact mode styles (if applicable) */
+.compact-mode .action-buttons {
+    flex-direction: column; /* Stack buttons vertically in compact mode */
+}
+
+.current-pokemon {
+    background-color: #f0f8ff; /* Light blue for highlighted Pokémon */
 }
