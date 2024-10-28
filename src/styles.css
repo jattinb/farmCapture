@@ -390,11 +390,15 @@ tr.current-pokemon td {
     background-color: #d32f2f; /* Darker red on hover */
 }
 
-/* Compact mode styles (if applicable) */
+/* Compact mode styles for action buttons */
 .compact-mode .action-buttons {
-    flex-direction: column; /* Stack buttons vertically in compact mode */
+    flex-direction: row; /* Maintain row alignment in compact mode */
+    gap: 2px; /* Reduced gap between buttons */
 }
 
-.current-pokemon {
-    background-color: #f0f8ff; /* Light blue for highlighted Pokémon */
+.compact-mode .action-buttons button {
+    font-size: 9px; /* Further reduce font size in compact mode */
+    padding: 3px 6px; /* Adjusted padding for compactness */
+    border-radius: 3px; /* Smaller border-radius for compact mode */
+    transition: background-color 0.2s, transform 0.1s; /* Adjusted transition for compact mode */
 }
