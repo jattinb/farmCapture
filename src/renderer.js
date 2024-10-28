@@ -100,7 +100,7 @@ function toggleCapture() {
         Array.from(currPokeEles).forEach(ele => ele.classList.remove('current-pokemon'));
     }
 
-    updateStatus(!isActive);
+    updateStatus(isActive);
 }
 
 // Helper function to toggle action buttons
@@ -155,10 +155,12 @@ ipcRenderer.on('update-count-noEncounter', () => {
 
 ipcRenderer.on('update-count', (_, data) => {
     const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
-    const totalEncounters = data.wildCount; // Use wildCount for totalEncounters
-    const pokemonData = data.pokemonCounts; // Use pokemonCounts for pokemonData
-
-    updatePokemonTable(pokemonData, currentEncounter, totalEncounters);
+    const totalEncounters = data.wildCount;
+    const pokemonData = data.pokemonCounts;
+    const startButton = document.getElementById('toggleCapture');
+    const isSessionRunning = startButton.classList.contains('button-red'); // Flag for session status
+    console.log(startButton.classList.contains('button-red'))
+    updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning);
 
     // Update total wild encounters
     document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
@@ -167,7 +169,7 @@ ipcRenderer.on('update-count', (_, data) => {
 });
 
 // Function to update the Pokémon table and include action buttons
-function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
+function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning) {
     const tableBody = document.getElementById('pokemonTableBody');
     const currentEncounterLower = currentEncounter.toLowerCase();
 
@@ -177,7 +179,7 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
         // Convert pokemonData from object to array, then sort by frequency
         const sortedPokemonData = Object.entries(pokemonData)
             .map(([name, frequency]) => ({ name, frequency }))
-            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency
+            .sort((a, b) => b.frequency - a.frequency); // Sort by frequency in descending order
 
         sortedPokemonData.forEach(pokemon => {
             const row = document.createElement('tr');
@@ -195,24 +197,24 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
 
             // Create action buttons for increment, decrement, and delete
             const actionButtons = document.createElement('div');
-            actionButtons.classList.add('action-buttons'); // Add class for styling
+            actionButtons.classList.add('action-buttons');
 
             const plusBtn = document.createElement('button');
             plusBtn.textContent = '+';
             plusBtn.classList.add('button', 'button-blue', 'button-plus');
-            plusBtn.disabled = true;
+            plusBtn.disabled = isSessionRunning;
             plusBtn.addEventListener('click', () => incrementPokemon(pokemon.name));
 
             const minusBtn = document.createElement('button');
             minusBtn.textContent = '-';
             minusBtn.classList.add('button', 'button-blue', 'button-minus');
-            minusBtn.disabled = true;
+            minusBtn.disabled = isSessionRunning;
             minusBtn.addEventListener('click', () => decrementPokemon(pokemon.name));
 
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'X';
-            deleteBtn.classList.add('button', 'button-red', 'button-delete'); // Added delete-button class
-            deleteBtn.disabled = true;
+            deleteBtn.classList.add('button', 'button-red', 'button-delete');
+            deleteBtn.disabled = isSessionRunning;
             deleteBtn.addEventListener('click', () => deletePokemon(pokemon.name));
 
             // Append buttons to action buttons container
@@ -227,10 +229,10 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
             row.appendChild(nameCell);
             row.appendChild(percentageCell);
             row.appendChild(countCell);
-            row.appendChild(actionCell); // Append action cell to row
+            row.appendChild(actionCell);
 
             // Highlight the current encounter row
-            if (currentEncounterLower === pokemon.name.toLowerCase()) {
+            if (isSessionRunning && (currentEncounterLower === pokemon.name.toLowerCase())) {
                 row.classList.add('current-pokemon');
             }
 

@@ -40,8 +40,9 @@ app.whenReady().then(async () => {
       createWindow();
     }
   });
-  huntSession.pokemonList = await loadPokemonList()
-  huntSession.pokemonSet = new Set(huntSession.pokemonList)
+
+  huntSession.pokemonList = await loadPokemonList();
+  huntSession.pokemonSet = new Set(huntSession.pokemonList);
   attachListeners();
 });
 
@@ -111,9 +112,7 @@ ipcMain.handle('save-dialog', async () => {
     title: 'Export CSV',
     defaultPath: fileName,
     buttonLabel: 'Export',
-    filters: [
-      { name: 'CSV Files', extensions: ['csv'] }
-    ]
+    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
   });
   return result;
 });
@@ -131,19 +130,16 @@ ipcMain.handle('open-file-dialog', async () => {
   const result = await dialog.showOpenDialog({
     title: 'Import CSV',
     buttonLabel: 'Import',
-    filters: [
-      { name: 'CSV Files', extensions: ['csv'] }
-    ],
+    filters: [{ name: 'CSV Files', extensions: ['csv'] }],
     properties: ['openFile']
   });
   return result;
 });
 
-// Handle CSV import and parsing
 ipcMain.on('import-session', (_event, filePath) => {
   if (!huntSession.isActive()) {
     const importedData = [];
-    console.log(filePath)
+    console.log(filePath);
     fs.createReadStream(filePath)
       .pipe(csvParser())
       .on('data', (row) => {
@@ -206,11 +202,36 @@ ipcMain.on('toggle-always-on-top', () => {
 });
 
 ipcMain.on('toggle-size', (_event, isCompact) => {
-  const [currentWidth, currentHeight] = mainWindow.getSize(); // Get the current width and height
-
-  if (isCompact) {
-    mainWindow.setSize(340, currentHeight - 200); // Change only the width to 340
-  } else {
-    mainWindow.setSize(450, currentHeight + 200); // Change only the width to 450
-  }
+  const [currentWidth, currentHeight] = mainWindow.getSize();
+  mainWindow.setSize(isCompact ? 340 : 450, isCompact ? currentHeight - 200 : currentHeight + 200);
 });
+
+// ipcMain handlers
+ipcMain.on('increment-pokemon', (event, pokemonName) => {
+  if (!huntSession.pokemonCounts[pokemonName]) {
+    huntSession.pokemonCounts[pokemonName] = 0;
+  }
+  huntSession.pokemonCounts[pokemonName] += 1;
+  sendUpdatedCount(event, pokemonName);
+});
+
+ipcMain.on('decrement-pokemon', (event, pokemonName) => {
+  if (huntSession.pokemonCounts[pokemonName] > 0) {
+    huntSession.pokemonCounts[pokemonName] -= 1;
+  }
+  sendUpdatedCount(event, pokemonName);
+});
+
+ipcMain.on('delete-pokemon', (event, pokemonName) => {
+  delete huntSession.pokemonCounts[pokemonName];
+  sendUpdatedCount(event, pokemonName);
+});
+
+function sendUpdatedCount(event, pokemonName) {
+  event.sender.send('update-count', {
+    currPoke: pokemonName,
+    wildCount: Object.values(huntSession.pokemonCounts).reduce((acc, count) => acc + count, 0),
+    pokemonCounts: huntSession.pokemonCounts,
+    isSessionRunning: huntSession.isSessionRunning // Ensure session state is sent
+  });
+}
