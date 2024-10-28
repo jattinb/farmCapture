@@ -354,13 +354,15 @@ tr.current-pokemon td {
 
 .action-buttons button {
     font-size: 10px; /* Smaller font size for buttons */
+    font-weight: bolder; /* Make text bold */
     padding: 4px 8px; /* Adjusted padding for better touch targets */
     border-radius: 4px; /* Small rounded corners */
-    background-color: #4CAF50; /* Default button background color */
+    background-color: #444444; /* Default button background color */
     color: white; /* Button text color */
     border: none; /* Remove borders */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s; /* Added transition for scaling */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add a shadow to text */
 }
 
 /* Hover effect */
@@ -386,15 +388,6 @@ tr.current-pokemon td {
 
 .button-delete:hover:not(:disabled) {
     background-color: #d32f2f; /* Darker red on hover */
-}
-
-/* Button color variations */
-.button-plus {
-    background-color: #008CBA; /* Blue for plus */
-}
-
-.button-minus {
-    background-color: #007BFF; /* Light blue for minus */
 }
 
 /* Compact mode styles (if applicable) */
