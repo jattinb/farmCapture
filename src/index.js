@@ -212,17 +212,20 @@ ipcMain.on('increment-pokemon', (event, pokemonName) => {
     huntSession.pokemonCounts[pokemonName] = 0;
   }
   huntSession.pokemonCounts[pokemonName] += 1;
+  huntSession.wildCount += 1
   sendUpdatedCount(event, pokemonName);
 });
 
 ipcMain.on('decrement-pokemon', (event, pokemonName) => {
   if (huntSession.pokemonCounts[pokemonName] > 0) {
     huntSession.pokemonCounts[pokemonName] -= 1;
+    huntSession.wildCount -= 1
   }
   sendUpdatedCount(event, pokemonName);
 });
 
 ipcMain.on('delete-pokemon', (event, pokemonName) => {
+  huntSession.wildCount -= huntSession.pokemonCounts[pokemonName]
   delete huntSession.pokemonCounts[pokemonName];
   sendUpdatedCount(event, pokemonName);
 });
@@ -230,7 +233,7 @@ ipcMain.on('delete-pokemon', (event, pokemonName) => {
 function sendUpdatedCount(event, pokemonName) {
   event.sender.send('update-count', {
     currPoke: pokemonName,
-    wildCount: Object.values(huntSession.pokemonCounts).reduce((acc, count) => acc + count, 0),
+    wildCount: huntSession.wildCount,
     pokemonCounts: huntSession.pokemonCounts,
     isSessionRunning: huntSession.isSessionRunning // Ensure session state is sent
   });
