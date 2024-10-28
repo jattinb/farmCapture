@@ -68,8 +68,8 @@ class HuntSession extends EventEmitter {
         return {
             x: huntingWindow.x - 50,
             y: huntingWindow.y - 50,
-            w: huntingWindow.w + 100,
-            h: huntingWindow.h + 75,
+            w: huntingWindow.w + 150,
+            h: huntingWindow.h + 100,
         };
     }
 
