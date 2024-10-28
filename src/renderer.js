@@ -203,19 +203,19 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
 
             const plusBtn = document.createElement('button');
             plusBtn.textContent = '+';
-            plusBtn.classList.add('button', 'button-blue', 'button-plus');
+            plusBtn.classList.add('button', 'button-plus');
             plusBtn.disabled = isSessionRunning;
             plusBtn.addEventListener('click', () => incrementPokemon(pokemon.name));
 
             const minusBtn = document.createElement('button');
             minusBtn.textContent = '-';
-            minusBtn.classList.add('button', 'button-blue', 'button-minus');
+            minusBtn.classList.add('button', 'button-minus');
             minusBtn.disabled = isSessionRunning;
             minusBtn.addEventListener('click', () => decrementPokemon(pokemon.name));
 
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'X';
-            deleteBtn.classList.add('button', 'button-red', 'button-delete');
+            deleteBtn.classList.add('button', 'button-delete');
             deleteBtn.disabled = isSessionRunning;
             deleteBtn.addEventListener('click', () => deletePokemon(pokemon.name));
 

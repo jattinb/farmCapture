@@ -380,7 +380,7 @@ tr.current-pokemon td {
 }
 
 /* Delete button styles */
-.button-delete {
+.action-buttons .button-delete {
     background-color: #f44336; /* Red background for delete button */
 }
 
