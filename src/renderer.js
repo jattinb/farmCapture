@@ -179,7 +179,7 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
         // Convert pokemonData from object to array, then sort by frequency
         const sortedPokemonData = Object.entries(pokemonData)
             .map(([name, frequency]) => ({ name, frequency }))
-            .sort((a, b) => b.frequency - a.frequency); // Sort by frequency in descending order
+            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency in descending order
 
         sortedPokemonData.forEach(pokemon => {
             const row = document.createElement('tr');
@@ -191,8 +191,10 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
             // Add Pokémon name
             nameCell.textContent = capitalizeFirstLetter(pokemon.name);
 
-            // Add percentage and count
-            percentageCell.textContent = `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`;
+            // Add percentage and count, handling divide-by-zero for totalEncounters
+            percentageCell.textContent = pokemon.frequency > 0
+                ? `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`
+                : "0%";
             countCell.textContent = pokemon.frequency;
 
             // Create action buttons for increment, decrement, and delete
