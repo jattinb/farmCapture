@@ -4,38 +4,33 @@ const checkValidEncounter = (text) => {
     console.log(text);
 
     // Define Pokémon names that may have suffixes
-    const suffixes = ['m', 'f', 'mime', 'rime', 'jr', 'z', 'o']; // Add more suffixes if needed, e.g., 'alpha', 'beta'
+    const suffixes = ['m', 'f', 'mime', 'rime', 'jr', 'z', 'o']; // Add more suffixes if needed
     const knownPokemonWithSuffixes = ['nidoran']; // Add other Pokémon names as needed
 
-    // Look for "wild" in the words array
-    const wildIndex = words.indexOf('wild');
-    if (wildIndex !== -1 && wildIndex < words.length - 1) {
-        let curPoke = words[wildIndex + 1];
+    let curPoke = null;
 
-        // Check if the detected Pokémon name has a suffix
-        if (knownPokemonWithSuffixes.includes(curPoke) && wildIndex + 2 < words.length) {
-            const potentialSuffix = words[wildIndex + 2];
+    // Check for "wild" followed by a Pokémon name or merged "wildpokemon"
+    for (let i = 0; i < words.length; i++) {
+        if (words[i] === 'wild' && i < words.length - 1) {
+            // Case with "wild" followed by a separate Pokémon name
+            curPoke = words[i + 1];
+        } else if (words[i].startsWith('wild') && words[i].length > 4) {
+            // Case with merged "wildpokemon" (e.g., "wildStarly")
+            curPoke = words[i].substring(4);
+        }
+
+        // If curPoke is identified, check for suffix immediately
+        if (curPoke && knownPokemonWithSuffixes.includes(curPoke) && i + 2 < words.length) {
+            const potentialSuffix = words[i + 2];
             if (suffixes.includes(potentialSuffix)) {
                 curPoke = `${curPoke}-${potentialSuffix}`;
             }
         }
 
-        console.log('Encounter found:', curPoke);
-        return { valid: true, curPoke };
-    } else if (wildIndex !== -1 && words[wildIndex + 1].startsWith('wild')) {
-        // Handle merged "wildpokemon" case
-        let pokemonName = words[wildIndex + 1].substring(4); // Extract the Pokémon name after "wild"
-
-        // Check if the detected Pokémon name has a suffix
-        if (knownPokemonWithSuffixes.includes(pokemonName) && wildIndex + 2 < words.length) {
-            const potentialSuffix = words[wildIndex + 2];
-            if (suffixes.includes(potentialSuffix)) {
-                pokemonName = `${pokemonName}-${potentialSuffix}`;
-            }
+        if (curPoke) {
+            console.log('Encounter found:', curPoke);
+            return { valid: true, curPoke };
         }
-
-        console.log('Encounter found:', pokemonName);
-        return { valid: true, curPoke: pokemonName };
     }
 
     return { valid: false, curPoke: null };
