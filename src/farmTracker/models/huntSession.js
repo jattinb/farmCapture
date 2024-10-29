@@ -84,7 +84,7 @@ class HuntSession extends EventEmitter {
             console.log(text, confidence)
             // console.log(text, confidence)
             // Handle low-confidence OCR results
-            if (confidence < 50) {
+            if (confidence < 45) {
                 this.handleNoEncounter();
                 return;
             }
