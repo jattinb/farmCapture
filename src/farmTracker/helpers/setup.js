@@ -35,7 +35,7 @@ async function processScreen(screen, displayId, OCRforSetUp) {
         }
         // console.log("From filtered", goldData.text);
         const vsCoordinates = findVSCoordinates(goldData.words);
-
+        // console.log(vsCoordinates)
         if (!vsCoordinates) {
             return { status: false, displayId, window: { x: 0, y: 0, w: 0, h: 0 }, error: '"VS." not found' };
         }
@@ -144,32 +144,27 @@ function findPokemonLine(text, wordData) {
     let pokemonName = '';
     let bottomRight = null;
 
-    // Create a map for quick lookup of word bounding boxes
-    const wordMap = wordData.reduce((map, word) => {
-        map[word.text.toUpperCase()] = word.bbox;
-        return map;
-    }, {});
+    // Iterate through lines to find the line with "WILD"
+    for (let line of lines) {
+        const upperLine = line.toUpperCase();
+        if (upperLine.includes('WILD')) {
+            // Grab everything after "WILD" as the Pokémon name
+            pokemonName = line.slice(line.toUpperCase().indexOf('WILD') + 5).trim();
 
-    // Iterate through lines to find the relevant line and Pokémon name
-    for (let j = 0; j < lines.length; j++) {
-        const line = lines[j].toUpperCase();
-        if (line.includes('WILD')) {
-            const words = line.split(' ');
-            const wildIndex = words.indexOf('WILD');
-            if (wildIndex !== -1) {
-                pokemonName = words.slice(wildIndex + 1).join(' ');
+            // Find the bounding box of the last word in the Pokémon name
+            const nameParts = pokemonName.toUpperCase().split(' ');
+            const lastWord = nameParts[nameParts.length - 1];
+            const wordObj = wordData.find(word => word.text.toUpperCase() === lastWord);
 
-                // Lookup the Pokémon name in the word map
-                const bbox = wordMap[pokemonName.toUpperCase()];
-                if (bbox) {
-                    bottomRight = { x: bbox.x1, y: bbox.y1 };
-                }
-                break;
+            if (wordObj) {
+                bottomRight = { x: wordObj.bbox.x1, y: wordObj.bbox.y1 };
             }
+            break;
         }
     }
 
     return { pokemonName, bottomRight };
 }
+
 
 module.exports = setup;
