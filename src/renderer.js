@@ -154,11 +154,12 @@ ipcRenderer.on('update-count-noEncounter', () => {
 });
 
 ipcRenderer.on('update-count', (_, data) => {
-    const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
     const totalEncounters = data.wildCount;
     const pokemonData = data.pokemonCounts;
     const startButton = document.getElementById('toggleCapture');
     const isSessionRunning = startButton.classList.contains('button-red'); // Flag for session status
+    const currentEncounter = (data.currPoke && isSessionRunning) ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
+
     console.log(startButton.classList.contains('button-red'))
     updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning);
 
