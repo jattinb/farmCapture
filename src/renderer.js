@@ -79,8 +79,13 @@ function updateStatus(isActive) {
     statusElement.classList.toggle('status-stopped', !isActive);
 }
 
+let isProcessing = false; // Flag to prevent double-clicks
+
 // Function to toggle capture state
 function toggleCapture() {
+    if (isProcessing) return; // Prevent further clicks while processing
+    isProcessing = true;
+
     const button = document.getElementById('toggleCapture');
     const isActive = button.classList.contains('button-green');
 
@@ -101,7 +106,13 @@ function toggleCapture() {
     }
 
     updateStatus(isActive);
+
+    // Re-enable the button after a short delay to ensure operation completes
+    setTimeout(() => {
+        isProcessing = false;
+    }, 500); // Adjust delay as needed
 }
+
 
 // Helper function to toggle action buttons
 function toggleActionButtons(disable) {
