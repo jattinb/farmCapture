@@ -200,18 +200,18 @@ tr.current-pokemon td {
     color: white;
 }
 
-.button-green:hover {
+/* .button-green:hover {
     background-color: #45a049;
-}
+} */
 
 .button-red {
     background-color: #f44336;
     color: white;
 }
 
-.button-red:hover {
+/* .button-red:hover {
     background-color: #da190b;
-}
+} */
 
 .button-blue {
     background-color: #2196F3;
@@ -342,4 +342,63 @@ tr.current-pokemon td {
 .compact-mode .always-on-top-label input[type="checkbox"] {
     margin-left: 5px; /* Adjusted margin */
     transform: scale(0.7); /* Further reduced size */
+}
+
+/* Styling for action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px; /* Gap between buttons */
+}
+
+.action-buttons button {
+    font-size: 14px; /* Smaller font size for buttons */
+    font-weight: bolder; /* Make text bold */
+    padding: 2px 4px; /* Adjusted padding for better touch targets */
+    border-radius: 4px; /* Small rounded corners */
+    background-color: #444444; /* Default button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove borders */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Added transition for scaling */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add a shadow to text */
+}
+
+/* Hover effect */
+.action-buttons button:hover:not(:disabled) {
+    transform: scale(1.05); /* Scale up on hover */
+}
+
+/* Disabled state */
+.action-buttons button:disabled {
+    background-color: #ccc; /* Disabled state styling */
+    cursor: not-allowed; /* Not allowed cursor */
+}
+
+/* Prevent hover color change for disabled buttons */
+.action-buttons button:disabled:hover {
+    background-color: #ccc; /* Maintain grey color when hovered */
+}
+
+/* Delete button styles */
+.action-buttons .button-delete {
+    background-color: #f44336; /* Red background for delete button */
+}
+
+.button-delete:hover:not(:disabled) {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+/* Compact mode styles for action buttons */
+.compact-mode .action-buttons {
+    flex-direction: row; /* Maintain row alignment in compact mode */
+    gap: 2px; /* Reduced gap between buttons */
+}
+
+.compact-mode .action-buttons button {
+    font-size: 9px; /* Further reduce font size in compact mode */
+    padding: 3px 6px; /* Adjusted padding for compactness */
+    border-radius: 3px; /* Smaller border-radius for compact mode */
+    transition: background-color 0.2s, transform 0.1s; /* Adjusted transition for compact mode */
 }

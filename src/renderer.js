@@ -5,15 +5,17 @@ const { ipcRenderer } = require('electron');
 // Function to display a message
 function displayMessage(messageId) {
     const messageElement = document.getElementById(messageId);
-    messageElement.style.display = 'block';
+    if (messageElement) {
+        messageElement.style.display = 'block';
+    }
 }
 
-
 // Function to close a message
-// eslint-disable-next-line no-unused-vars
 function closeMessage(messageId) {
     const messageElement = document.getElementById(messageId);
-    messageElement.style.display = 'none';
+    if (messageElement) {
+        messageElement.style.display = 'none';
+    }
 }
 
 // Function to capitalize the first letter
@@ -23,33 +25,25 @@ function capitalizeFirstLetter(str) {
 
 // Disable all controls
 function disableAllControls() {
-    const setupButton = document.getElementById('setup');
-    const resetButton = document.getElementById('reset');
-    const toggleCaptureButton = document.getElementById('toggleCapture');
-
-    setupButton.disabled = true;
-    resetButton.disabled = true;
-    toggleCaptureButton.disabled = true;
+    document.getElementById('setup').disabled = true;
+    document.getElementById('reset').disabled = true;
+    document.getElementById('toggleCapture').disabled = true;
 }
 
 // Disable capture-related controls
 function disableCaptureControls() {
-    const toggleCaptureButton = document.getElementById('toggleCapture');
-    toggleCaptureButton.disabled = true;
+    document.getElementById('toggleCapture').disabled = true;
 }
 
 // Enable capture-related controls
 function enableCaptureControls() {
-    const toggleCaptureButton = document.getElementById('toggleCapture');
-    toggleCaptureButton.disabled = false;
+    document.getElementById('toggleCapture').disabled = false;
 }
 
 // Enable setup and reset controls
 function enableSetupAndResetControls() {
-    const setupButton = document.getElementById('setup');
-    const resetButton = document.getElementById('reset');
-    setupButton.disabled = false;
-    resetButton.disabled = false;
+    document.getElementById('setup').disabled = false;
+    document.getElementById('reset').disabled = false;
 }
 
 // Send IPC event to setup
@@ -81,36 +75,60 @@ document.getElementById('reset').addEventListener('click', () => {
 function updateStatus(isActive) {
     const statusElement = document.getElementById('status');
     statusElement.textContent = isActive ? 'Active' : 'Inactive';
-    statusElement.classList.remove(isActive ? 'status-stopped' : 'status-active');
-    statusElement.classList.add(isActive ? 'status-active' : 'status-stopped');
+    statusElement.classList.toggle('status-active', isActive);
+    statusElement.classList.toggle('status-stopped', !isActive);
 }
+
+let isProcessing = false; // Flag to prevent double-clicks
 
 // Function to toggle capture state
 function toggleCapture() {
+    if (isProcessing) return; // Prevent further clicks while processing
+    isProcessing = true;
+
     const button = document.getElementById('toggleCapture');
     const isActive = button.classList.contains('button-green');
 
     if (isActive) {
         ipcRenderer.send('start-capture');
-        button.classList.remove('button-green');
-        button.classList.add('button-red');
+        button.classList.replace('button-green', 'button-red');
         button.textContent = 'Stop';
+        toggleActionButtons(true);
     } else {
         ipcRenderer.send('stop-capture');
-        button.classList.remove('button-red');
-        button.classList.add('button-green');
+        button.classList.replace('button-red', 'button-green');
         button.textContent = 'Start';
+        toggleActionButtons(false);
+
+        // Remove 'current-pokemon' class from all current Pokémon elements
+        const currPokeEles = document.getElementsByClassName('current-pokemon');
+        Array.from(currPokeEles).forEach(ele => ele.classList.remove('current-pokemon'));
     }
 
     updateStatus(isActive);
+
+    // Re-enable the button after a short delay to ensure operation completes
+    setTimeout(() => {
+        isProcessing = false;
+    }, 500); // Adjust delay as needed
 }
 
-ipcRenderer.on('setup-start', () => {
-    disableAllControls(); // Disable all controls during setup
-});
 
+// Helper function to toggle action buttons
+function toggleActionButtons(disable) {
+    const plusBtns = document.getElementsByClassName('button-plus');
+    const minusBtns = document.getElementsByClassName('button-minus');
+    const deleteBtns = document.getElementsByClassName('button-delete');
 
-ipcRenderer.on('setup-complete', (_event, data) => {
+    Array.from(plusBtns).forEach(btn => (btn.disabled = disable));
+    Array.from(minusBtns).forEach(btn => (btn.disabled = disable));
+    Array.from(deleteBtns).forEach(btn => (btn.disabled = disable));
+}
+
+// IPC event handlers
+ipcRenderer.on('setup-start', disableAllControls); // Disable all controls during setup
+
+ipcRenderer.on('setup-complete', () => {
     const setupButton = document.getElementById('setup');
     setupButton.disabled = false;
     setupButton.classList.remove('button-loading');
@@ -133,72 +151,109 @@ ipcRenderer.on('setup-failed', (event, data) => {
 
     enableCaptureControls(); // Enable capture controls even if setup failed
     enableSetupAndResetControls(); // Enable setup and reset controls even if setup failed
-    console.log("Setup Failed:", data.error);
+    console.error("Setup Failed:", data.error);
     displayMessage('setupFailed'); // Display failed message
 });
 
 // Handle the update-count-noEncounter event
-ipcRenderer.on('update-count-noEncounter', (_event) => {
+ipcRenderer.on('update-count-noEncounter', () => {
     const highlightedRow = document.querySelector('.current-pokemon');
     if (highlightedRow) {
         highlightedRow.classList.remove('current-pokemon'); // Remove the highlight
     }
-
-    // Clear the current encounter display
     document.getElementById('currentEncounter').innerHTML = '<strong>No encounter</strong>';
 });
 
-ipcRenderer.on('update-count', (_event, data) => {
-    const currentEncounter = data.currPoke ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
-    const totalEncounters = data.wildCount; // Use wildCount for totalEncounters
-    const pokemonData = data.pokemonCounts; // Use pokemonCounts for pokemonData
+ipcRenderer.on('update-count', (_, data) => {
+    const totalEncounters = data.wildCount;
+    const pokemonData = data.pokemonCounts;
+    const startButton = document.getElementById('toggleCapture');
+    const isSessionRunning = startButton.classList.contains('button-red'); // Flag for session status
+    const currentEncounter = (data.currPoke && isSessionRunning) ? capitalizeFirstLetter(data.currPoke) : 'No encounter';
 
-    updatePokemonTable(pokemonData, currentEncounter, totalEncounters);
+    console.log(startButton.classList.contains('button-red'))
+    updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning);
 
     // Update total wild encounters
     document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
-
     // Update current encounter
     document.getElementById('currentEncounter').innerHTML = `<strong>${currentEncounter}</strong>`;
 });
 
-// Function to update the Pokémon table
-function updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
+// Function to update the Pokémon table and include action buttons
+function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning) {
     const tableBody = document.getElementById('pokemonTableBody');
     const currentEncounterLower = currentEncounter.toLowerCase();
 
-    // Clear existing rows only if there is any data to update
     if (pokemonData) {
         tableBody.innerHTML = '';
 
         // Convert pokemonData from object to array, then sort by frequency
         const sortedPokemonData = Object.entries(pokemonData)
             .map(([name, frequency]) => ({ name, frequency }))
-            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency in ascending order
+            .sort((a, b) => a.frequency - b.frequency); // Sort by frequency in descending order
 
         sortedPokemonData.forEach(pokemon => {
             const row = document.createElement('tr');
             const nameCell = document.createElement('td');
             const percentageCell = document.createElement('td');
             const countCell = document.createElement('td');
+            const actionCell = document.createElement('td'); // New cell for action buttons
 
+            // Add Pokémon name
             nameCell.textContent = capitalizeFirstLetter(pokemon.name);
-            percentageCell.textContent = `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`;
+
+            // Add percentage and count, handling divide-by-zero for totalEncounters
+            percentageCell.textContent = pokemon.frequency > 0
+                ? `${((pokemon.frequency / totalEncounters) * 100).toFixed(1)}%`
+                : "0%";
             countCell.textContent = pokemon.frequency;
 
-            // Highlight the row if the Pokémon matches the current encounter
-            if (pokemon.name.toLowerCase() === currentEncounterLower) {
-                row.classList.add('current-pokemon');
-            }
+            // Create action buttons for increment, decrement, and delete
+            const actionButtons = document.createElement('div');
+            actionButtons.classList.add('action-buttons');
 
+            const plusBtn = document.createElement('button');
+            plusBtn.textContent = '+';
+            plusBtn.classList.add('button', 'button-plus');
+            plusBtn.disabled = isSessionRunning;
+            plusBtn.addEventListener('click', () => incrementPokemon(pokemon.name));
+
+            const minusBtn = document.createElement('button');
+            minusBtn.textContent = '-';
+            minusBtn.classList.add('button', 'button-minus');
+            minusBtn.disabled = isSessionRunning;
+            minusBtn.addEventListener('click', () => decrementPokemon(pokemon.name));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'X';
+            deleteBtn.classList.add('button', 'button-delete');
+            deleteBtn.disabled = isSessionRunning;
+            deleteBtn.addEventListener('click', () => deletePokemon(pokemon.name));
+
+            // Append buttons to action buttons container
+            actionButtons.appendChild(plusBtn);
+            actionButtons.appendChild(minusBtn);
+            actionButtons.appendChild(deleteBtn);
+
+            // Append action buttons to action cell
+            actionCell.appendChild(actionButtons);
+
+            // Append cells to row
             row.appendChild(nameCell);
             row.appendChild(percentageCell);
             row.appendChild(countCell);
+            row.appendChild(actionCell);
+
+            // Highlight the current encounter row
+            if (isSessionRunning && (currentEncounterLower === pokemon.name.toLowerCase())) {
+                row.classList.add('current-pokemon');
+            }
+
             tableBody.appendChild(row);
         });
     }
 }
-
 
 ipcRenderer.on('update-timer', (_event, timeString) => {
     document.getElementById('farmDuration').textContent = `${timeString}`;
@@ -307,3 +362,18 @@ ipcRenderer.on('always-on-top-toggled', (_event, isAlwaysOnTop) => {
     const toggleButton = document.getElementById('toggleAlwaysOnTopButton');
     toggleButton.textContent = isAlwaysOnTop ? 'Disable Always On Top' : 'Enable Always On Top';
 });
+
+// Function to increment Pokémon count
+function incrementPokemon(name) {
+    ipcRenderer.send('increment-pokemon', name);
+}
+
+// Function to decrement Pokémon count
+function decrementPokemon(name) {
+    ipcRenderer.send('decrement-pokemon', name);
+}
+
+// Function to delete Pokémon
+function deletePokemon(name) {
+    ipcRenderer.send('delete-pokemon', name);
+}

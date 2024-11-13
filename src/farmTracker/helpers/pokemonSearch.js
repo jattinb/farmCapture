@@ -9,12 +9,20 @@ function findPokemon(name, pokemonList) {
         threshold: 0.3, // Adjust the threshold as needed
     };
 
+    // Preprocessing: Normalize known suffix cases
+    const normalizedName = name.toLowerCase();
+    if (normalizedName === 'nidoranm' || normalizedName === 'nidoran m') {
+        name = 'nidoran-m';
+    } else if (normalizedName === 'nidoranf' || normalizedName === 'nidoran f') {
+        name = 'nidoran-f';
+    }
+
     // Create a Fuse instance with the Pokémon list
     const fuse = new Fuse(pokemonListArray, options);
 
     // Search for the closest match
     const result = fuse.search(name);
-
+    // console.log("Name", name, "Result:", result)
     if (result.length === 0) {
         return 'No match found';
     }

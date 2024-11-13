@@ -68,7 +68,7 @@ class HuntSession extends EventEmitter {
         return {
             x: huntingWindow.x - 50,
             y: huntingWindow.y - 50,
-            w: huntingWindow.w + 100,
+            w: huntingWindow.w + 150,
             h: huntingWindow.h + 75,
         };
     }
@@ -81,10 +81,10 @@ class HuntSession extends EventEmitter {
 
             // Perform OCR recognition on the captured image
             const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
-
+            console.log(text, confidence)
             // console.log(text, confidence)
             // Handle low-confidence OCR results
-            if (confidence < 50) {
+            if (confidence < 45) {
                 this.handleNoEncounter();
                 return;
             }
