@@ -14,7 +14,6 @@ const EventEmitter = require('events');
 // const Timer = require(timerPath);
 const fs = require('fs');
 const { parse } = require('json2csv');
-
 const { formatTime, parseTimeToMilliseconds } = require('./../helpers/formatTime');
 const captureWindow = require('./../helpers/captureWindow');
 const OCRSession = require('./../helpers/OCRSession');
@@ -23,23 +22,20 @@ const Timer = require('./../models/timer');
 const { isPokemonInSet } = require('./../helpers/pokemonList');
 const { findPokemon } = require('../helpers/pokemonSearch');
 const HuntingWindowManager = require('../helpers/huntingWindowManager');
+const PokemonDataManager = require('../helpers/pokemonDataManager'); // Import PokemonDataManager
 
 class HuntSession extends EventEmitter {
     constructor() {
-        super(); // Must call super() before accessing 'this'
+        super();
 
         if (HuntSession.instance) {
             return HuntSession.instance;
         }
-        this.huntingWindowManager = new HuntingWindowManager()
 
-        this.wildCount = 0;
-        this.pokemonCounts = {};
-        this.isLastScreenEncounter = false;
-        this.currPoke = null;
+        this.huntingWindowManager = new HuntingWindowManager();
+        this.pokemonDataManager = new PokemonDataManager(); // Initialize PokemonDataManager
         this.pokemonList = null
         this.pokemonSet = null
-
         this.timer = Timer.getInstance();
         this.intervalID = null;
 
@@ -54,12 +50,11 @@ class HuntSession extends EventEmitter {
     }
 
     setUpWindow(window, displayId) {
-        this.huntingWindowManager.setWindowAndDisplayId(window, displayId)
+        this.huntingWindowManager.setWindowAndDisplayId(window, displayId);
     }
 
     loadState(pokemonCounts = {}, wildCount = 0, timeStr = '00:00:00') {
-        this.wildCount = wildCount;
-        this.pokemonCounts = pokemonCounts;
+        this.pokemonDataManager.loadState(pokemonCounts, wildCount); // Delegate to PokemonDataManager
         if (timeStr === '00:00:00') {
             this.timer.reset();
         } else {
@@ -69,12 +64,11 @@ class HuntSession extends EventEmitter {
 
     async captureAndRecognize() {
         try {
-            // Capture the window based on the huntingDisplayId
             const imageBuffer = await captureWindow(this.huntingWindowManager.getDisplayId());
 
             // Perform OCR recognition on the captured image
             const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindowManager.getWindow());
-            console.log(text, confidence)
+            console.log(text, confidence);
             // console.log(text, confidence)
             // Handle low-confidence OCR results
             if (confidence < 45) {
@@ -101,7 +95,7 @@ class HuntSession extends EventEmitter {
 
         } catch (error) {
             console.error('Error during capture and recognition:', error);
-            this.handleNoEncounter()
+            this.handleNoEncounter();
             // Handle specific OCR worker error
             if (error.message === 'OCR worker is not initialized or has been terminated.') {
                 console.log('Recognition was attempted after the worker was terminated.');
@@ -111,16 +105,14 @@ class HuntSession extends EventEmitter {
 
     handleNoEncounter() {
         console.log('No encounter');
-        this.isLastScreenEncounter = false;
+        this.pokemonDataManager.setLastScreenEncounter(false); // Use PokemonDataManager to handle state
         this.emit('noEncounter');
     }
 
     handleEncounter(curPoke) {
         let validPoke = curPoke;
 
-        // Check if the Pokémon has already been encountered
-        if (!this.pokemonCounts[curPoke]) {
-            // Validate the Pokémon name if not already in pokemonCounts
+        if (!this.pokemonDataManager.getPokemonCounts()[curPoke]) {
             validPoke = isPokemonInSet(curPoke, this.pokemonSet) ? curPoke : findPokemon(curPoke, this.pokemonList);
             if (validPoke === 'No match found') {
                 console.log('No Match Found');
@@ -128,26 +120,24 @@ class HuntSession extends EventEmitter {
             }
         }
 
-        // Skip counting if it's the same encounter as the last one
-        if (this.isLastScreenEncounter && this.currPoke === validPoke) {
+        if (this.pokemonDataManager.getLastScreenEncounter() && this.pokemonDataManager.getCurrPoke() === validPoke) {
             console.log('Same encounter, not counting');
             return;
         }
 
-        // Update pokemonCounts and other properties
-        this.pokemonCounts[validPoke] = (this.pokemonCounts[validPoke] || 0) + 1;
-        this.currPoke = validPoke;
-        this.wildCount++;
-        this.isLastScreenEncounter = true;
+        this.pokemonDataManager.setPokemonCounts({ ...this.pokemonDataManager.getPokemonCounts(), [validPoke]: (this.pokemonDataManager.getPokemonCounts()[validPoke] || 0) + 1 });
+        this.pokemonDataManager.setCurrPoke(validPoke);
+        this.pokemonDataManager.setWildCount(this.pokemonDataManager.getWildCount() + 1);
+        this.pokemonDataManager.setLastScreenEncounter(true);
 
         console.log(`Detected new "wild ${validPoke}" encounter.`);
-        console.log(`Total encounters: ${this.wildCount}`);
-        console.log('Pokemon counts:', this.pokemonCounts);
+        console.log(`Total encounters: ${this.pokemonDataManager.getWildCount()}`);
+        console.log('Pokemon counts:', this.pokemonDataManager.getPokemonCounts());
 
         this.emit('newEncounter', {
-            currPoke: this.currPoke,
-            wildCount: this.wildCount,
-            pokemonCounts: this.pokemonCounts,
+            currPoke: this.pokemonDataManager.getCurrPoke(),
+            wildCount: this.pokemonDataManager.getWildCount(),
+            pokemonCounts: this.pokemonDataManager.getPokemonCounts(),
         });
     }
 
@@ -189,8 +179,8 @@ class HuntSession extends EventEmitter {
             return;
         }
 
-        this.isLastScreenEncounter = false;
-        this.currPoke = null;
+        this.pokemonDataManager.setLastScreenEncounter(false);
+        this.pokemonDataManager.setCurrPoke(null);
         this.loadState();
         this.emit('reset-count', {
             currPoke: null,
@@ -207,19 +197,17 @@ class HuntSession extends EventEmitter {
         const fields = ['pokemon', 'count', 'time', 'totalCount'];
         const csvData = [];
 
-        // Convert pokemonCounts object to array of { pokemon, count } objects
-        Object.entries(this.pokemonCounts).forEach(([pokemon, count]) => {
+        Object.entries(this.pokemonDataManager.getPokemonCounts()).forEach(([pokemon, count]) => {
             csvData.push({ pokemon, count });
         });
 
-        // Include time and totalCount for the session only in the first row
         if (csvData.length > 0) {
             csvData[0].time = formatTime(this.timer.elapsedTime);
-            csvData[0].totalCount = this.wildCount;
+            csvData[0].totalCount = this.pokemonDataManager.getWildCount();
         }
 
         const csv = parse(csvData, { fields });
-        const filePath = `${filename}`; // Construct the file path with the chosen filename
+        const filePath = `${filename}`;
 
         try {
             fs.writeFileSync(filePath, csv);
@@ -237,14 +225,14 @@ class HuntSession extends EventEmitter {
         }
         data.forEach(row => {
             const { pokemon, count } = row;
-            this.pokemonCounts[pokemon] = parseInt(count, 10);
-            this.wildCount += parseInt(count, 10);
+            this.pokemonDataManager.getPokemonCounts()[pokemon] = parseInt(count, 10);
+            this.pokemonDataManager.setWildCount(this.pokemonDataManager.getWildCount() + parseInt(count, 10));
         });
 
         this.emit('update-count', {
             currPoke: null,
-            wildCount: this.wildCount,
-            pokemonCounts: this.pokemonCounts,
+            wildCount: this.pokemonDataManager.getWildCount(),
+            pokemonCounts: this.pokemonDataManager.getPokemonCounts(),
         });
     }
 

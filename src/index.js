@@ -12,6 +12,7 @@ const setup = require('./farmTracker/helpers/setup');
 const { loadPokemonList } = require('./farmTracker/helpers/pokemonList');
 
 let huntSession = HuntSession.getInstance();
+let pokemonDataManager = huntSession.pokemonDataManager; // Use the instance from HuntSession
 let mainWindow;
 let huntingWindow;
 let huntingDisplayId;
@@ -190,11 +191,52 @@ function attachListeners() {
       mainWindow.webContents.send('update-count', timeString);
     });
 
-    listenersAttached = true; // Set flag to true after attaching listeners
+    listenersAttached = true;
   }
 }
 
-// Toggle always on top
+// Increment Pokémon count
+ipcMain.on('increment-pokemon', (event, pokemonName) => {
+  let currentCount = pokemonDataManager.getPokemonCounts()[pokemonName] || 0;
+  pokemonDataManager.setPokemonCounts({
+    ...pokemonDataManager.getPokemonCounts(),
+    [pokemonName]: currentCount + 1,
+  });
+  pokemonDataManager.setWildCount(pokemonDataManager.getWildCount() + 1);
+  sendUpdatedCount(event, pokemonName);
+});
+
+// Decrement Pokémon count
+ipcMain.on('decrement-pokemon', (event, pokemonName) => {
+  let currentCount = pokemonDataManager.getPokemonCounts()[pokemonName] || 0;
+  if (currentCount > 0) {
+    pokemonDataManager.setPokemonCounts({
+      ...pokemonDataManager.getPokemonCounts(),
+      [pokemonName]: currentCount - 1,
+    });
+    pokemonDataManager.setWildCount(pokemonDataManager.getWildCount() - 1);
+  }
+  sendUpdatedCount(event, pokemonName);
+});
+
+// Delete Pokémon
+ipcMain.on('delete-pokemon', (event, pokemonName) => {
+  let currentCount = pokemonDataManager.getPokemonCounts()[pokemonName] || 0;
+  pokemonDataManager.setWildCount(pokemonDataManager.getWildCount() - currentCount);
+  const { [pokemonName]: _, ...remainingCounts } = pokemonDataManager.getPokemonCounts();
+  pokemonDataManager.setPokemonCounts(remainingCounts);
+  sendUpdatedCount(event, pokemonName);
+});
+
+function sendUpdatedCount(event, pokemonName) {
+  event.sender.send('update-count', {
+    currPoke: pokemonName,
+    wildCount: pokemonDataManager.getWildCount(),
+    pokemonCounts: pokemonDataManager.getPokemonCounts(),
+    isSessionRunning,
+  });
+}
+
 ipcMain.on('toggle-always-on-top', () => {
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
   mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
@@ -205,36 +247,3 @@ ipcMain.on('toggle-size', (_event, isCompact) => {
   const [currentWidth, currentHeight] = mainWindow.getSize();
   mainWindow.setSize(isCompact ? 340 : 450, isCompact ? currentHeight - 200 : currentHeight + 200);
 });
-
-// ipcMain handlers
-ipcMain.on('increment-pokemon', (event, pokemonName) => {
-  if (!huntSession.pokemonCounts[pokemonName]) {
-    huntSession.pokemonCounts[pokemonName] = 0;
-  }
-  huntSession.pokemonCounts[pokemonName] += 1;
-  huntSession.wildCount += 1
-  sendUpdatedCount(event, pokemonName);
-});
-
-ipcMain.on('decrement-pokemon', (event, pokemonName) => {
-  if (huntSession.pokemonCounts[pokemonName] > 0) {
-    huntSession.pokemonCounts[pokemonName] -= 1;
-    huntSession.wildCount -= 1
-  }
-  sendUpdatedCount(event, pokemonName);
-});
-
-ipcMain.on('delete-pokemon', (event, pokemonName) => {
-  huntSession.wildCount -= huntSession.pokemonCounts[pokemonName]
-  delete huntSession.pokemonCounts[pokemonName];
-  sendUpdatedCount(event, pokemonName);
-});
-
-function sendUpdatedCount(event, pokemonName) {
-  event.sender.send('update-count', {
-    currPoke: pokemonName,
-    wildCount: huntSession.wildCount,
-    pokemonCounts: huntSession.pokemonCounts,
-    isSessionRunning: huntSession.isSessionRunning // Ensure session state is sent
-  });
-}
