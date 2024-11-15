@@ -22,6 +22,7 @@ const checkValidEncounter = require('./../helpers/checkValidEncounter');
 const Timer = require('./../models/timer');
 const { isPokemonInSet } = require('./../helpers/pokemonList');
 const { findPokemon } = require('../helpers/pokemonSearch');
+const HuntingWindowManager = require('../helpers/huntingWindowManager');
 
 class HuntSession extends EventEmitter {
     constructor() {
@@ -30,19 +31,22 @@ class HuntSession extends EventEmitter {
         if (HuntSession.instance) {
             return HuntSession.instance;
         }
+        this.huntingWindowManager = new HuntingWindowManager()
 
-        this.huntingWindow = null;
-        this.huntingDisplayId = null;
         this.wildCount = 0;
         this.pokemonCounts = {};
-        this.timer = Timer.getInstance();
-        this.intervalID = null;
         this.isLastScreenEncounter = false;
         this.currPoke = null;
-        this.fileName = null;
-        this.ocrSession = new OCRSession();
         this.pokemonList = null
         this.pokemonSet = null
+
+        this.timer = Timer.getInstance();
+        this.intervalID = null;
+
+        this.fileName = null;
+
+        this.ocrSession = new OCRSession();
+
         // Bind timer events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
@@ -50,8 +54,7 @@ class HuntSession extends EventEmitter {
     }
 
     setUpWindow(window, displayId) {
-        this.huntingWindow = this.adjustHuntingWindow(window);
-        this.huntingDisplayId = displayId;
+        this.huntingWindowManager.setWindowAndDisplayId(window, displayId)
     }
 
     loadState(pokemonCounts = {}, wildCount = 0, timeStr = '00:00:00') {
@@ -64,23 +67,13 @@ class HuntSession extends EventEmitter {
         }
     }
 
-    adjustHuntingWindow(huntingWindow) {
-        return {
-            x: huntingWindow.x - 50,
-            y: huntingWindow.y - 50,
-            w: huntingWindow.w + 150,
-            h: huntingWindow.h + 75,
-        };
-    }
-
     async captureAndRecognize() {
         try {
             // Capture the window based on the huntingDisplayId
-            const imageBuffer = await captureWindow(this.huntingDisplayId);
-            console.log(this.huntingWindow, this.huntingDisplayId);
+            const imageBuffer = await captureWindow(this.huntingWindowManager.getDisplayId());
 
             // Perform OCR recognition on the captured image
-            const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindow);
+            const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindowManager.getWindow());
             console.log(text, confidence)
             // console.log(text, confidence)
             // Handle low-confidence OCR results
