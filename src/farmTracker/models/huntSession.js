@@ -1,244 +1,129 @@
-const path = require('path');
 const EventEmitter = require('events');
-
-// const captureWindowPath = path.join(__dirname, '..', 'helpers', 'captureWindow');
-// const OCRSessionPath = path.join(__dirname, '..', 'helpers', 'OCRSession');
-// const checkValidEncounterPath = path.join(__dirname, '..', 'helpers', 'checkValidEncounter');
-// const timerPath = path.join(__dirname, 'timer');
-// const formatTimePath = path.join(__dirname, '..', 'helpers', 'formatTime');
-
-// const captureWindow = require(captureWindowPath);
-// const OCRSession = require(OCRSessionPath);
-// const checkValidEncounter = require(checkValidEncounterPath);
-// const { formatTime, parseTimeToMilliseconds } = require(formatTimePath);
-// const Timer = require(timerPath);
-const fs = require('fs');
-const { parse } = require('json2csv');
 const { formatTime, parseTimeToMilliseconds } = require('./../helpers/formatTime');
-const captureWindow = require('./../helpers/captureWindow');
-const OCRSession = require('./../helpers/OCRSession');
-const checkValidEncounter = require('./../helpers/checkValidEncounter');
-const Timer = require('./../models/timer');
-const { isPokemonInSet } = require('./../helpers/pokemonList');
-const { findPokemon } = require('../helpers/pokemonSearch');
-const HuntingWindowManager = require('../helpers/huntingWindowManager');
-const PokemonDataManager = require('../helpers/pokemonDataManager'); // Import PokemonDataManager
+const Timer = require('./timer');
+const PokemonDataManager = require('./pokemonDataManager');
+const HuntingWindowManager = require('./huntingWindowManager');
+const CaptureManager = require('./captureManager');
+const OCRSession = require('./OCRSession');
+const EncounterManager = require('./encounterManager');
+const PokemonListManager = require('./pokemonListManager');
 
 class HuntSession extends EventEmitter {
     constructor() {
         super();
-
         if (HuntSession.instance) {
             return HuntSession.instance;
         }
 
         this.huntingWindowManager = new HuntingWindowManager();
-        this.pokemonDataManager = new PokemonDataManager(); // Initialize PokemonDataManager
-        this.pokemonList = null
-        this.pokemonSet = null
-        this.timer = Timer.getInstance();
-        this.intervalID = null;
-
-        this.fileName = null;
-
+        this.pokemonDataManager = new PokemonDataManager();
+        this.timer = new Timer();
         this.ocrSession = new OCRSession();
+        this.captureManager = new CaptureManager(this.huntingWindowManager, this.ocrSession);
+        this.pokemonListManager = null;
+        this.encounterManager = null;
 
-        // Bind timer events
+        // Bind events
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
+        // Initialize managers asynchronously
+        this.initializeManagers();
+
         HuntSession.instance = this;
+    }
+
+    async initializeManagers() {
+        try {
+            this.pokemonListManager = await new PokemonListManager();
+            this.encounterManager = new EncounterManager(this.pokemonDataManager, this.pokemonListManager);
+        } catch (error) {
+            console.error('Error initializing managers:', error);
+        }
     }
 
     setUpWindow(window, displayId) {
         this.huntingWindowManager.setWindowAndDisplayId(window, displayId);
     }
 
-    loadState(pokemonCounts = {}, wildCount = 0, timeStr = '00:00:00') {
-        this.pokemonDataManager.loadState(pokemonCounts, wildCount); // Delegate to PokemonDataManager
-        if (timeStr === '00:00:00') {
+    loadState(pokemonCounts = {}, wildCount = 0, timeStr) {
+        this.pokemonDataManager.loadState(pokemonCounts, wildCount);
+
+        if (!timeStr) {
             this.timer.reset();
         } else {
             this.timer.loadTime(parseTimeToMilliseconds(timeStr));
         }
+        // this.emit('update-time', this.timer.getFormattedTime());
     }
 
-    async captureAndRecognize() {
-        try {
-            const imageBuffer = await captureWindow(this.huntingWindowManager.getDisplayId());
-
-            // Perform OCR recognition on the captured image
-            const { text, confidence } = await this.ocrSession.recognizeText(imageBuffer, this.huntingWindowManager.getWindow());
-            console.log(text, confidence);
-            // console.log(text, confidence)
-            // Handle low-confidence OCR results
-            if (confidence < 45) {
-                this.handleNoEncounter();
-                return;
-            }
-
-            // Check if the OCR result contains a valid encounter
-            const { valid, curPoke } = checkValidEncounter(text);
-
-            if (!valid) {
-                this.handleNoEncounter();
-                return;
-            }
-
-            // Ensure that a Pokémon was detected
-            if (!curPoke) {
-                console.log('Cannot detect Pokémon encountered');
-                return;
-            }
-
-            // Handle the detected Pokémon encounter
-            this.handleEncounter(curPoke);
-
-        } catch (error) {
-            console.error('Error during capture and recognition:', error);
-            this.handleNoEncounter();
-            // Handle specific OCR worker error
-            if (error.message === 'OCR worker is not initialized or has been terminated.') {
-                console.log('Recognition was attempted after the worker was terminated.');
-            }
-        }
-    }
-
-    handleNoEncounter() {
-        console.log('No encounter');
-        this.pokemonDataManager.setLastScreenEncounter(false); // Use PokemonDataManager to handle state
-        this.emit('noEncounter');
-    }
-
-    handleEncounter(curPoke) {
-        let validPoke = curPoke;
-
-        if (!this.pokemonDataManager.getPokemonCounts()[curPoke]) {
-            validPoke = isPokemonInSet(curPoke, this.pokemonSet) ? curPoke : findPokemon(curPoke, this.pokemonList);
-            if (validPoke === 'No match found') {
-                console.log('No Match Found');
-                return;
-            }
-        }
-
-        if (this.pokemonDataManager.getLastScreenEncounter() && this.pokemonDataManager.getCurrPoke() === validPoke) {
-            console.log('Same encounter, not counting');
+    async handleNoEncounter() {
+        if (!this.encounterManager) {
+            console.error('EncounterManager is not initialized.');
             return;
         }
 
-        this.pokemonDataManager.setPokemonCounts({ ...this.pokemonDataManager.getPokemonCounts(), [validPoke]: (this.pokemonDataManager.getPokemonCounts()[validPoke] || 0) + 1 });
-        this.pokemonDataManager.setCurrPoke(validPoke);
-        this.pokemonDataManager.setWildCount(this.pokemonDataManager.getWildCount() + 1);
-        this.pokemonDataManager.setLastScreenEncounter(true);
-
-        console.log(`Detected new "wild ${validPoke}" encounter.`);
-        console.log(`Total encounters: ${this.pokemonDataManager.getWildCount()}`);
-        console.log('Pokemon counts:', this.pokemonDataManager.getPokemonCounts());
-
-        this.emit('newEncounter', {
-            currPoke: this.pokemonDataManager.getCurrPoke(),
-            wildCount: this.pokemonDataManager.getWildCount(),
-            pokemonCounts: this.pokemonDataManager.getPokemonCounts(),
-        });
+        this.encounterManager.handleNoEncounter();
+        this.emit('noEncounter', this.pokemonDataManager.getData());
     }
 
-    async startCaptureInterval(interval = 1000) {
-        if (this.intervalID) {
-            console.log('Capture interval already running');
-            return;
-        }
-        await this.ocrSession.initializeWorker();
-        console.log('Hunting Session Started');
-        this.intervalID = setInterval(() => {
-            this.captureAndRecognize();
-        }, interval);
-        this.timer.start();
-    }
-
-    async stopCaptureInterval() {
-        if (!this.intervalID) {
-            console.log('No capture interval to stop');
+    async handleEncounter(curPoke) {
+        if (!this.encounterManager) {
+            console.error('EncounterManager is not initialized.');
             return;
         }
 
-        clearInterval(this.intervalID);
-        this.intervalID = null;
-        this.timer.stop();
-        this.emit('stop');
-
-        try {
-            await this.ocrSession.terminateWorker();
-            console.log('Hunting Session Stopped');
-        } catch (error) {
-            console.error('Error terminating OCR worker:', error.message);
-        }
+        await this.encounterManager.handleEncounter(curPoke);
+        this.emit('newEncounter', this.pokemonDataManager.getData());
     }
 
-    reset() {
-        if (this.intervalID) {
+    async reset() {
+        if (this.captureManager.intervalID) {
             console.log('Cannot reset while session is running');
             return;
         }
 
-        this.pokemonDataManager.setLastScreenEncounter(false);
-        this.pokemonDataManager.setCurrPoke(null);
+        this.pokemonDataManager.reset();
         this.loadState();
-        this.emit('reset-count', {
-            currPoke: null,
-            wildCount: 0,
-            pokemonCounts: {},
-        });
-
-        // Reset the singleton instance
-        HuntSession.resetInstance();
+        this.emit('reset-count', this.pokemonDataManager.dataState);
     }
 
-    // Export session data to CSV
-    exportSessionToCSV(filename) {
-        const fields = ['pokemon', 'count', 'time', 'totalCount'];
-        const csvData = [];
-
-        Object.entries(this.pokemonDataManager.getPokemonCounts()).forEach(([pokemon, count]) => {
-            csvData.push({ pokemon, count });
-        });
-
-        if (csvData.length > 0) {
-            csvData[0].time = formatTime(this.timer.elapsedTime);
-            csvData[0].totalCount = this.pokemonDataManager.getWildCount();
+    async exportSessionToCSV(filename) {
+        if (!this.fileManager) {
+            console.error('FileManager is not initialized.');
+            return;
         }
-
-        const csv = parse(csvData, { fields });
-        const filePath = `${filename}`;
-
-        try {
-            fs.writeFileSync(filePath, csv);
-            console.log(`Session data exported to CSV: ${filePath}`);
-        } catch (err) {
-            console.error('Error exporting session to CSV:', err);
-        }
+        this.fileManager.exportSessionToCSV(filename);
     }
 
-    // Import session data from CSV
-    importSessionFromCSV(data) {
-        this.reset();
-        if (data && data[0].time) {
-            this.timer.loadTime(parseTimeToMilliseconds(data[0].time));
+    async importSessionFromCSV(data) {
+        if (!this.fileManager) {
+            console.error('FileManager is not initialized.');
+            return;
         }
-        data.forEach(row => {
-            const { pokemon, count } = row;
-            this.pokemonDataManager.getPokemonCounts()[pokemon] = parseInt(count, 10);
-            this.pokemonDataManager.setWildCount(this.pokemonDataManager.getWildCount() + parseInt(count, 10));
-        });
-
-        this.emit('update-count', {
-            currPoke: null,
-            wildCount: this.pokemonDataManager.getWildCount(),
-            pokemonCounts: this.pokemonDataManager.getPokemonCounts(),
-        });
+        this.fileManager.importSessionFromCSV(data);
     }
 
-    // Method to check if a hunting session is active
     isActive() {
-        return !!this.intervalID;
+        return !!this.captureManager.intervalID;
+    }
+
+    async startCaptureInterval(interval = 1000) {
+        await this.captureManager.startCaptureInterval(interval);
+        this.timer.start()
+        this.captureManager.captureAndRecognize().then(result => {
+            if (!result.success) {
+                console.log(`No encounter: ${result.reason}`);
+                this.handleNoEncounter();
+            } else {
+                this.handleEncounter(result.curPoke);
+            }
+        });
+    }
+
+    async stopCaptureInterval() {
+        await this.captureManager.stopCaptureInterval();
+        this.emit('stop');
+        this.timer.stop()
     }
 
     static getInstance() {
@@ -247,10 +132,6 @@ class HuntSession extends EventEmitter {
             HuntSession.instance = new HuntSession();
         }
         return HuntSession.instance;
-    }
-
-    static resetInstance() {
-        HuntSession.instance = null;
     }
 }
 

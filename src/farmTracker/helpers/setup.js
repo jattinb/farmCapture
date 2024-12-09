@@ -1,6 +1,6 @@
 const screenshot = require('screenshot-desktop');
 const Jimp = require('jimp');
-const OCR = require('./OCRSession')
+const OCR = require('../models/OCRSession')
 
 async function setup() {
     const OCRforSetUp = new OCR();

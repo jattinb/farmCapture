@@ -9,13 +9,10 @@ const fs = require('fs');
 
 const HuntSession = require('./farmTracker/models/huntSession');
 const setup = require('./farmTracker/helpers/setup');
-const { loadPokemonList } = require('./farmTracker/helpers/pokemonList');
 
 let huntSession = HuntSession.getInstance();
 let pokemonDataManager = huntSession.pokemonDataManager; // Use the instance from HuntSession
 let mainWindow;
-let huntingWindow;
-let huntingDisplayId;
 let isSessionRunning = false;
 let listenersAttached = false;
 
@@ -42,8 +39,6 @@ app.whenReady().then(async () => {
     }
   });
 
-  huntSession.pokemonList = await loadPokemonList();
-  huntSession.pokemonSet = new Set(huntSession.pokemonList);
   attachListeners();
 });
 
@@ -63,10 +58,8 @@ ipcMain.on('setup', async () => {
       mainWindow.webContents.send('setup-failed', setUpComplete);
     } else {
       console.log('Setup complete');
-      huntingWindow = setUpComplete.window;
-      huntingDisplayId = setUpComplete.displayId;
       mainWindow.webContents.send('setup-complete', setUpComplete);
-      huntSession.setUpWindow(huntingWindow, huntingDisplayId);
+      huntSession.setUpWindow(setUpComplete.window, setUpComplete.displayId);
     }
   } catch (error) {
     console.error('Error during setup process:', error);
@@ -172,10 +165,12 @@ function extractFileName(filePath) {
 function attachListeners() {
   if (!listenersAttached) {
     huntSession.on('newEncounter', (data) => {
+      console.log("INSIDE newEncounter")
       mainWindow.webContents.send('update-count', data);
     });
 
     huntSession.on('noEncounter', (data) => {
+      console.log("INSIDE noEncounter")
       mainWindow.webContents.send('update-count-noEncounter', data);
     });
 
@@ -183,12 +178,13 @@ function attachListeners() {
       mainWindow.webContents.send('update-count', data);
     });
 
-    huntSession.on('update-timer', (timeString) => {
-      mainWindow.webContents.send('update-timer', timeString);
+    huntSession.on('update-count', (data) => {
+      console.log("INSIDE update-count")
+      mainWindow.webContents.send('update-count', data);
     });
 
-    huntSession.on('update-count', (timeString) => {
-      mainWindow.webContents.send('update-count', timeString);
+    huntSession.on('update-timer', (timeString) => {
+      mainWindow.webContents.send('update-timer', timeString);
     });
 
     listenersAttached = true;

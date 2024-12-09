@@ -20,7 +20,7 @@ class OCRSession {
     async recognizeText(imageBuffer, window) {
         try {
             const { x, y, w, h } = window;
-
+            console.log(typeof (imageBuffer), window)
             // Perform OCR using Tesseract.js with specified rectangle
             const { data: { text, confidence } } = await this.worker.recognize(imageBuffer, {
                 rectangle: { top: y, left: x, width: w, height: h }

@@ -165,6 +165,7 @@ ipcRenderer.on('update-count-noEncounter', () => {
 });
 
 ipcRenderer.on('update-count', (_, data) => {
+    console.log(_, data.wildCount)
     const totalEncounters = data.wildCount;
     const pokemonData = data.pokemonCounts;
     const startButton = document.getElementById('toggleCapture');
