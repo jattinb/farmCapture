@@ -303,7 +303,6 @@ function deletePokemon(name) {
     ipcRenderer.send('delete-pokemon', name);
 }
 
-// Function to update the Pokémon table with dropdowns and actions
 function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning) {
     const tableBody = document.getElementById('pokemonTableBody');
     const currentEncounterLower = currentEncounter.toLowerCase();
@@ -314,7 +313,14 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
         // Convert pokemonData to array and sort by frequency
         const sortedPokemonData = Object.entries(pokemonData)
             .map(([name, counts]) => ({ name, counts }))
-            .sort((a, b) => a.counts.total - b.counts.total);
+            .sort((a, b) => b.counts.total - a.counts.total); // Sort by total encounters in descending order
+
+        const totalCounts = Object.values(pokemonData).reduce((totals, pokemon) => {
+            totals.m += pokemon.m;
+            totals.d += pokemon.d;
+            totals.n += pokemon.n;
+            return totals;
+        }, { m: 0, d: 0, n: 0 });
 
         sortedPokemonData.forEach((pokemon) => {
             const { name, counts } = pokemon;
@@ -362,14 +368,14 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
             tableBody.appendChild(row);
 
             // Add dropdown row
-            const dropdownRow = createDropdownRow(name, counts, totalEncounters);
+            const dropdownRow = createDropdownRow(name, counts, totalCounts, totalEncounters);
             tableBody.appendChild(dropdownRow);
         });
     }
 }
 
-// Function to create a dropdown row
-function createDropdownRow(name, counts, totalEncounters) {
+// Create a dropdown row for time-specific data
+function createDropdownRow(name, counts, totalCounts, totalEncounters) {
     const row = document.createElement('tr');
     row.classList.add('dropdown-row', `dropdown-${name}`);
     row.style.display = 'none'; // Hidden by default
@@ -388,12 +394,14 @@ function createDropdownRow(name, counts, totalEncounters) {
         timeCell.textContent = time;
 
         const countCell = document.createElement('td');
-        const timeCount = counts[time.toLowerCase()[0]] || counts['total'];
+        const timeKey = time.toLowerCase()[0]; // 'm' for morning, 'd' for day, 'n' for night, 't' for total
+        const timeCount = time === 'Total' ? counts.total : counts[timeKey] || 0;
         countCell.textContent = timeCount;
 
         const percentageCell = document.createElement('td');
+        const totalForTime = time === 'Total' ? totalCounts.m + totalCounts.d + totalCounts.n : totalEncounters;
         percentageCell.textContent =
-            timeCount > 0 ? `${((timeCount / totalEncounters) * 100).toFixed(1)}%` : '0%'; // Here the total should be specific to the time, example total for morning is total of all pokmoen encountered in the morning
+            timeCount > 0 ? `${((timeCount / totalForTime) * 100).toFixed(1)}%` : '0%';
 
         const actionCell = document.createElement('td');
         if (time !== 'Total') {
