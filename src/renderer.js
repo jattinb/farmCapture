@@ -2,6 +2,8 @@
 
 const { ipcRenderer } = require('electron');
 
+let dropdownState = {};
+
 // Function to display a message
 function displayMessage(messageId) {
     const messageElement = document.getElementById(messageId);
@@ -308,6 +310,12 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
     const currentEncounterLower = currentEncounter.toLowerCase();
 
     if (pokemonData) {
+        // Save the current state of dropdowns
+        const openDropdowns = { ...dropdownState };
+
+        // Reset dropdownState to ensure removed Pokémon don't persist in state
+        dropdownState = {};
+
         tableBody.innerHTML = '';
 
         // Convert pokemonData to array and sort by frequency
@@ -370,6 +378,12 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
             // Add dropdown row
             const dropdownRow = createDropdownRow(name, counts, totalCounts, totalEncounters);
             tableBody.appendChild(dropdownRow);
+
+            // Restore dropdown state if it was open before
+            if (openDropdowns[name]) {
+                dropdownRow.style.display = 'table-row';
+                dropdownState[name] = true; // Reapply state
+            }
         });
     }
 }
@@ -437,7 +451,9 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
 function toggleDropdown(name) {
     const dropdownRow = document.querySelector(`.dropdown-${name}`);
     if (dropdownRow) {
-        dropdownRow.style.display = dropdownRow.style.display === 'none' ? 'table-row' : 'none';
+        const isCurrentlyVisible = dropdownRow.style.display !== 'none';
+        dropdownRow.style.display = isCurrentlyVisible ? 'none' : 'table-row';
+        dropdownState[name] = !isCurrentlyVisible; // Update state
     }
 }
 
