@@ -401,19 +401,19 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
         const percentageCell = document.createElement('td');
         const totalForTime = time === 'Total' ? totalCounts.m + totalCounts.d + totalCounts.n : totalEncounters;
         percentageCell.textContent =
-            timeCount > 0 ? `${((timeCount / totalForTime) * 100).toFixed(1)}%` : '0%';
+            timeCount > 0 ? `${((timeCount / totalCounts[timeKey]) * 100).toFixed(1)}%` : '0%';
 
         const actionCell = document.createElement('td');
         if (time !== 'Total') {
             const plusBtn = document.createElement('button');
             plusBtn.textContent = '+';
             plusBtn.classList.add('button', 'button-plus');
-            plusBtn.addEventListener('click', () => incrementTimeCount(name, time.toLowerCase()));
+            plusBtn.addEventListener('click', () => incrementTimeCount(name, timeKey));
 
             const minusBtn = document.createElement('button');
             minusBtn.textContent = '-';
             minusBtn.classList.add('button', 'button-minus');
-            minusBtn.addEventListener('click', () => decrementTimeCount(name, time.toLowerCase()));
+            minusBtn.addEventListener('click', () => decrementTimeCount(name, timeKey));
 
             actionCell.appendChild(plusBtn);
             actionCell.appendChild(minusBtn);
