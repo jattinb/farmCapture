@@ -238,3 +238,53 @@ function sendUpdatedCount(event, pokemonName) {
     isSessionRunning: huntSession.isSessionRunning // Ensure session state is sent
   });
 }
+
+// Increment time count
+ipcMain.on('increment-time-count', (event, { name, time }) => {
+  if (!huntSession.pokemonCounts[name]) {
+    huntSession.pokemonCounts[name] = { total: 0, m: 0, d: 0, n: 0 };
+  }
+
+  // Increment time-based counts (morning, day, night) if applicable
+  if (time === 'm') {
+    huntSession.pokemonCounts[name].m += 1;
+  } else if (time === 'd') {
+    huntSession.pokemonCounts[name].d += 1;
+  } else if (time === 'n') {
+    huntSession.pokemonCounts[name].n += 1;
+  }
+
+  huntSession.pokemonCounts[name].total += 1;
+  huntSession.wildCount += 1;
+
+  sendUpdatedCount(event, name);
+});
+
+// Decrement time count
+ipcMain.on('decrement-time-count', (event, { name, time }) => {
+  if (huntSession.pokemonCounts[name]) {
+    if (time === 'm' && huntSession.pokemonCounts[name].m > 0) {
+      huntSession.pokemonCounts[name].m -= 1;
+    } else if (time === 'd' && huntSession.pokemonCounts[name].d > 0) {
+      huntSession.pokemonCounts[name].d -= 1;
+    } else if (time === 'n' && huntSession.pokemonCounts[name].n > 0) {
+      huntSession.pokemonCounts[name].n -= 1;
+    }
+
+    if (huntSession.pokemonCounts[name].total > 0) {
+      huntSession.pokemonCounts[name].total -= 1;
+      huntSession.wildCount -= 1;
+    }
+
+    sendUpdatedCount(event, name);
+  }
+});
+
+// Delete Pokémon
+ipcMain.on('delete-pokemon', (event, name) => {
+  if (huntSession.pokemonCounts[name]) {
+    huntSession.wildCount -= huntSession.pokemonCounts[name].total || 0;
+    delete huntSession.pokemonCounts[name];
+    sendUpdatedCount(event, name);
+  }
+});
