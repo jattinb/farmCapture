@@ -328,8 +328,8 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
 
             const row = document.createElement('tr');
             const nameCell = document.createElement('td');
-            const countCell = document.createElement('td');
             const percentageCell = document.createElement('td');
+            const countCell = document.createElement('td');
             const actionCell = document.createElement('td');
 
             // Add Pokémon name
