@@ -179,7 +179,7 @@ tr.current-pokemon td {
 
 /* Dropdown table styling */
 .dropdown-table {
-    width: 100%;
+    width: 110%;
     border-collapse: collapse;
 }
 
