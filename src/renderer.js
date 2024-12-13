@@ -364,8 +364,8 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
 
             // Append cells to row
             row.appendChild(nameCell);
-            row.appendChild(countCell);
             row.appendChild(percentageCell);
+            row.appendChild(countCell);
             row.appendChild(actionCell);
 
             // Highlight the current encounter row
@@ -432,8 +432,8 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
         actionCell.appendChild(minusBtn);
 
         subRow.appendChild(timeCell);
-        subRow.appendChild(countCell);
         subRow.appendChild(percentageCell);
+        subRow.appendChild(countCell);
         subRow.appendChild(actionCell);
 
         dropdownTable.appendChild(subRow);
