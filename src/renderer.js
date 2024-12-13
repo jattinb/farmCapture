@@ -400,7 +400,8 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
     const dropdownTable = document.createElement('table');
     dropdownTable.classList.add('dropdown-table');
 
-    const timeFrames = ['Morning', 'Day', 'Night', 'Total'];
+    // Exclude 'Total' from time frames
+    const timeFrames = ['Morning', 'Day', 'Night'];
     timeFrames.forEach((time) => {
         const subRow = document.createElement('tr');
 
@@ -408,30 +409,27 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
         timeCell.textContent = time;
 
         const countCell = document.createElement('td');
-        const timeKey = time.toLowerCase()[0]; // 'm' for morning, 'd' for day, 'n' for night, 't' for total
-        const timeCount = time === 'Total' ? counts.total : counts[timeKey] || 0;
+        const timeKey = time.toLowerCase()[0]; // 'm' for morning, 'd' for day, 'n' for night
+        const timeCount = counts[timeKey] || 0;
         countCell.textContent = timeCount;
 
         const percentageCell = document.createElement('td');
-        const totalForTime = time === 'Total' ? totalCounts.m + totalCounts.d + totalCounts.n : totalEncounters;
         percentageCell.textContent =
             timeCount > 0 ? `${((timeCount / totalCounts[timeKey]) * 100).toFixed(1)}%` : '0%';
 
         const actionCell = document.createElement('td');
-        if (time !== 'Total') {
-            const plusBtn = document.createElement('button');
-            plusBtn.textContent = '+';
-            plusBtn.classList.add('button', 'button-plus');
-            plusBtn.addEventListener('click', () => incrementTimeCount(name, timeKey));
+        const plusBtn = document.createElement('button');
+        plusBtn.textContent = '+';
+        plusBtn.classList.add('button', 'button-plus');
+        plusBtn.addEventListener('click', () => incrementTimeCount(name, timeKey));
 
-            const minusBtn = document.createElement('button');
-            minusBtn.textContent = '-';
-            minusBtn.classList.add('button', 'button-minus');
-            minusBtn.addEventListener('click', () => decrementTimeCount(name, timeKey));
+        const minusBtn = document.createElement('button');
+        minusBtn.textContent = '-';
+        minusBtn.classList.add('button', 'button-minus');
+        minusBtn.addEventListener('click', () => decrementTimeCount(name, timeKey));
 
-            actionCell.appendChild(plusBtn);
-            actionCell.appendChild(minusBtn);
-        }
+        actionCell.appendChild(plusBtn);
+        actionCell.appendChild(minusBtn);
 
         subRow.appendChild(timeCell);
         subRow.appendChild(countCell);
