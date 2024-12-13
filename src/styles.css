@@ -170,7 +170,7 @@ tr.current-pokemon td {
 }
 
 .dropdown-row td {
-    padding: 10px;
+    padding: 0px;
     text-align: left;
     font-size: 14px;
     color: #CCCCCC;
@@ -184,19 +184,19 @@ tr.current-pokemon td {
 }
 
 .dropdown-table td {
-    padding: 8px;
+    padding: 0px;
     border: 1px solid #444444;
     text-align: center;
     color: #FFFFFF;
 }
 
-.dropdown-table tr:nth-child(odd) td {
+.dropdown-table tr td {
     background-color: #444444;
 }
 
-.dropdown-table tr:nth-child(even) td {
+/* .dropdown-table tr:nth-child(even) td {
     background-color: #3A3A3A;
-}
+} */
 
 /* Button styling */
 .button-container {
