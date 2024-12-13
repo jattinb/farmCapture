@@ -349,7 +349,7 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
 
             // Add action buttons
             const expandBtn = document.createElement('button');
-            expandBtn.textContent = 'Expand ▼';
+            expandBtn.textContent = '▼';
             expandBtn.classList.add('button', 'button-expand');
             expandBtn.addEventListener('click', () => toggleDropdown(name));
 
@@ -445,15 +445,21 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
     return row;
 }
 
-// Function to toggle dropdown visibility
+// Function to toggle dropdown visibility and change arrow direction
 function toggleDropdown(name) {
     const dropdownRow = document.querySelector(`.dropdown-${name}`);
+    const expandBtn = document.querySelector(`.dropdown-${name}`).previousSibling.querySelector('.button-expand');
+
     if (dropdownRow) {
         const isCurrentlyVisible = dropdownRow.style.display !== 'none';
         dropdownRow.style.display = isCurrentlyVisible ? 'none' : 'table-row';
         dropdownState[name] = !isCurrentlyVisible; // Update state
+
+        // Change arrow direction
+        expandBtn.textContent = isCurrentlyVisible ? '▼' : '▲'; // ▼ for closed, ▲ for open
     }
 }
+
 
 // Function to increment time count
 function incrementTimeCount(name, time) {
