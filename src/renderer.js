@@ -420,12 +420,12 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
         const actionCell = document.createElement('td');
         const plusBtn = document.createElement('button');
         plusBtn.textContent = '+';
-        plusBtn.classList.add('button', 'button-plus');
+        plusBtn.classList.add('button', 'button-plus', 'button-action');
         plusBtn.addEventListener('click', () => incrementTimeCount(name, timeKey));
 
         const minusBtn = document.createElement('button');
         minusBtn.textContent = '-';
-        minusBtn.classList.add('button', 'button-minus');
+        minusBtn.classList.add('button', 'button-minus', 'button-action');
         minusBtn.addEventListener('click', () => decrementTimeCount(name, timeKey));
 
         actionCell.appendChild(plusBtn);
