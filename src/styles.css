@@ -215,11 +215,15 @@ tr.current-pokemon td {
 .button {
     flex: 1;
     padding: 10px;
-    border: none;
+    border: inherit;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     margin: 5px 0;
+}
+
+.button-action {
+    padding: 5px;
 }
 
 .compact-mode .button {

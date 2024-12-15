@@ -350,12 +350,12 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
             // Add action buttons
             const expandBtn = document.createElement('button');
             expandBtn.textContent = '▼';
-            expandBtn.classList.add('button', 'button-expand');
+            expandBtn.classList.add('button', 'button-expand', 'button-action');
             expandBtn.addEventListener('click', () => toggleDropdown(name));
 
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'X';
-            deleteBtn.classList.add('button', 'button-delete');
+            deleteBtn.classList.add('button', 'button-delete', 'button-action');
             deleteBtn.disabled = isSessionRunning;
             deleteBtn.addEventListener('click', () => deletePokemon(name));
 
