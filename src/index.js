@@ -224,12 +224,6 @@ ipcMain.on('decrement-pokemon', (event, pokemonName) => {
   sendUpdatedCount(event, pokemonName);
 });
 
-ipcMain.on('delete-pokemon', (event, pokemonName) => {
-  huntSession.wildCount -= huntSession.pokemonCounts[pokemonName]
-  delete huntSession.pokemonCounts[pokemonName];
-  sendUpdatedCount(event, pokemonName);
-});
-
 function sendUpdatedCount(event, pokemonName) {
   event.sender.send('update-count', {
     currPoke: pokemonName,
