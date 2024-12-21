@@ -181,8 +181,8 @@ class HuntSession extends EventEmitter {
         const pokeTimeString = this.pokeTime();
         const [hours] = pokeTimeString.split(':').map(Number);
 
-        if (hours >= 6 && hours < 12) return 'm'; // Morning
-        if (hours >= 12 && hours < 18) return 'd'; // Daytime
+        if (hours >= 4 && hours < 10) return 'm'; // Morning
+        if (hours >= 10 && hours < 20) return 'd'; // Daytime
         return 'n'; // Nighttime
     }
 
