@@ -122,6 +122,7 @@ body {
     background-color: #444444;
     border-radius: 5px;
     overflow: hidden;
+    table-layout: fixed; /* Ensures consistent column widths */
 }
 
 .compact-mode .table {
@@ -175,17 +176,19 @@ tr.current-pokemon td {
     font-size: 16px; /* Match font size */
     color: #CCCCCC;
     background-color: #2C2C2C;
+    border: none; /* Remove border for seamless alignment */
 }
 
 /* Dropdown table styling */
 .dropdown-table {
     width: 100%; /* Match main table width */
     border-collapse: collapse;
+    table-layout: fixed; /* Ensures consistent column widths */
 }
 
-.dropdown-table td {
-    padding: 6px; /* Match padding */
-    border: 1px solid #444444;
+.dropdown-table td, .dropdown-table th {
+    padding: 12px; /* Match padding */
+    border: 1px solid #444444; /* Match outer table borders */
     text-align: center; /* Match text alignment */
     color: #FFFFFF;
 }
@@ -193,6 +196,7 @@ tr.current-pokemon td {
 .dropdown-table tr td {
     background-color: #444444;
 }
+
 
 /* .dropdown-table tr:nth-child(even) td {
     background-color: #3A3A3A;
