@@ -103,14 +103,30 @@ body {
     color: #4CAF50; /* Green text color for active */
 }
 
-/* Encounters */
+/* Encounters styles */
 .encounters {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.current-encounter {
+    text-align: left;
+}
+
+.poketime {
+    text-align: right;
+    font-weight: bold;
+    transition: color 0.3s ease; /* Smooth transition for color change */
 }
 
 .compact-mode .encounters {
+    font-size: 16px;
+}
+
+.compact-mode .poketime {
     font-size: 16px;
 }
 

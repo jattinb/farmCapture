@@ -183,19 +183,30 @@ ipcRenderer.on('update-count', (_, data) => {
 });
 
 ipcRenderer.on('update-timer', (_event, data) => {
-    let { timeString, timeOfDay } = data
+    const { timeString, timeOfDay } = data;
+
     document.getElementById('farmDuration').textContent = `${timeString}`;
 
-    // Update the UI based on the time of day ('m', 'd', or 'n')
+    // Update the Poketime text with the corresponding time of day
     const timeOfDayText = {
         m: 'Morning',
         d: 'Day',
         n: 'Night',
     };
 
-    // Update a DOM element with the time of day
-    document.getElementById('pokeTime').innerText = timeOfDayText[timeOfDay] || 'Unknown';
+    const timeOfDayColors = {
+        m: 'yellow',
+        d: 'gold',
+        n: 'darkblue',
+    };
+
+    const pokeTimeElement = document.getElementById('pokeTime');
+    pokeTimeElement.innerHTML = `<strong>${timeOfDayText[timeOfDay] || 'Unknown'}</strong>`;
+
+    // Apply the corresponding color style
+    pokeTimeElement.style.color = timeOfDayColors[timeOfDay] || 'white';
 });
+
 
 
 ipcRenderer.on('import-complete', (_event, data) => {
@@ -387,7 +398,7 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
             tableBody.appendChild(row);
 
             // Add dropdown row
-            const dropdownRow = createDropdownRow(name, counts, totalCounts, totalEncounters);
+            const dropdownRow = createDropdownRow(name, counts, totalCounts, totalEncounters, isSessionRunning);
             tableBody.appendChild(dropdownRow);
 
             // Restore dropdown state if it was open before
@@ -400,7 +411,7 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
 }
 
 // Create a dropdown row for time-specific data
-function createDropdownRow(name, counts, totalCounts, totalEncounters) {
+function createDropdownRow(name, counts, totalCounts, totalEncounters, isSessionRunning) {
     const row = document.createElement('tr');
     row.classList.add('dropdown-row', `dropdown-${name}`);
     row.style.display = 'none'; // Hidden by default
@@ -432,13 +443,13 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
         const plusBtn = document.createElement('button');
         plusBtn.textContent = '+';
         plusBtn.classList.add('button', 'button-plus', 'button-action');
-        plusBtn.disabled = true;
+        plusBtn.disabled = isSessionRunning;
         plusBtn.addEventListener('click', () => incrementTimeCount(name, timeKey));
 
         const minusBtn = document.createElement('button');
         minusBtn.textContent = '-';
         minusBtn.classList.add('button', 'button-minus', 'button-action');
-        minusBtn.disabled = true;
+        minusBtn.disabled = isSessionRunning;
         minusBtn.addEventListener('click', () => decrementTimeCount(name, timeKey));
 
         actionCell.appendChild(plusBtn);
