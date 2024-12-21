@@ -321,7 +321,7 @@ function updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSe
         // Convert pokemonData to array and sort by frequency
         const sortedPokemonData = Object.entries(pokemonData)
             .map(([name, counts]) => ({ name, counts }))
-            .sort((a, b) => b.counts.total - a.counts.total); // Sort by total encounters in descending order
+            .sort((b, a) => b.counts.total - a.counts.total); // Sort by total encounters in ascending order
 
         const totalCounts = Object.values(pokemonData).reduce((totals, pokemon) => {
             totals.m += pokemon.m;
