@@ -182,8 +182,19 @@ ipcRenderer.on('update-count', (_, data) => {
     document.getElementById('currentEncounter').innerHTML = `<strong>${currentEncounter}</strong>`;
 });
 
-ipcRenderer.on('update-timer', (_event, timeString) => {
+ipcRenderer.on('update-timer', (_event, data) => {
+    let { timeString, timeOfDay } = data
     document.getElementById('farmDuration').textContent = `${timeString}`;
+
+    // Update the UI based on the time of day ('m', 'd', or 'n')
+    const timeOfDayText = {
+        m: 'Morning',
+        d: 'Day',
+        n: 'Night',
+    };
+
+    // Update a DOM element with the time of day
+    document.getElementById('pokeTime').innerText = timeOfDayText[timeOfDay] || 'Unknown';
 });
 
 
@@ -421,11 +432,13 @@ function createDropdownRow(name, counts, totalCounts, totalEncounters) {
         const plusBtn = document.createElement('button');
         plusBtn.textContent = '+';
         plusBtn.classList.add('button', 'button-plus', 'button-action');
+        plusBtn.disabled = true;
         plusBtn.addEventListener('click', () => incrementTimeCount(name, timeKey));
 
         const minusBtn = document.createElement('button');
         minusBtn.textContent = '-';
         minusBtn.classList.add('button', 'button-minus', 'button-action');
+        minusBtn.disabled = true;
         minusBtn.addEventListener('click', () => decrementTimeCount(name, timeKey));
 
         actionCell.appendChild(plusBtn);

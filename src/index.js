@@ -183,7 +183,8 @@ function attachListeners() {
     });
 
     huntSession.on('update-timer', (timeString) => {
-      mainWindow.webContents.send('update-timer', timeString);
+      let timeOfDay = huntSession.getTimeOfDay()
+      mainWindow.webContents.send('update-timer', { timeString, timeOfDay });
     });
 
     huntSession.on('update-count', (timeString) => {
