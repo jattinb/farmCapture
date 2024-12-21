@@ -153,7 +153,6 @@ body {
 }
 
 .compact-mode .table th, .compact-mode .table td {
-    padding: 8px; /* Reduced padding */
     font-size: 16px; /* Reduced font size */
 }
 
