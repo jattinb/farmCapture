@@ -256,22 +256,15 @@ ipcMain.on('increment-time-count', (event, { name, time }) => {
 
 // Decrement time count
 ipcMain.on('decrement-time-count', (event, { name, time }) => {
-  if (huntSession.pokemonCounts[name]) {
-    if (time === 'm' && huntSession.pokemonCounts[name].m > 0) {
-      huntSession.pokemonCounts[name].m -= 1;
+  if (huntSession.pokemonCounts[name] && ['m', 'd', 'n'].includes(time)) {
+    const count = huntSession.pokemonCounts[name][time];
+    if (count > 0) {
+      huntSession.pokemonCounts[name][time] -= 1;
       huntSession.pokemonCounts[name].total -= 1;
       huntSession.wildCount -= 1;
-    } else if (time === 'd' && huntSession.pokemonCounts[name].d > 0) {
-      huntSession.pokemonCounts[name].d -= 1;
-      huntSession.pokemonCounts[name].total -= 1;
-      huntSession.wildCount -= 1;
-    } else if (time === 'n' && huntSession.pokemonCounts[name].n > 0) {
-      huntSession.pokemonCounts[name].n -= 1;
-      huntSession.pokemonCounts[name].total -= 1;
-      huntSession.wildCount -= 1;
-    }
 
-    sendUpdatedCount(event, name);
+      sendUpdatedCount(event, name);
+    }
   }
 });
 
