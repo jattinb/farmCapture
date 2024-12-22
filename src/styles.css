@@ -266,6 +266,11 @@ tr.current-pokemon td {
     color: white;
 }
 
+.button-red:hover {
+    background-color: #D32F2F;
+    color: white;
+}
+
 .button-delete:hover {
     background-color: #D32F2F;
 }
