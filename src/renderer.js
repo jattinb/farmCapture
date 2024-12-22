@@ -121,10 +121,18 @@ function toggleActionButtons(disable) {
     const plusBtns = document.getElementsByClassName('button-plus');
     const minusBtns = document.getElementsByClassName('button-minus');
     const deleteBtns = document.getElementsByClassName('button-delete');
+    const setupButton = document.getElementById('setup');
+    const exportButton = document.getElementById('exportCSV');
+    const importButton = document.getElementById('importCSV');
+    const resetButton = document.getElementById('reset');
 
     Array.from(plusBtns).forEach(btn => (btn.disabled = disable));
     Array.from(minusBtns).forEach(btn => (btn.disabled = disable));
     Array.from(deleteBtns).forEach(btn => (btn.disabled = disable));
+    setupButton.disabled = disable;
+    exportButton.disabled = disable;
+    importButton.disabled = disable;
+    resetButton.disabled = disable;
 }
 
 // IPC event handlers

@@ -438,6 +438,16 @@ tr.current-pokemon td {
     background-color: #ccc; /* Maintain grey color when hovered */
 }
 
+.button:disabled {
+    background-color: #ccc; /* Disabled state styling */
+    cursor: not-allowed; /* Not allowed cursor */
+}
+
+/* Prevent hover color change for disabled buttons */
+.button:disabled:hover {
+    background-color: #ccc; /* Maintain grey color when hovered */
+}
+
 /* Delete button styles */
 .action-buttons .button-delete {
     background-color: #f44336; /* Red background for delete button */
@@ -458,4 +468,19 @@ tr.current-pokemon td {
     padding: 3px 6px; /* Adjusted padding for compactness */
     border-radius: 3px; /* Smaller border-radius for compact mode */
     transition: background-color 0.2s, transform 0.1s; /* Adjusted transition for compact mode */
+}
+
+/* Reset Button - Example Styles */
+.button-reset {
+    background-color: #c15ee6; /* Muted Beige */
+    color: #ffffff; /* Dark Grey Text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-reset:hover {
+    background-color: #A54CC7; /* Slightly darker beige for hover */
 }
