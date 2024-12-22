@@ -183,7 +183,8 @@ function attachListeners() {
     });
 
     huntSession.on('update-timer', (timeString) => {
-      mainWindow.webContents.send('update-timer', timeString);
+      let timeOfDay = huntSession.getTimeOfDay()
+      mainWindow.webContents.send('update-timer', { timeString, timeOfDay });
     });
 
     huntSession.on('update-count', (timeString) => {
@@ -224,12 +225,6 @@ ipcMain.on('decrement-pokemon', (event, pokemonName) => {
   sendUpdatedCount(event, pokemonName);
 });
 
-ipcMain.on('delete-pokemon', (event, pokemonName) => {
-  huntSession.wildCount -= huntSession.pokemonCounts[pokemonName]
-  delete huntSession.pokemonCounts[pokemonName];
-  sendUpdatedCount(event, pokemonName);
-});
-
 function sendUpdatedCount(event, pokemonName) {
   event.sender.send('update-count', {
     currPoke: pokemonName,
@@ -238,3 +233,47 @@ function sendUpdatedCount(event, pokemonName) {
     isSessionRunning: huntSession.isSessionRunning // Ensure session state is sent
   });
 }
+
+// Increment time count
+ipcMain.on('increment-time-count', (event, { name, time }) => {
+  if (!huntSession.pokemonCounts[name]) {
+    huntSession.pokemonCounts[name] = { total: 0, m: 0, d: 0, n: 0 };
+  }
+
+  // Increment time-based counts (morning, day, night) if applicable
+  if (time === 'm') {
+    huntSession.pokemonCounts[name].m += 1;
+  } else if (time === 'd') {
+    huntSession.pokemonCounts[name].d += 1;
+  } else if (time === 'n') {
+    huntSession.pokemonCounts[name].n += 1;
+  }
+
+  huntSession.pokemonCounts[name].total += 1;
+  huntSession.wildCount += 1;
+
+  sendUpdatedCount(event, name);
+});
+
+// Decrement time count
+ipcMain.on('decrement-time-count', (event, { name, time }) => {
+  if (huntSession.pokemonCounts[name] && ['m', 'd', 'n'].includes(time)) {
+    const count = huntSession.pokemonCounts[name][time];
+    if (count > 0) {
+      huntSession.pokemonCounts[name][time] -= 1;
+      huntSession.pokemonCounts[name].total -= 1;
+      huntSession.wildCount -= 1;
+
+      sendUpdatedCount(event, name);
+    }
+  }
+});
+
+// Delete Pokémon
+ipcMain.on('delete-pokemon', (event, name) => {
+  if (huntSession.pokemonCounts[name]) {
+    huntSession.wildCount -= huntSession.pokemonCounts[name].total || 0;
+    delete huntSession.pokemonCounts[name];
+    sendUpdatedCount(event, name);
+  }
+});

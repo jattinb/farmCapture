@@ -11,10 +11,9 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    position: relative; /* To position the checkbox */
 }
 
-/* Original styles */
+/* Container styling */
 .container {
     margin: auto;
     background-color: #333333;
@@ -23,6 +22,7 @@ body {
     width: 400px; /* Original width */
     padding: 20px; /* Original padding */
     margin-top: 10px;
+    overflow-x: auto; /* Handle table overflow */
 }
 
 /* Compact mode styles */
@@ -103,15 +103,30 @@ body {
     color: #4CAF50; /* Green text color for active */
 }
 
+/* Encounters styles */
 .encounters {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.current-encounter {
+    text-align: left;
+}
+
+.poketime {
+    text-align: right;
+    font-weight: bold;
+    transition: color 0.3s ease; /* Smooth transition for color change */
 }
 
 .compact-mode .encounters {
-    display: flex;
-    justify-content: space-between;
+    font-size: 16px;
+}
+
+.compact-mode .poketime {
     font-size: 16px;
 }
 
@@ -123,48 +138,86 @@ body {
     background-color: #444444;
     border-radius: 5px;
     overflow: hidden;
+    table-layout: fixed; /* Ensures consistent column widths */
 }
 
 .compact-mode .table {
-    margin-bottom: 10px; /* Reduced margin */
-}
-
-/* Highlight current Pokémon row in green */
-tr.current-pokemon td {
-    background-color: #4CAF50; /* Green background color */
-    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .table th, .table td {
-    padding: 12px; /* Original padding */
+    padding: 12px;
     text-align: center;
-    border: 1px solid #555555; /* Border for table cells */
-    color: #FFFFFF; /* Text color for table cells */
+    border: 1px solid #555555;
+    color: #FFFFFF;
 }
 
 .compact-mode .table th, .compact-mode .table td {
-    padding: 8px; /* Reduced padding */
     font-size: 16px; /* Reduced font size */
 }
 
 .table th {
     background-color: #333333; /* Dark background for table headers */
     border-bottom: 2px solid #555555; /* Thicker bottom border for headers */
+    font-weight: bold;
 }
 
 .table td {
-    background-color: #555555; /* Slightly lighter background for table cells */
+    background-color: #555555;
 }
 
-/* Style for the total row */
+/* Highlight for the current Pokémon */
+tr.current-pokemon td {
+    background-color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Total row styling */
 .table tfoot .total-row td {
     font-weight: bold;
-    background-color: #222222; /* Darker background for the total row */
-    padding: 12px; /* Ensure padding matches the other rows */
-    border-top: 2px solid #555555; /* Add a top border to distinguish the total row */
-    text-align: center; /* Center-align text in the footer */
+    background-color: #222222;
+    border-top: 2px solid #555555;
 }
 
+/* Dropdown row styling */
+.dropdown-row {
+    background-color: #333333;
+    transition: all 0.3s ease;
+}
+
+.dropdown-row td {
+    padding: 0px; /* Match padding */
+    text-align: center; /* Align text center */
+    font-size: 16px; /* Match font size */
+    color: #CCCCCC;
+    background-color: #2C2C2C;
+    border: none; /* Remove border for seamless alignment */
+}
+
+/* Dropdown table styling */
+.dropdown-table {
+    width: 100%; /* Match main table width */
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures consistent column widths */
+}
+
+.dropdown-table td, .dropdown-table th {
+    padding: 12px; /* Match padding */
+    border: 1px solid #444444; /* Match outer table borders */
+    text-align: center; /* Match text alignment */
+    color: #FFFFFF;
+}
+
+.dropdown-table tr td {
+    background-color: #444444;
+}
+
+
+/* .dropdown-table tr:nth-child(even) td {
+    background-color: #3A3A3A;
+} */
+
+/* Button styling */
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -181,11 +234,15 @@ tr.current-pokemon td {
 .button {
     flex: 1;
     padding: 10px;
-    border: none;
+    border: inherit;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     margin: 5px 0;
+}
+
+.button-action {
+    padding: 5px;
 }
 
 .compact-mode .button {
@@ -200,18 +257,23 @@ tr.current-pokemon td {
     color: white;
 }
 
-/* .button-green:hover {
-    background-color: #45a049;
-} */
+.button:hover {
+    background-color: #45A049;
+}
 
 .button-red {
     background-color: #f44336;
     color: white;
 }
 
-/* .button-red:hover {
-    background-color: #da190b;
-} */
+.button-red:hover {
+    background-color: #D32F2F;
+    color: white;
+}
+
+.button-delete:hover {
+    background-color: #D32F2F;
+}
 
 .button-blue {
     background-color: #2196F3;
@@ -381,6 +443,16 @@ tr.current-pokemon td {
     background-color: #ccc; /* Maintain grey color when hovered */
 }
 
+.button:disabled {
+    background-color: #ccc; /* Disabled state styling */
+    cursor: not-allowed; /* Not allowed cursor */
+}
+
+/* Prevent hover color change for disabled buttons */
+.button:disabled:hover {
+    background-color: #ccc; /* Maintain grey color when hovered */
+}
+
 /* Delete button styles */
 .action-buttons .button-delete {
     background-color: #f44336; /* Red background for delete button */
@@ -401,4 +473,19 @@ tr.current-pokemon td {
     padding: 3px 6px; /* Adjusted padding for compactness */
     border-radius: 3px; /* Smaller border-radius for compact mode */
     transition: background-color 0.2s, transform 0.1s; /* Adjusted transition for compact mode */
+}
+
+/* Reset Button - Example Styles */
+.button-reset {
+    background-color: #c15ee6; /* Muted Beige */
+    color: #ffffff; /* Dark Grey Text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-reset:hover {
+    background-color: #A54CC7; /* Slightly darker beige for hover */
 }

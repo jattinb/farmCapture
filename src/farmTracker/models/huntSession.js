@@ -25,7 +25,7 @@ const { findPokemon } = require('../helpers/pokemonSearch');
 
 class HuntSession extends EventEmitter {
     constructor() {
-        super(); // Must call super() before accessing 'this'
+        super();
 
         if (HuntSession.instance) {
             return HuntSession.instance;
@@ -34,16 +34,16 @@ class HuntSession extends EventEmitter {
         this.huntingWindow = null;
         this.huntingDisplayId = null;
         this.wildCount = 0;
-        this.pokemonCounts = {};
+        this.pokemonCounts = {}; // Structure: { pokemonName: { total: 0, m: 0, d: 0, n: 0 } }
         this.timer = Timer.getInstance();
         this.intervalID = null;
         this.isLastScreenEncounter = false;
         this.currPoke = null;
         this.fileName = null;
         this.ocrSession = new OCRSession();
-        this.pokemonList = null
-        this.pokemonSet = null
-        // Bind timer events
+        this.pokemonList = null;
+        this.pokemonSet = null;
+
         this.timer.on('update-timer', (timeString) => this.emit('update-timer', timeString));
 
         HuntSession.instance = this;
@@ -133,6 +133,7 @@ class HuntSession extends EventEmitter {
                 console.log('No Match Found');
                 return;
             }
+            this.pokemonCounts[validPoke] = { total: 0, m: 0, d: 0, n: 0 };
         }
 
         // Skip counting if it's the same encounter as the last one
@@ -141,8 +142,9 @@ class HuntSession extends EventEmitter {
             return;
         }
 
-        // Update pokemonCounts and other properties
-        this.pokemonCounts[validPoke] = (this.pokemonCounts[validPoke] || 0) + 1;
+        const timeOfDay = this.getTimeOfDay();
+        this.pokemonCounts[validPoke][timeOfDay]++;
+        this.pokemonCounts[validPoke].total++;
         this.currPoke = validPoke;
         this.wildCount++;
         this.isLastScreenEncounter = true;
@@ -156,6 +158,32 @@ class HuntSession extends EventEmitter {
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
+    }
+
+    pokeTime() {
+        const now = new Date();
+        const utcHours = now.getUTCHours();
+        const utcMinutes = now.getUTCMinutes();
+        const utcSeconds = now.getUTCSeconds();
+
+        let secondsPassed = utcHours * 3600 + utcMinutes * 60 + utcSeconds;
+        secondsPassed *= 4;
+
+        const adjustedDate = new Date(now.getTime() + secondsPassed * 1000);
+
+        const adjustedHours = adjustedDate.getUTCHours();
+        const adjustedMinutes = adjustedDate.getUTCMinutes();
+
+        return `${String(adjustedHours).padStart(2, '0')}:${String(adjustedMinutes).padStart(2, '0')}`;
+    }
+
+    getTimeOfDay() {
+        const pokeTimeString = this.pokeTime();
+        const [hours] = pokeTimeString.split(':').map(Number);
+
+        if (hours >= 4 && hours < 10) return 'm'; // Morning
+        if (hours >= 10 && hours < 20) return 'd'; // Daytime
+        return 'n'; // Nighttime
     }
 
     async startCaptureInterval(interval = 1000) {
@@ -211,22 +239,26 @@ class HuntSession extends EventEmitter {
 
     // Export session data to CSV
     exportSessionToCSV(filename) {
-        const fields = ['pokemon', 'count', 'time', 'totalCount'];
+        const fields = ['pokemon', 'total', 'morning', 'day', 'night', 'time', 'totalCount'];
         const csvData = [];
 
-        // Convert pokemonCounts object to array of { pokemon, count } objects
-        Object.entries(this.pokemonCounts).forEach(([pokemon, count]) => {
-            csvData.push({ pokemon, count });
+        Object.entries(this.pokemonCounts).forEach(([pokemon, counts]) => {
+            csvData.push({
+                pokemon,
+                total: counts.total,
+                morning: counts.m,
+                day: counts.d,
+                night: counts.n,
+            });
         });
 
-        // Include time and totalCount for the session only in the first row
         if (csvData.length > 0) {
             csvData[0].time = formatTime(this.timer.elapsedTime);
             csvData[0].totalCount = this.wildCount;
         }
 
         const csv = parse(csvData, { fields });
-        const filePath = `${filename}`; // Construct the file path with the chosen filename
+        const filePath = `${filename}`;
 
         try {
             fs.writeFileSync(filePath, csv);
@@ -243,9 +275,14 @@ class HuntSession extends EventEmitter {
             this.timer.loadTime(parseTimeToMilliseconds(data[0].time));
         }
         data.forEach(row => {
-            const { pokemon, count } = row;
-            this.pokemonCounts[pokemon] = parseInt(count, 10);
-            this.wildCount += parseInt(count, 10);
+            const { pokemon, total, morning, day, night } = row;
+            this.pokemonCounts[pokemon] = {
+                total: parseInt(total, 10),
+                m: parseInt(morning, 10),
+                d: parseInt(day, 10),
+                n: parseInt(night, 10),
+            };
+            this.wildCount += parseInt(total, 10);
         });
 
         this.emit('update-count', {
