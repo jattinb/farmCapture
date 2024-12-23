@@ -187,8 +187,9 @@ function attachListeners() {
       mainWindow.webContents.send('update-timer', { timeString, timeOfDay });
     });
 
-    huntSession.on('update-count', (timeString) => {
-      mainWindow.webContents.send('update-count', timeString);
+    huntSession.on('update-count', (data) => {
+      console.log('update-count event:', data);
+      mainWindow.webContents.send('update-count', data);
     });
 
     listenersAttached = true; // Set flag to true after attaching listeners

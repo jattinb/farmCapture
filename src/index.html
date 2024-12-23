@@ -10,12 +10,15 @@
     <div class="container">
         <p class="farm-duration">
             <span id="farmDuration">00:00:00</span>
-            <span id="status" class="status status-stopped">Inactive</span>
+            <label class="knob-container">
+                <input type="checkbox" id="toggleKnob" class="knob" disabled>
+                <span class="knob-slider"></span>
+            </label>
         </p>
         <div class="button-container">
             <button id="toggleInstructionsBtn" class="button button-blue">Instructions</button>
             <button id="setup" class="button button-blue">Setup</button>
-            <button id="toggleCapture" class="button button-green" disabled>Start</button>
+            <!-- <button id="toggleCapture" class="button button-green" disabled>Start</button> -->
             <button id="reset" class="button button-reset">Reset</button>
         </div>
         <div class="setup-instructions" id="instructions" style="display: none;">
