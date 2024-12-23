@@ -232,8 +232,7 @@ class App {
 
         // IPC event handler for updating the table
         ipcRenderer.on('update-count', (event, data) => {
-            console.log("inside update-count event")
-            this.updatePokemonTable(data.pokemonCounts, data.currPoke, data.wildCount, data.isSessionRunning);
+            this.updatePokemonTable(data.pokemonCounts, data.currPoke, data.wildCount);
             this.updateUI()
         });
 
@@ -287,8 +286,8 @@ class App {
         ipcRenderer.send('delete-pokemon', name);
     }
 
-    updatePokemonTable(pokemonData, currentEncounter, totalEncounters, isSessionRunning) {
-        console.log("inside updatePokemonTable")
+    updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
+        isSessionRunning = this.appState.isCaptureActive;
         const tableBody = document.getElementById('pokemonTableBody');
         const currentEncounterLower = currentEncounter ? currentEncounter.toLowerCase() : '';
 
