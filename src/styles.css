@@ -145,25 +145,30 @@ body {
     margin-bottom: 10px;
 }
 
-.table th, .table td {
+.table th {
     padding: 12px;
     text-align: center;
     border: 1px solid #555555;
     color: #FFFFFF;
-}
-
-.compact-mode .table th, .compact-mode .table td {
-    font-size: 16px; /* Reduced font size */
-}
-
-.table th {
     background-color: #333333; /* Dark background for table headers */
     border-bottom: 2px solid #555555; /* Thicker bottom border for headers */
     font-weight: bold;
 }
 
+.compact-mode .table th {
+    font-size: 16px; /* Reduced font size */
+}
+
 .table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #555555;
+    color: #FFFFFF;
     background-color: #555555;
+}
+
+.compact-mode .table td {
+    font-size: 16px; /* Reduced font size */
 }
 
 /* Highlight for the current Pokémon */
@@ -560,3 +565,4 @@ tr.current-pokemon td {
     gap: 0px;
     width: 35%;
 }
+
