@@ -287,7 +287,6 @@ class App {
     }
 
     updatePokemonTable(pokemonData, currentEncounter, totalEncounters) {
-        isSessionRunning = this.appState.isCaptureActive;
         const tableBody = document.getElementById('pokemonTableBody');
         const currentEncounterLower = currentEncounter ? currentEncounter.toLowerCase() : '';
 
@@ -338,7 +337,7 @@ class App {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'X';
                 deleteBtn.classList.add('button', 'button-delete', 'button-action');
-                deleteBtn.disabled = isSessionRunning;
+                deleteBtn.disabled = this.appState.isCaptureActive;
                 deleteBtn.addEventListener('click', () => this.deletePokemon(name));
 
                 actionCell.appendChild(expandBtn);
@@ -351,14 +350,14 @@ class App {
                 row.appendChild(actionCell);
 
                 // Highlight the current encounter row
-                if (isSessionRunning && currentEncounterLower === name.toLowerCase()) {
+                if (this.appState.isCaptureActive && currentEncounterLower === name.toLowerCase()) {
                     row.classList.add('current-pokemon');
                 }
 
                 tableBody.appendChild(row);
 
                 // Add dropdown row
-                const dropdownRow = this.createDropdownRow(name, counts, totalCounts, totalEncounters, isSessionRunning);
+                const dropdownRow = this.createDropdownRow(name, counts, totalCounts, totalEncounters);
                 tableBody.appendChild(dropdownRow);
 
                 // Restore dropdown state if it was open before
@@ -371,7 +370,7 @@ class App {
     }
 
     // Create a dropdown row for time-specific data
-    createDropdownRow(name, counts, totalCounts, totalEncounters, isSessionRunning) {
+    createDropdownRow(name, counts, totalCounts, totalEncounters) {
         const row = document.createElement('tr');
         row.classList.add('dropdown-row', `dropdown-${name}`);
         row.style.display = 'none'; // Hidden by default
@@ -403,13 +402,13 @@ class App {
             const plusBtn = document.createElement('button');
             plusBtn.textContent = '+';
             plusBtn.classList.add('button', 'button-plus', 'button-action');
-            plusBtn.disabled = isSessionRunning;
+            plusBtn.disabled = this.appState.isCaptureActive;
             plusBtn.addEventListener('click', () => this.incrementTimeCount(name, timeKey));
 
             const minusBtn = document.createElement('button');
             minusBtn.textContent = '-';
             minusBtn.classList.add('button', 'button-minus', 'button-action');
-            minusBtn.disabled = isSessionRunning;
+            minusBtn.disabled = this.appState.isCaptureActive;
             minusBtn.addEventListener('click', () => this.decrementTimeCount(name, timeKey));
 
             actionCell.appendChild(plusBtn);
