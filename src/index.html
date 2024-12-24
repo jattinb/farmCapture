@@ -19,7 +19,7 @@
             <button id="toggleInstructionsBtn" class="button button-blue">Instructions</button>
             <button id="setup" class="button button-blue">Setup</button>
             <!-- <button id="toggleCapture" class="button button-green" disabled>Start</button> -->
-            <button id="reset" class="button button-reset">Reset</button>
+            <!-- <button id="reset" class="button button-reset">Reset</button> -->
         </div>
         <div class="setup-instructions" id="instructions" style="display: none;">
             <h3>Setup Instructions</h3>
@@ -65,12 +65,12 @@
                 </tr>
             </tfoot>
         </table>
-        <div class="button-container">
+        <!-- <div class="button-container"> -->
             <!-- Other buttons -->
-            <button id="exportCSV" class="button button-blue">Export</button>
-            <button id="importCSV" class="button button-blue">Import</button>
+            <!-- <button id="exportCSV" class="button button-blue">Export</button> -->
+            <!-- <button id="importCSV" class="button button-blue">Import</button> -->
             <!-- <input type="text" id="exportFilename" placeholder="Enter filename"> -->
-        </div>
+        <!-- </div> -->
         <div id="importSuccess" class="setup-message setup-success" style="display: none;">
             Import successful!<button class="close-btn" onclick="closeMessage('importSuccess')">&times;</button>
         </div>
@@ -88,6 +88,17 @@
                 <input type="checkbox" id="toggleCompact"/>
             </label>
         </div>        
+        <div class="button-container bottom-right">
+            <button id="importCSV" class="button button-icon">
+                <img src="icons/upload.png" alt="Import">
+            </button>
+            <button id="exportCSV" class="button button-icon">
+                <img src="icons/download.png" alt="Export">
+            </button>
+            <button id="reset" class="button button-icon button-red">
+                <img src="icons/delete.png" alt="Reset">
+            </button>
+        </div>
     </div>
     <!-- Include renderer.js for IPC event handling -->
     <script src="./renderer.js"></script>
