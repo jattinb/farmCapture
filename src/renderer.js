@@ -268,6 +268,31 @@ class App {
             console.log('Import complete:', importedData);
             this.displayMessage('importSuccess'); // Display a success message
         });
+
+        ipcRenderer.on('update-timer', (_event, data) => {
+            const { timeString, timeOfDay } = data;
+
+            document.getElementById('farmDuration').textContent = `${timeString}`;
+
+            // Update the Poketime text with the corresponding time of day
+            const timeOfDayText = {
+                m: 'Morning',
+                d: 'Day',
+                n: 'Night',
+            };
+
+            const timeOfDayColors = {
+                m: 'yellow',
+                d: 'gold',
+                n: 'darkblue',
+            };
+
+            const pokeTimeElement = document.getElementById('pokeTime');
+            pokeTimeElement.innerHTML = `<strong>${timeOfDayText[timeOfDay] || 'Unknown'}</strong>`;
+
+            // Apply the corresponding color style
+            pokeTimeElement.style.color = timeOfDayColors[timeOfDay] || 'white';
+        });
     }
 
     toggleAlwaysOnTop() {
