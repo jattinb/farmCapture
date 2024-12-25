@@ -207,7 +207,7 @@ tr.current-pokemon td {
 }
 
 .dropdown-table td, .dropdown-table th {
-    padding: 12px; /* Match padding */
+    padding: 5px; /* Match padding with outer table */
     border: 1px solid #444444; /* Match outer table borders */
     text-align: center; /* Match text alignment */
     color: #FFFFFF;
