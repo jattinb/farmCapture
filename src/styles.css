@@ -20,7 +20,7 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     border-radius: 10px;
     padding: 20px; /* Original padding */
-    margin-top: 10px;
+    margin-top: 5px;
     overflow-x: auto; /* Handle table overflow */
 }
 
@@ -51,7 +51,7 @@ body {
     font-size: 24px;
     font-weight: bold;
     text-align: left; /* Align content to the right */
-    margin-top: 20px;
+    margin-top: 0px;
     margin-bottom: 20px;
 }
 

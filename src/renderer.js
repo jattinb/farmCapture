@@ -349,6 +349,9 @@ class App {
                 return totals;
             }, { m: 0, d: 0, n: 0 });
 
+            // Update total wild encounters
+            document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
+
             sortedPokemonData.forEach((pokemon) => {
                 const { name, counts } = pokemon;
                 const total = counts.total;
