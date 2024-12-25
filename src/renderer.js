@@ -202,34 +202,35 @@ class App {
                 console.warn('Element with ID "toggleKnob" not found.');
             }
 
-            const compactBtn = document.getElementById('toggleCompact');
-            if (compactBtn) {
-                let isCompact = false;
+            // Remove compact mode event listener
+            // const compactBtn = document.getElementById('toggleCompact');
+            // if (compactBtn) {
+            //     let isCompact = false;
 
-                // Initialize the button text
-                compactBtn.textContent = isCompact ? 'Original' : 'Compact';
+            //     // Initialize the button text
+            //     compactBtn.textContent = isCompact ? 'Original' : 'Compact';
 
-                compactBtn.addEventListener('click', () => {
-                    isCompact = !isCompact;
-                    ipcRenderer.send('toggle-size', isCompact);
+            //     compactBtn.addEventListener('click', () => {
+            //         isCompact = !isCompact;
+            //         ipcRenderer.send('toggle-size', isCompact);
 
-                    // Toggle CSS class on the body or main container
-                    const body = document.body; // Or another container element
-                    if (body) {
-                        if (isCompact) {
-                            body.classList.add('compact-mode');
-                            compactBtn.textContent = 'Original';
-                        } else {
-                            body.classList.remove('compact-mode');
-                            compactBtn.textContent = 'Compact';
-                        }
-                    } else {
-                        console.warn('Body element not found.');
-                    }
-                });
-            } else {
-                console.warn('Element with ID "toggleCompact" not found.');
-            }
+            //         // Toggle CSS class on the body or main container
+            //         const body = document.body; // Or another container element
+            //         if (body) {
+            //             if (isCompact) {
+            //                 body.classList.add('compact-mode');
+            //                 compactBtn.textContent = 'Original';
+            //             } else {
+            //                 body.classList.remove('compact-mode');
+            //                 compactBtn.textContent = 'Compact';
+            //             }
+            //         } else {
+            //             console.warn('Body element not found.');
+            //         }
+            //     });
+            // } else {
+            //     console.warn('Element with ID "toggleCompact" not found.');
+            // }
 
             // Initial UI update based on the initial state
             this.updateUI();

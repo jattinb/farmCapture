@@ -24,13 +24,6 @@ body {
     overflow-x: auto; /* Handle table overflow */
 }
 
-/* Compact mode styles */
-.compact-mode .container {
-    width: 300px; /* Reduced width */
-    padding: 10px; /* Reduced padding */
-    border-radius: 8px; /* Slightly smaller border-radius */
-}
-
 .header {
     text-align: center;
     margin-bottom: 20px;
@@ -41,26 +34,14 @@ body {
     font-size: 24px; /* Original title font size */
 }
 
-.compact-mode .header h1 {
-    font-size: 22px; /* Smaller title font size */
-}
-
 .header h2 {
     margin: 0;
     font-size: 16px;
     color: #BBBBBB;
 }
 
-.compact-mode .header h2 {
-    font-size: 14px; /* Smaller subtitle font size */
-}
-
 .section {
     margin-bottom: 20px;
-}
-
-.compact-mode .section {
-    margin-bottom: 10px; /* Reduced margin */
 }
 
 .farm-duration {
@@ -74,19 +55,9 @@ body {
     margin-bottom: 20px;
 }
 
-.compact-mode .farm-duration {
-    font-size: 20px; /* Smaller duration font size */
-    margin-top: 4px; /* Reduced top margin */
-    margin-bottom: 16px; /* Reduced bottom margin */
-}
-
 .status-container {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.compact-mode .status-container {
-    margin-bottom: 10px; /* Reduced margin */
 }
 
 .status {
@@ -121,14 +92,6 @@ body {
     transition: color 0.3s ease; /* Smooth transition for color change */
 }
 
-.compact-mode .encounters {
-    font-size: 16px;
-}
-
-.compact-mode .poketime {
-    font-size: 16px;
-}
-
 /* Table styling */
 .table {
     border-collapse: collapse;
@@ -138,10 +101,6 @@ body {
     overflow: hidden;
     table-layout: fixed; /* Ensures consistent column widths */
     width: 100%; /* Ensure table takes full width */
-}
-
-.compact-mode .table {
-    margin-bottom: 10px;
 }
 
 .table th {
@@ -154,20 +113,12 @@ body {
     font-weight: bold;
 }
 
-.compact-mode .table th {
-    font-size: 16px; /* Reduced font size */
-}
-
 .table td {
     padding: 5px;
     text-align: center;
     border: 1px solid #555555;
     color: #FFFFFF;
     background-color: #555555;
-}
-
-.compact-mode .table td {
-    font-size: 16px; /* Reduced font size */
 }
 
 /* Highlight for the current Pokémon */
@@ -230,11 +181,6 @@ tr.current-pokemon td {
     margin-bottom: 10px;
 }
 
-.compact-mode .button-container {
-    gap: 5px; /* Reduced gap */
-    margin-bottom: 5px; /* Reduced margin */
-}
-
 .button {
     flex: 1;
     padding: 10px;
@@ -247,13 +193,6 @@ tr.current-pokemon td {
 
 .button-action {
     padding: 5px;
-}
-
-.compact-mode .button {
-    padding: 5px; /* Reduced padding */
-    border-radius: 3px; /* Reduced border-radius */
-    font-size: 14px; /* Reduced font size */
-    margin: 4px 0; /* Reduced margin */
 }
 
 .button-green {
@@ -304,16 +243,6 @@ tr.current-pokemon td {
     padding: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     border-radius: 10px;
-}
-
-.compact-mode .setup-instructions {
-    display: none;
-    background-color: #262525;
-    margin: auto;
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    border-radius: 10px;
-    font-size: 14px; /* Reduced font size */
 }
 
 .button-loading {
@@ -376,38 +305,15 @@ tr.current-pokemon td {
     align-items: center;
 }
 
-/* Compact mode */
-.compact-mode .compact-label {
-    bottom: 25px; /* Adjusted position for compact mode */
-    right: 8px;
-    font-size: 0.7em; /* Reduced font size */
-}
-
-.compact-mode .always-on-top-label {
-    bottom: 5px; /* Closer to Compact label in compact mode */
-    right: 8px;
-    font-size: 0.7em; /* Reduced font size */
-}
-
 /* Checkbox adjustments */
 .compact-label input[type="checkbox"] {
     margin-left: 10px; /* Adjust margin for spacing */
     transform: scale(0.8); /* Reduced size */
 }
 
-.compact-mode .compact-label input[type="checkbox"] {
-    margin-left: 5px; /* Adjusted margin */
-    transform: scale(0.7); /* Further reduced size */
-}
-
 .always-on-top-label input[type="checkbox"] {
     margin-left: 10px; /* Adjust margin for spacing */
     transform: scale(0.8); /* Reduced size */
-}
-
-.compact-mode .always-on-top-label input[type="checkbox"] {
-    margin-left: 5px; /* Adjusted margin */
-    transform: scale(0.7); /* Further reduced size */
 }
 
 /* Styling for action buttons */
@@ -464,19 +370,6 @@ tr.current-pokemon td {
 
 .button-delete:hover:not(:disabled) {
     background-color: #d32f2f; /* Darker red on hover */
-}
-
-/* Compact mode styles for action buttons */
-.compact-mode .action-buttons {
-    flex-direction: row; /* Maintain row alignment in compact mode */
-    gap: 2px; /* Reduced gap between buttons */
-}
-
-.compact-mode .action-buttons button {
-    font-size: 9px; /* Further reduce font size in compact mode */
-    padding: 3px 6px; /* Adjusted padding for compactness */
-    border-radius: 3px; /* Smaller border-radius for compact mode */
-    transition: background-color 0.2s, transform 0.1s; /* Adjusted transition for compact mode */
 }
 
 /* Reset Button - Example Styles */

@@ -203,11 +203,6 @@ ipcMain.on('toggle-always-on-top', () => {
   mainWindow.webContents.send('always-on-top-toggled', !isAlwaysOnTop);
 });
 
-ipcMain.on('toggle-size', (_event, isCompact) => {
-  const [currentWidth, currentHeight] = mainWindow.getSize();
-  mainWindow.setSize(isCompact ? 340 : 450, isCompact ? currentHeight - 200 : currentHeight + 200);
-});
-
 ipcMain.on('adjust-window-height', (_event, newHeight) => {
   const [currentWidth] = mainWindow.getSize();
   mainWindow.setSize(currentWidth, newHeight + 50); // Add some padding to the new height
