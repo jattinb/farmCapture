@@ -137,6 +137,7 @@ body {
     border-radius: 5px;
     overflow: hidden;
     table-layout: fixed; /* Ensures consistent column widths */
+    width: 100%; /* Ensure table takes full width */
 }
 
 .compact-mode .table {
@@ -200,7 +201,9 @@ tr.current-pokemon td {
 /* Dropdown table styling */
 .dropdown-table {
     border-collapse: collapse;
+    width: 100%; /* Ensure dropdown table takes full width */
     table-layout: fixed; /* Ensures consistent column widths */
+    max-width: 100%; /* Prevents dropdown from expanding beyond container */
 }
 
 .dropdown-table td, .dropdown-table th {
@@ -213,7 +216,6 @@ tr.current-pokemon td {
 .dropdown-table tr td {
     background-color: #444444;
 }
-
 
 /* .dropdown-table tr:nth-child(even) td {
     background-color: #3A3A3A;
@@ -562,4 +564,3 @@ tr.current-pokemon td {
     gap: 0px;
     width: 35%;
 }
-
