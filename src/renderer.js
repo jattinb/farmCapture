@@ -124,6 +124,14 @@ class App {
         }, 500); // Adjust delay as needed
     }
 
+    adjustWindowHeight() {
+        const container = document.querySelector('.container');
+        if (container) {
+            const newHeight = container.scrollHeight;
+            ipcRenderer.send('adjust-window-height', newHeight);
+        }
+    }
+
     init() {
         // Add event listener to toggle knob
         document.getElementById('toggleKnob').addEventListener('change', this.toggleCapture.bind(this));
@@ -225,6 +233,9 @@ class App {
 
             // Initial UI update based on the initial state
             this.updateUI();
+
+            // Adjust window height on initial load
+            this.adjustWindowHeight();
         });
 
         // IPC Event Handlers
@@ -267,6 +278,7 @@ class App {
         ipcRenderer.on('import-complete', (event, importedData) => {
             console.log('Import complete:', importedData);
             this.displayMessage('importSuccess'); // Display a success message
+            this.adjustWindowHeight(); // Adjust window height after import
         });
 
         ipcRenderer.on('update-timer', (_event, data) => {
@@ -405,6 +417,16 @@ class App {
 
         const dropdownTable = document.createElement('table');
         dropdownTable.classList.add('dropdown-table');
+
+        // Add colgroup to ensure consistent column widths
+        const colgroup = document.createElement('colgroup');
+        colgroup.innerHTML = `
+            <col style="width: 30%;">
+            <col style="width: 25%;">
+            <col style="width: 20%;">
+            <col style="width: 25%;">
+        `;
+        dropdownTable.appendChild(colgroup);
 
         // Exclude 'Total' from time frames
         const timeFrames = ['Morning', 'Day', 'Night'];

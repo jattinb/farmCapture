@@ -20,7 +20,7 @@ let listenersAttached = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 450,
+    width: 400,
     height: 700,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -206,6 +206,11 @@ ipcMain.on('toggle-always-on-top', () => {
 ipcMain.on('toggle-size', (_event, isCompact) => {
   const [currentWidth, currentHeight] = mainWindow.getSize();
   mainWindow.setSize(isCompact ? 340 : 450, isCompact ? currentHeight - 200 : currentHeight + 200);
+});
+
+ipcMain.on('adjust-window-height', (_event, newHeight) => {
+  const [currentWidth] = mainWindow.getSize();
+  mainWindow.setSize(currentWidth, newHeight + 50); // Add some padding to the new height
 });
 
 // ipcMain handlers
