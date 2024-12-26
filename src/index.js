@@ -21,7 +21,7 @@ let listenersAttached = false;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 700,
+    height: 300,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
