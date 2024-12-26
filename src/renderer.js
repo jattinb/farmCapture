@@ -503,6 +503,8 @@ class App {
             // Change arrow direction
             expandBtn.textContent = isCurrentlyVisible ? '▼' : '▲'; // ▼ for closed, ▲ for open
         }
+
+        this.adjustWindowHeight()
     }
 
     // Function to increment time count

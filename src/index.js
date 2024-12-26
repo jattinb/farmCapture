@@ -203,15 +203,18 @@ ipcMain.on('toggle-always-on-top', () => {
 });
 
 ipcMain.on('adjust-window-height', (_event, newHeight) => {
-  const [currentWidth] = mainWindow.getSize();
+  const [currentWidth, currentHeight] = mainWindow.getSize();
   const [currentX, currentY] = mainWindow.getPosition();
 
-  mainWindow.setBounds({
-    x: currentX,
-    y: currentY,
-    width: currentWidth,
-    height: newHeight + 50 // Add some padding to the new height
-  });
+  if (newHeight !== (currentHeight - 50)) {
+    mainWindow.setBounds({
+      x: currentX,
+      y: currentY,
+      width: currentWidth,
+      height: newHeight + 50 // Add some padding to the new height
+    });
+  }
+
 });
 
 // ipcMain handlers
