@@ -195,7 +195,6 @@ function attachListeners() {
     listenersAttached = true; // Set flag to true after attaching listeners
   }
 }
-
 // Toggle always on top
 ipcMain.on('toggle-always-on-top', () => {
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
@@ -205,7 +204,14 @@ ipcMain.on('toggle-always-on-top', () => {
 
 ipcMain.on('adjust-window-height', (_event, newHeight) => {
   const [currentWidth] = mainWindow.getSize();
-  mainWindow.setSize(currentWidth, newHeight + 50); // Add some padding to the new height
+  const [currentX, currentY] = mainWindow.getPosition();
+
+  mainWindow.setBounds({
+    x: currentX,
+    y: currentY,
+    width: currentWidth,
+    height: newHeight + 50 // Add some padding to the new height
+  });
 });
 
 // ipcMain handlers
