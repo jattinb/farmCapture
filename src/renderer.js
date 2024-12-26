@@ -271,6 +271,15 @@ class App {
             console.log('Setup failed', data);
         });
 
+        // Handle the update-count-noEncounter event
+        ipcRenderer.on('update-count-noEncounter', () => {
+            const highlightedRow = document.querySelector('.current-pokemon');
+            if (highlightedRow) {
+                highlightedRow.classList.remove('current-pokemon'); // Remove the highlight
+            }
+            document.getElementById('currentEncounter').innerHTML = '<strong>No encounter</strong>';
+        });
+
         ipcRenderer.on('always-on-top-toggled', (_event, isAlwaysOnTop) => {
             const toggleButton = document.getElementById('toggleAlwaysOnTopButton');
             toggleButton.textContent = isAlwaysOnTop ? 'Disable Always On Top' : 'Enable Always On Top';
