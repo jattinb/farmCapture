@@ -200,15 +200,16 @@ ipcMain.on('adjust-window-height', (_event, newHeight) => {
   const [currentWidth, currentHeight] = mainWindow.getSize();
   const [currentX, currentY] = mainWindow.getPosition();
 
-  if (newHeight !== (currentHeight - 50)) {
+  // Only update the window height if the difference is significant
+  const heightDifference = Math.abs(newHeight - (currentHeight - 50));
+  if (heightDifference > 10) { // Adjust the threshold as needed
     mainWindow.setBounds({
       x: currentX,
       y: currentY,
       width: currentWidth,
-      height: newHeight + 50 // Add some padding to the new height
+      height: newHeight + 50
     });
   }
-
 });
 
 // ipcMain handlers
