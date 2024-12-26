@@ -430,7 +430,6 @@ class App {
                 const dropdownRow = this.createDropdownRow(name, counts, totalCounts, totalEncounters);
                 tableBody.appendChild(dropdownRow);
 
-                this.adjustWindowHeight()
 
                 // Restore dropdown state if it was open before
                 if (openDropdowns[name]) {
@@ -438,6 +437,8 @@ class App {
                     this.dropdownState[name] = true; // Reapply state
                 }
             });
+
+            this.adjustWindowHeight()
         }
     }
 
