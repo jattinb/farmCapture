@@ -353,6 +353,7 @@ tr.current-pokemon td {
     background-color: #ccc; /* Maintain grey color when hovered */
 }
 
+/* Existing styles for buttons */
 .button:disabled {
     background-color: #ccc; /* Disabled state styling */
     cursor: not-allowed; /* Not allowed cursor */
@@ -361,6 +362,17 @@ tr.current-pokemon td {
 /* Prevent hover color change for disabled buttons */
 .button:disabled:hover {
     background-color: #ccc; /* Maintain grey color when hovered */
+}
+
+/* Override styles for specific buttons to prevent grey background */
+.button.no-grey:disabled {
+    background-color: inherit; /* Keep the original background color */
+    cursor: not-allowed; /* Not allowed cursor */
+}
+
+/* Prevent hover color change for specific disabled buttons */
+.button.no-grey:disabled:hover {
+    background-color: inherit; /* Maintain original background color when hovered */
 }
 
 /* Delete button styles */
