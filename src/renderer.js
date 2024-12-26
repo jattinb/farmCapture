@@ -185,6 +185,7 @@ class App {
                 } else {
                     console.warn('Element with ID "instructions" not found.');
                 }
+                this.adjustWindowHeight()
             };
 
             const toggleInstructionsBtn = document.getElementById('toggleInstructionsBtn');
