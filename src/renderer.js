@@ -172,6 +172,20 @@ class App {
             }
         });
 
+        // Add event listener for exporting JSON
+        document.getElementById('exportCSV').addEventListener('click', () => {
+            if (!this.appState.isCaptureActive) {
+                ipcRenderer.invoke('save-dialog').then((result) => {
+                    if (!result.canceled) {
+                        const filename = result.filePath;
+                        ipcRenderer.send('export-session', filename);
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            }
+        });
+
         // Add event listener for DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
             const toggleInstructions = () => {
@@ -363,7 +377,9 @@ class App {
             document.getElementById('totalEncounters').innerHTML = `<strong>${totalEncounters}</strong>`;
 
             // Update current encounter
-            document.getElementById('currentEncounter').innerHTML = `<strong>${this.capitalizeFirstLetter(currentEncounter)}</strong>`;
+            if (currentEncounter) {
+                document.getElementById('currentEncounter').innerHTML = `<strong>${this.capitalizeFirstLetter(currentEncounter)}</strong>`;
+            }
 
             sortedPokemonData.forEach((pokemon) => {
                 const { name, counts } = pokemon;

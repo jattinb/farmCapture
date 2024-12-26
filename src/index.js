@@ -106,20 +106,20 @@ ipcMain.on('reset-capture', () => {
 });
 
 ipcMain.handle('save-dialog', async () => {
-  const fileName = huntSession.fileName || 'export.csv';
+  const fileName = huntSession.fileName || 'export.json';
 
   const result = await dialog.showSaveDialog({
-    title: 'Export CSV',
+    title: 'Export JSON',
     defaultPath: fileName,
     buttonLabel: 'Export',
-    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    filters: [{ name: 'JSON Files', extensions: ['json'] }]
   });
   return result;
 });
 
 ipcMain.on('export-session', (_event, filename) => {
   if (!huntSession.isActive()) {
-    huntSession.exportSessionToCSV(filename);
+    huntSession.exportSessionToJSON(filename);
   } else {
     console.log('Cannot export session: It is running.');
   }
@@ -128,9 +128,9 @@ ipcMain.on('export-session', (_event, filename) => {
 // Handle open file dialog
 ipcMain.handle('open-file-dialog', async () => {
   const result = await dialog.showOpenDialog({
-    title: 'Import CSV',
+    title: 'Import JSON',
     buttonLabel: 'Import',
-    filters: [{ name: 'CSV Files', extensions: ['csv'] }],
+    filters: [{ name: 'JSON Files', extensions: ['json'] }],
     properties: ['openFile']
   });
   return result;
@@ -138,22 +138,16 @@ ipcMain.handle('open-file-dialog', async () => {
 
 ipcMain.on('import-session', (_event, filePath) => {
   if (!huntSession.isActive()) {
-    const importedData = [];
-    console.log(filePath);
-    fs.createReadStream(filePath)
-      .pipe(csvParser())
-      .on('data', (row) => {
-        importedData.push(row);
-      })
-      .on('end', () => {
-        huntSession.importSessionFromCSV(importedData);
-        mainWindow.webContents.send('import-complete', importedData);
-        huntSession.fileName = extractFileName(filePath);
-      })
-      .on('error', (err) => {
-        console.error('Error reading CSV file:', err);
-        mainWindow.webContents.send('import-failed');
-      });
+    try {
+      const data = fs.readFileSync(filePath, 'utf8');
+      const jsonData = JSON.parse(data);
+      huntSession.importSessionFromJSON(jsonData);
+      mainWindow.webContents.send('import-complete', jsonData);
+      huntSession.fileName = extractFileName(filePath);
+    } catch (err) {
+      console.error('Error reading JSON file:', err);
+      mainWindow.webContents.send('import-failed');
+    }
   } else {
     console.log('Cannot import session: It is running.');
   }
@@ -162,8 +156,8 @@ ipcMain.on('import-session', (_event, filePath) => {
 function extractFileName(filePath) {
   // Extract the file name from the path
   const fullFileName = filePath.split(path.sep).pop();
-  // Remove the .csv extension
-  const fileName = fullFileName.replace('.csv', '');
+  // Remove the .json extension
+  const fileName = fullFileName.replace('.json', '');
   return fileName;
 }
 

@@ -292,6 +292,41 @@ class HuntSession extends EventEmitter {
         });
     }
 
+    // Export session data to JSON
+    exportSessionToJSON(filename) {
+        const sessionData = {
+            pokemonCounts: this.pokemonCounts,
+            wildCount: this.wildCount,
+            elapsedTime: this.timer.elapsedTime,
+        };
+
+        const json = JSON.stringify(sessionData, null, 2);
+        const filePath = `${filename}`;
+
+        try {
+            fs.writeFileSync(filePath, json);
+            console.log(`Session data exported to JSON: ${filePath}`);
+        } catch (err) {
+            console.error('Error exporting session to JSON:', err);
+        }
+    }
+
+    // Import session data from JSON
+    importSessionFromJSON(data) {
+        this.reset();
+        if (data.elapsedTime) {
+            this.timer.loadTime(data.elapsedTime);
+        }
+        this.pokemonCounts = data.pokemonCounts || {};
+        this.wildCount = data.wildCount || 0;
+
+        this.emit('update-count', {
+            currPoke: null,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
+    }
+
     // Method to check if a hunting session is active
     isActive() {
         return !!this.intervalID;
