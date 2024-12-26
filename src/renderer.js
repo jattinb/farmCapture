@@ -78,7 +78,7 @@ class App {
         });
     }
 
-    updateUI() {
+    updateButtonsState() {
         if (this.appState.isSetupInProgress) {
             this.toggleButtons(true, ['action', 'setup', 'reset', 'importExport', 'capture']);
         } else if (!this.appState.hasSetupRun) {
@@ -116,7 +116,7 @@ class App {
         }
 
         this.updateStatus(this.appState.isCaptureActive);
-        this.updateUI();
+        this.updateButtonsState();
 
         // Re-enable the button after a short delay to ensure operation completes
         setTimeout(() => {
@@ -146,7 +146,7 @@ class App {
                     setupButton.classList.add('button-loading');
                     setupButton.textContent = 'Working...';
                 }
-                this.updateUI();
+                this.updateButtonsState();
                 ipcRenderer.send('setup'); // Send IPC event to trigger setup process in main.js
             }
         });
@@ -233,7 +233,7 @@ class App {
             // }
 
             // Initial UI update based on the initial state
-            this.updateUI();
+            this.updateButtonsState();
 
             // Adjust window height on initial load
             this.adjustWindowHeight();
@@ -245,19 +245,19 @@ class App {
         // IPC event handler for updating the table
         ipcRenderer.on('update-count', (event, data) => {
             this.updatePokemonTable(data.pokemonCounts, data.currPoke, data.wildCount);
-            this.updateUI()
+            this.updateButtonsState()
         });
 
         // IPC event handlers for setup process
         ipcRenderer.on('setup-start', () => {
             this.appState.isSetupInProgress = true;
-            this.updateUI();
+            this.updateButtonsState();
         }); // Disable all controls during setup
 
         ipcRenderer.on('setup-complete', () => {
             this.appState.isSetupInProgress = false;
             this.appState.hasSetupRun = true;
-            this.updateUI();
+            this.updateButtonsState();
             this.resetSetupButton();
             this.displayMessage('setupSuccess');
             console.log('Setup complete');
@@ -265,7 +265,7 @@ class App {
 
         ipcRenderer.on('setup-failed', (event, data) => {
             this.appState.isSetupInProgress = false;
-            this.updateUI();
+            this.updateButtonsState();
             this.resetSetupButton();
             this.displayMessage('setupFailed', data);
             console.log('Setup failed', data);
