@@ -420,7 +420,7 @@ tr.current-pokemon td {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #ccc; /* Default grey color for disabled state */
     transition: .4s;
     border-radius: 34px;
 }
@@ -438,11 +438,19 @@ tr.current-pokemon td {
 }
 
 .knob:checked + .knob-slider {
-    background-color: #4CAF50;
+    background-color: #4CAF50; /* Green color when enabled */
 }
 
 .knob:checked + .knob-slider:before {
     transform: translateX(26px);
+}
+
+.knob:not(:checked):not(:disabled) + .knob-slider {
+    background-color: #f44336; /* Red color when off */
+}
+
+.knob:disabled + .knob-slider {
+    background-color: #ccc; /* Grey color when disabled */
 }
 
 .button-icon {
