@@ -39,6 +39,7 @@ module.exports = {
                 { from: 'src/preload.js', to: 'preload.js' }, // Copy preload script
                 { from: 'src/renderer.js', to: 'renderer.js' }, // Copy renderer script
                 { from: 'src/pokemon_names.csv', to: 'pokemon_names.csv' }, // Copy pokemon names list
+                { from: 'src/icons/delete.png', to: 'icons/delete.png' }, // Copy icons directory
             ],
         }),
         // Uncomment if you want to use obfuscation

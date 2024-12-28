@@ -30,7 +30,10 @@
       }
     ],
     "asarUnpack": [
-      "dist/pokemon_names.csv"
+      "dist/pokemon_names.csv",
+      "dist/icons/upload.png",
+      "dist/icons/download.png",
+      "dist/icons/delete.png"
     ],
     "directories": {
       "output": "release"
