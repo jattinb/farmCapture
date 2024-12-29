@@ -40,6 +40,8 @@ module.exports = {
                 { from: 'src/renderer.js', to: 'renderer.js' }, // Copy renderer script
                 { from: 'src/pokemon_names.csv', to: 'pokemon_names.csv' }, // Copy pokemon names list
                 { from: 'src/icons/delete.png', to: 'icons/delete.png' }, // Copy icons directory
+                { from: 'src/icons/upload.png', to: 'icons/upload.png' }, // Copy icons directory
+                { from: 'src/icons/download.png', to: 'icons/download.png' }, // Copy icons directory
             ],
         }),
         // Uncomment if you want to use obfuscation
