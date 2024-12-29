@@ -122,6 +122,15 @@ class HuntSession extends EventEmitter {
         this.emit('noEncounter');
     }
 
+    sortPokemonCounts() {
+        return Object.entries(this.pokemonCounts)
+            .sort(([, b], [, a]) => b.total - a.total)
+            .reduce((acc, [name, counts]) => {
+                acc[name] = counts;
+                return acc;
+            }, {});
+    }
+
     handleEncounter(curPoke) {
         let validPoke = curPoke;
 
@@ -153,20 +162,12 @@ class HuntSession extends EventEmitter {
         console.log(`Total encounters: ${this.wildCount}`);
         console.log('Pokemon counts:', this.pokemonCounts);
 
-        // Sort the pokemonCounts by total encounters in descending order
-        const sortedPokemonCounts = Object.entries(this.pokemonCounts)
-            .sort(([, b], [, a]) => b.total - a.total)
-            .reduce((acc, [name, counts]) => {
-                acc[name] = counts;
-                return acc;
-            }, {});
-
-        this.pokemonCounts = sortedPokemonCounts;
+        this.pokemonCounts = this.sortPokemonCounts();
 
         this.emit('newEncounter', {
             currPoke: this.currPoke,
             wildCount: this.wildCount,
-            pokemonCounts: sortedPokemonCounts,
+            pokemonCounts: this.pokemonCounts,
         });
     }
 
@@ -295,15 +296,25 @@ class HuntSession extends EventEmitter {
             this.wildCount += parseInt(total, 10);
         });
 
-        // Sort the pokemonCounts by total encounters in descending order
-        const sortedPokemonCounts = Object.entries(this.pokemonCounts)
-            .sort(([, a], [, b]) => b.total - a.total)
-            .reduce((acc, [name, counts]) => {
-                acc[name] = counts;
-                return acc;
-            }, {});
+        this.pokemonCounts = this.sortPokemonCounts();
 
-        this.pokemonCounts = sortedPokemonCounts;
+        this.emit('update-count', {
+            currPoke: null,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
+    }
+
+    // Import session data from JSON
+    importSessionFromJSON(data) {
+        this.reset();
+        if (data.elapsedTime) {
+            this.timer.loadTime(data.elapsedTime);
+        }
+        this.pokemonCounts = data.pokemonCounts || {};
+        this.wildCount = data.wildCount || 0;
+
+        this.pokemonCounts = this.sortPokemonCounts();
 
         this.emit('update-count', {
             currPoke: null,
@@ -329,32 +340,6 @@ class HuntSession extends EventEmitter {
         } catch (err) {
             console.error('Error exporting session to JSON:', err);
         }
-    }
-
-    // Import session data from JSON
-    importSessionFromJSON(data) {
-        this.reset();
-        if (data.elapsedTime) {
-            this.timer.loadTime(data.elapsedTime);
-        }
-        this.pokemonCounts = data.pokemonCounts || {};
-        this.wildCount = data.wildCount || 0;
-
-        // Sort the pokemonCounts by total encounters in descending order
-        const sortedPokemonCounts = Object.entries(this.pokemonCounts)
-            .sort(([, b], [, a]) => b.total - a.total)
-            .reduce((acc, [name, counts]) => {
-                acc[name] = counts;
-                return acc;
-            }, {});
-
-        this.pokemonCounts = sortedPokemonCounts;
-
-        this.emit('update-count', {
-            currPoke: null,
-            wildCount: this.wildCount,
-            pokemonCounts: this.pokemonCounts,
-        });
     }
 
     // Method to check if a hunting session is active
