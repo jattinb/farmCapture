@@ -7,6 +7,7 @@ class App {
             isCaptureActive: false,
             isSetupInProgress: false,
             hasSetupRun: false,
+            // hasSortedOnce: false, // New state variable to track if sorting has happened
         };
         this.isProcessing = false; // Flag to prevent double-clicks
     }
@@ -361,13 +362,10 @@ class App {
 
             tableBody.innerHTML = '';
 
-            let sortedPokemonData = Object.entries(pokemonData)
+            // No need to sort here as it's already sorted in huntSession.js
+            const sortedPokemonData = Object.entries(pokemonData)
                 .map(([name, counts]) => ({ name, counts }));
 
-            // Sort by frequency only if the session is running
-            if (this.appState.isCaptureActive) {
-                sortedPokemonData = sortedPokemonData.sort((b, a) => b.counts.total - a.counts.total); // Sort by total encounters in ascending order
-            }
 
             const totalCounts = Object.values(pokemonData).reduce((totals, pokemon) => {
                 totals.m += pokemon.m;
@@ -433,7 +431,6 @@ class App {
                 const dropdownRow = this.createDropdownRow(name, counts, totalCounts, totalEncounters);
                 tableBody.appendChild(dropdownRow);
 
-
                 // Restore dropdown state if it was open before
                 if (openDropdowns[name]) {
                     dropdownRow.style.display = 'table-row';
@@ -441,7 +438,7 @@ class App {
                 }
             });
 
-            this.adjustWindowHeight()
+            this.adjustWindowHeight();
         }
     }
 

@@ -153,10 +153,20 @@ class HuntSession extends EventEmitter {
         console.log(`Total encounters: ${this.wildCount}`);
         console.log('Pokemon counts:', this.pokemonCounts);
 
+        // Sort the pokemonCounts by total encounters in descending order
+        const sortedPokemonCounts = Object.entries(this.pokemonCounts)
+            .sort(([, b], [, a]) => b.total - a.total)
+            .reduce((acc, [name, counts]) => {
+                acc[name] = counts;
+                return acc;
+            }, {});
+
+        this.pokemonCounts = sortedPokemonCounts;
+
         this.emit('newEncounter', {
             currPoke: this.currPoke,
             wildCount: this.wildCount,
-            pokemonCounts: this.pokemonCounts,
+            pokemonCounts: sortedPokemonCounts,
         });
     }
 
@@ -285,6 +295,16 @@ class HuntSession extends EventEmitter {
             this.wildCount += parseInt(total, 10);
         });
 
+        // Sort the pokemonCounts by total encounters in descending order
+        const sortedPokemonCounts = Object.entries(this.pokemonCounts)
+            .sort(([, a], [, b]) => b.total - a.total)
+            .reduce((acc, [name, counts]) => {
+                acc[name] = counts;
+                return acc;
+            }, {});
+
+        this.pokemonCounts = sortedPokemonCounts;
+
         this.emit('update-count', {
             currPoke: null,
             wildCount: this.wildCount,
@@ -319,6 +339,16 @@ class HuntSession extends EventEmitter {
         }
         this.pokemonCounts = data.pokemonCounts || {};
         this.wildCount = data.wildCount || 0;
+
+        // Sort the pokemonCounts by total encounters in descending order
+        const sortedPokemonCounts = Object.entries(this.pokemonCounts)
+            .sort(([, b], [, a]) => b.total - a.total)
+            .reduce((acc, [name, counts]) => {
+                acc[name] = counts;
+                return acc;
+            }, {});
+
+        this.pokemonCounts = sortedPokemonCounts;
 
         this.emit('update-count', {
             currPoke: null,
