@@ -6,14 +6,10 @@ class App {
         this.appState = {
             isCaptureActive: false,
             isSetupInProgress: false,
-            hasSetupRun: false,
-            // hasSortedOnce: false, // New state variable to track if sorting has happened
+            hasSetupRun: false
         };
-        this.isProcessing = false; // Flag to prevent double-clicks
+        this.isProcessing = false;
     }
-
-    // Utility Functions
-    // -----------------
 
     displayMessage(messageId) {
         const messageElement = document.getElementById(messageId);
@@ -42,9 +38,6 @@ class App {
             setupButton.textContent = 'Setup';
         }
     }
-
-    // Button Toggle Functions
-    // -----------------------
 
     toggleButtons(disable, buttonTypes) {
         buttonTypes.forEach(type => {
@@ -218,45 +211,12 @@ class App {
                 console.warn('Element with ID "toggleKnob" not found.');
             }
 
-            // Remove compact mode event listener
-            // const compactBtn = document.getElementById('toggleCompact');
-            // if (compactBtn) {
-            //     let isCompact = false;
-
-            //     // Initialize the button text
-            //     compactBtn.textContent = isCompact ? 'Original' : 'Compact';
-
-            //     compactBtn.addEventListener('click', () => {
-            //         isCompact = !isCompact;
-            //         ipcRenderer.send('toggle-size', isCompact);
-
-            //         // Toggle CSS class on the body or main container
-            //         const body = document.body; // Or another container element
-            //         if (body) {
-            //             if (isCompact) {
-            //                 body.classList.add('compact-mode');
-            //                 compactBtn.textContent = 'Original';
-            //             } else {
-            //                 body.classList.remove('compact-mode');
-            //                 compactBtn.textContent = 'Compact';
-            //             }
-            //         } else {
-            //             console.warn('Body element not found.');
-            //         }
-            //     });
-            // } else {
-            //     console.warn('Element with ID "toggleCompact" not found.');
-            // }
-
             // Initial UI update based on the initial state
             this.updateButtonsState();
 
             // Adjust window height on initial load
             this.adjustWindowHeight();
         });
-
-        // IPC Event Handlers
-        // ------------------
 
         // IPC event handler for updating the table
         ipcRenderer.on('update-count', (event, data) => {
