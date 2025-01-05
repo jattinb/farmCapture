@@ -122,6 +122,15 @@ class HuntSession extends EventEmitter {
         this.emit('noEncounter');
     }
 
+    sortPokemonCounts() {
+        return Object.entries(this.pokemonCounts)
+            .sort(([, b], [, a]) => b.total - a.total)
+            .reduce((acc, [name, counts]) => {
+                acc[name] = counts;
+                return acc;
+            }, {});
+    }
+
     handleEncounter(curPoke) {
         let validPoke = curPoke;
 
@@ -152,6 +161,8 @@ class HuntSession extends EventEmitter {
         console.log(`Detected new "wild ${validPoke}" encounter.`);
         console.log(`Total encounters: ${this.wildCount}`);
         console.log('Pokemon counts:', this.pokemonCounts);
+
+        this.pokemonCounts = this.sortPokemonCounts();
 
         this.emit('newEncounter', {
             currPoke: this.currPoke,
@@ -285,11 +296,50 @@ class HuntSession extends EventEmitter {
             this.wildCount += parseInt(total, 10);
         });
 
+        this.pokemonCounts = this.sortPokemonCounts();
+
         this.emit('update-count', {
             currPoke: null,
             wildCount: this.wildCount,
             pokemonCounts: this.pokemonCounts,
         });
+    }
+
+    // Import session data from JSON
+    importSessionFromJSON(data) {
+        this.reset();
+        if (data.elapsedTime) {
+            this.timer.loadTime(data.elapsedTime);
+        }
+        this.pokemonCounts = data.pokemonCounts || {};
+        this.wildCount = data.wildCount || 0;
+
+        this.pokemonCounts = this.sortPokemonCounts();
+
+        this.emit('update-count', {
+            currPoke: null,
+            wildCount: this.wildCount,
+            pokemonCounts: this.pokemonCounts,
+        });
+    }
+
+    // Export session data to JSON
+    exportSessionToJSON(filename) {
+        const sessionData = {
+            pokemonCounts: this.pokemonCounts,
+            wildCount: this.wildCount,
+            elapsedTime: this.timer.elapsedTime,
+        };
+
+        const json = JSON.stringify(sessionData, null, 2);
+        const filePath = `${filename}`;
+
+        try {
+            fs.writeFileSync(filePath, json);
+            console.log(`Session data exported to JSON: ${filePath}`);
+        } catch (err) {
+            console.error('Error exporting session to JSON:', err);
+        }
     }
 
     // Method to check if a hunting session is active

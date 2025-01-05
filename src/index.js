@@ -20,8 +20,8 @@ let listenersAttached = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 450,
-    height: 700,
+    width: 400,
+    height: 300,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -106,20 +106,20 @@ ipcMain.on('reset-capture', () => {
 });
 
 ipcMain.handle('save-dialog', async () => {
-  const fileName = huntSession.fileName || 'export.csv';
+  const fileName = huntSession.fileName || 'export.json';
 
   const result = await dialog.showSaveDialog({
-    title: 'Export CSV',
+    title: 'Export JSON',
     defaultPath: fileName,
     buttonLabel: 'Export',
-    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    filters: [{ name: 'JSON Files', extensions: ['json'] }]
   });
   return result;
 });
 
 ipcMain.on('export-session', (_event, filename) => {
   if (!huntSession.isActive()) {
-    huntSession.exportSessionToCSV(filename);
+    huntSession.exportSessionToJSON(filename);
   } else {
     console.log('Cannot export session: It is running.');
   }
@@ -128,9 +128,9 @@ ipcMain.on('export-session', (_event, filename) => {
 // Handle open file dialog
 ipcMain.handle('open-file-dialog', async () => {
   const result = await dialog.showOpenDialog({
-    title: 'Import CSV',
+    title: 'Import JSON',
     buttonLabel: 'Import',
-    filters: [{ name: 'CSV Files', extensions: ['csv'] }],
+    filters: [{ name: 'JSON Files', extensions: ['json'] }],
     properties: ['openFile']
   });
   return result;
@@ -138,22 +138,16 @@ ipcMain.handle('open-file-dialog', async () => {
 
 ipcMain.on('import-session', (_event, filePath) => {
   if (!huntSession.isActive()) {
-    const importedData = [];
-    console.log(filePath);
-    fs.createReadStream(filePath)
-      .pipe(csvParser())
-      .on('data', (row) => {
-        importedData.push(row);
-      })
-      .on('end', () => {
-        huntSession.importSessionFromCSV(importedData);
-        mainWindow.webContents.send('import-complete', importedData);
-        huntSession.fileName = extractFileName(filePath);
-      })
-      .on('error', (err) => {
-        console.error('Error reading CSV file:', err);
-        mainWindow.webContents.send('import-failed');
-      });
+    try {
+      const data = fs.readFileSync(filePath, 'utf8');
+      const jsonData = JSON.parse(data);
+      huntSession.importSessionFromJSON(jsonData);
+      mainWindow.webContents.send('import-complete', jsonData);
+      huntSession.fileName = extractFileName(filePath);
+    } catch (err) {
+      console.error('Error reading JSON file:', err);
+      mainWindow.webContents.send('import-failed');
+    }
   } else {
     console.log('Cannot import session: It is running.');
   }
@@ -162,8 +156,8 @@ ipcMain.on('import-session', (_event, filePath) => {
 function extractFileName(filePath) {
   // Extract the file name from the path
   const fullFileName = filePath.split(path.sep).pop();
-  // Remove the .csv extension
-  const fileName = fullFileName.replace('.csv', '');
+  // Remove the .json extension
+  const fileName = fullFileName.replace('.json', '');
   return fileName;
 }
 
@@ -187,14 +181,14 @@ function attachListeners() {
       mainWindow.webContents.send('update-timer', { timeString, timeOfDay });
     });
 
-    huntSession.on('update-count', (timeString) => {
-      mainWindow.webContents.send('update-count', timeString);
+    huntSession.on('update-count', (data) => {
+      console.log('update-count event:', data);
+      mainWindow.webContents.send('update-count', data);
     });
 
     listenersAttached = true; // Set flag to true after attaching listeners
   }
 }
-
 // Toggle always on top
 ipcMain.on('toggle-always-on-top', () => {
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
@@ -202,9 +196,20 @@ ipcMain.on('toggle-always-on-top', () => {
   mainWindow.webContents.send('always-on-top-toggled', !isAlwaysOnTop);
 });
 
-ipcMain.on('toggle-size', (_event, isCompact) => {
+ipcMain.on('adjust-window-height', (_event, newHeight) => {
   const [currentWidth, currentHeight] = mainWindow.getSize();
-  mainWindow.setSize(isCompact ? 340 : 450, isCompact ? currentHeight - 200 : currentHeight + 200);
+  const [currentX, currentY] = mainWindow.getPosition();
+
+  // Only update the window height if the difference is significant
+  const heightDifference = Math.abs(newHeight - (currentHeight - 50));
+  if (heightDifference > 10) { // Adjust the threshold as needed
+    mainWindow.setBounds({
+      x: currentX,
+      y: currentY,
+      width: currentWidth,
+      height: newHeight + 50
+    });
+  }
 });
 
 // ipcMain handlers
