@@ -39,7 +39,7 @@ function findPokemon(name, pokemonList) {
     }
 
     // Otherwise, return the closest match
-    return topMatches[0].item;
+    return topMatches[0].item.replace(/\s+/g, '-');
 }
 
 module.exports = { findPokemon };
