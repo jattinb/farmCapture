@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron');
 
+const audio = new Audio('./pokemon-battle.mp3');
+
 class App {
     constructor() {
         this.dropdownState = {};
@@ -265,6 +267,11 @@ class App {
             console.log('Import complete:', importedData);
             this.displayMessage('importSuccess'); // Display a success message
             this.adjustWindowHeight(); // Adjust window height after import
+        });
+
+        ipcRenderer.on('target-found', (_event, data) => {
+            // Play an attention-grabbing sound
+            audio.play();
         });
 
         ipcRenderer.on('update-timer', (_event, data) => {

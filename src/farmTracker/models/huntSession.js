@@ -35,6 +35,7 @@ class HuntSession extends EventEmitter {
         this.huntingDisplayId = null;
         this.wildCount = 0;
         this.pokemonCounts = {}; // Structure: { pokemonName: { total: 0, m: 0, d: 0, n: 0 } }
+        this.targetPoke = new Set();
         this.timer = Timer.getInstance();
         this.intervalID = null;
         this.isLastScreenEncounter = false;
@@ -163,6 +164,12 @@ class HuntSession extends EventEmitter {
         console.log('Pokemon counts:', this.pokemonCounts);
 
         this.pokemonCounts = this.sortPokemonCounts();
+
+        if (this.targetPoke.includes(this.currPoke)) {
+            this.emit('targetFound', {
+                targetPoke: this.currPoke
+            });
+        }
 
         this.emit('newEncounter', {
             currPoke: this.currPoke,
