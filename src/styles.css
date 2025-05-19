@@ -477,3 +477,19 @@ tr.current-pokemon td {
     gap: 0px;
     width: 35%;
 }
+
+.sound-btn {
+    border: none;
+    background: transparent;
+    /* font-size: 1.2em; */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.sound-btn.active {
+    color: green;
+}
+
+.sound-btn.muted {
+    color: red;
+}

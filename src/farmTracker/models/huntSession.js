@@ -165,7 +165,7 @@ class HuntSession extends EventEmitter {
 
         this.pokemonCounts = this.sortPokemonCounts();
 
-        if (this.targetPoke.includes(this.currPoke)) {
+        if (this.targetPoke.has(this.currPoke)) {
             this.emit('targetFound', {
                 targetPoke: this.currPoke
             });

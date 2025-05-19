@@ -286,3 +286,19 @@ ipcMain.on('delete-pokemon', (event, name) => {
     sendUpdatedCount(event, name);
   }
 });
+
+ipcMain.on('toggle-sound-state', (event, { name, muted }) => {
+  if (!huntSession.targetPoke) {
+    huntSession.targetPoke = new Set();
+  }
+
+  if (muted) {
+    // If muted, remove from targetPoke set
+    huntSession.targetPoke.delete(name);
+    console.log(`Removed ${name} from targetPoke (muted)`);
+  } else {
+    // If unmuted, add to targetPoke set
+    huntSession.targetPoke.add(name);
+    console.log(`Added ${name} to targetPoke (unmuted)`);
+  }
+});

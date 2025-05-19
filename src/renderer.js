@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-const audio = new Audio('./pokemon-battle.mp3');
+const audio = new Audio('./battle.mp3');
 
 class App {
     constructor() {
@@ -378,6 +378,24 @@ class App {
                 deleteBtn.disabled = this.appState.isCaptureActive;
                 deleteBtn.addEventListener('click', () => this.deletePokemon(name));
 
+                console.log('Adding sound button for:', name);
+                const soundBtn = document.createElement('button');
+                soundBtn.classList.add('muted');
+                soundBtn.classList.remove('active');
+                soundBtn.textContent = '🔇';
+                soundBtn.classList.add('button', 'sound-btn', 'button-action');
+
+                // Add toggle behavior
+                soundBtn.addEventListener('click', () => {
+                    const isMuted = soundBtn.classList.toggle('muted');
+                    soundBtn.textContent = isMuted ? '🔇' : '🔊';
+                    soundBtn.classList.toggle('active', !isMuted);
+
+                    // Optional: Send state to backend
+                    ipcRenderer.send('toggle-sound-state', { name, muted: isMuted });
+                });
+
+                actionCell.appendChild(soundBtn);
                 actionCell.appendChild(expandBtn);
                 actionCell.appendChild(deleteBtn);
 
